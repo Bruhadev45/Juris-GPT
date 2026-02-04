@@ -1,0 +1,52 @@
+{
+  "builder_name": "csv",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "indian-legal",
+  "dataset_size": 213278426,
+  "description": "",
+  "download_checksums": {
+    "hf://datasets/ninadn/indian-legal@53caca6a4b53d8ec44d184584f41108f6719a108/train.csv": {
+      "num_bytes": 210207848,
+      "checksum": null
+    },
+    "hf://datasets/ninadn/indian-legal@53caca6a4b53d8ec44d184584f41108f6719a108/test.csv": {
+      "num_bytes": 3263388,
+      "checksum": null
+    }
+  },
+  "download_size": 213471236,
+  "features": {
+    "Text": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "Summary": {
+      "dtype": "string",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 426749662,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 210018091,
+      "num_examples": 7030,
+      "dataset_name": "indian-legal"
+    },
+    "test": {
+      "name": "test",
+      "num_bytes": 3260335,
+      "num_examples": 100,
+      "dataset_name": "indian-legal"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}

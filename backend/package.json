@@ -1,0 +1,9 @@
+{
+  "name": "jurisgpt-api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "if [ -d 'venv' ]; then source venv/bin/activate && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000; else echo 'Please run: bash setup.sh first to set up Python environment'; fi",
+    "start": "source venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+  }
+}

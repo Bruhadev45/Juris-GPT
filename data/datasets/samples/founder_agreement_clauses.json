@@ -1,0 +1,17 @@
+[
+  {
+    "clause_type": "Vesting Schedule",
+    "standard_terms": "4-year vesting with 1-year cliff",
+    "sample_text": "Each Founder equity shall vest over 48 months, with 12-month cliff. At cliff, 25% vests immediately, remaining 75% vests monthly over 36 months."
+  },
+  {
+    "clause_type": "Non-Compete",
+    "standard_terms": "12-24 months post-employment",
+    "sample_text": "During this Agreement and for 12 months following termination, Founder shall not engage in competing business within India."
+  },
+  {
+    "clause_type": "IP Assignment",
+    "standard_terms": "All work product belongs to company",
+    "sample_text": "Founder assigns to Company all right, title and interest in all Inventions and IP created during the term of this Agreement."
+  }
+]

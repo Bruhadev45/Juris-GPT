@@ -1,0 +1,152 @@
+{
+  "apis": {
+    "openai": {
+      "name": "OpenAI API",
+      "description": "GPT-4 for legal document generation and RAG responses",
+      "base_url": "https://api.openai.com/v1",
+      "documentation": "https://platform.openai.com/docs",
+      "signup": "https://platform.openai.com/signup",
+      "api_key_page": "https://platform.openai.com/api-keys",
+      "models_used": [
+        "gpt-4o-mini (RAG responses)",
+        "gpt-4o (document generation)",
+        "text-embedding-3-small (embeddings)"
+      ],
+      "pricing": "Pay per token - ~$0.15/1M input tokens for GPT-4o-mini",
+      "required": true,
+      "env_var": "OPENAI_API_KEY"
+    },
+    "indian_kanoon": {
+      "name": "Indian Kanoon API",
+      "description": "India's largest legal database with SC/HC judgments and statutes",
+      "base_url": "https://api.indiankanoon.org",
+      "documentation": "https://api.indiankanoon.org/documentation/",
+      "signup": "https://api.indiankanoon.org",
+      "endpoints": {
+        "search": "/search/?formInput={query}&pagenum={page}",
+        "document": "/doc/{doc_id}/",
+        "document_fragments": "/docfragment/{doc_id}/?formInput={query}",
+        "cite_check": "/citecheck/{doc_id}/"
+      },
+      "features": [
+        "Full-text legal search",
+        "Supreme Court judgments",
+        "High Court judgments (all 25 courts)",
+        "Tribunal decisions",
+        "Central and State Acts",
+        "Structural analysis (Facts, Issues, Arguments)",
+        "Citation analysis",
+        "AI-powered tags"
+      ],
+      "pricing": "Contact for pricing - educational/research tiers may be available",
+      "required": false,
+      "env_var": "INDIAN_KANOON_API_KEY"
+    },
+    "kaggle": {
+      "name": "Kaggle API",
+      "description": "Download datasets from Kaggle",
+      "base_url": "https://www.kaggle.com/api/v1",
+      "documentation": "https://www.kaggle.com/docs/api",
+      "signup": "https://www.kaggle.com/account/login",
+      "api_key_page": "https://www.kaggle.com/settings",
+      "setup_instructions": [
+        "1. Go to https://www.kaggle.com/settings",
+        "2. Scroll to API section",
+        "3. Click 'Create New Token'",
+        "4. Download kaggle.json",
+        "5. Place in ~/.kaggle/kaggle.json",
+        "6. Run: chmod 600 ~/.kaggle/kaggle.json"
+      ],
+      "datasets_to_download": [
+        "rowhitswami/all-indian-companies-registration-data-1900-2019",
+        "adarshsingh0903/legal-dataset-sc-judgments-india-19502024",
+        "vangap/indian-supreme-court-judgments",
+        "anshtanwar/list-of-startups"
+      ],
+      "pricing": "Free",
+      "required": false,
+      "env_var": "KAGGLE_KEY"
+    },
+    "huggingface": {
+      "name": "Hugging Face API",
+      "description": "Access ML models and datasets",
+      "base_url": "https://huggingface.co",
+      "documentation": "https://huggingface.co/docs",
+      "api_key_page": "https://huggingface.co/settings/tokens",
+      "datasets_to_download": [
+        "vihaannnn/Indian-Supreme-Court-Judgements-Chunked",
+        "ninadn/indian-legal"
+      ],
+      "models_used": [
+        "sentence-transformers/all-MiniLM-L6-v2 (free embeddings)"
+      ],
+      "pricing": "Free for public datasets and models",
+      "required": false,
+      "env_var": "HUGGINGFACE_TOKEN"
+    },
+    "instafinancials": {
+      "name": "InstaFinancials API",
+      "description": "Real-time Indian company data from MCA",
+      "base_url": "https://api.instafinancials.com",
+      "documentation": "https://api.instafinancials.com/",
+      "signup": "https://api.instafinancials.com/",
+      "endpoints": {
+        "company_master": "/api/company/{cin}",
+        "director_info": "/api/director/{din}",
+        "company_search": "/api/search?name={company_name}"
+      },
+      "features": [
+        "Company Master Data",
+        "Director Information (DIN)",
+        "CIN Verification",
+        "Company Status",
+        "Financial Statements"
+      ],
+      "pricing": "Free tier available",
+      "required": false,
+      "env_var": "INSTAFINANCIALS_API_KEY"
+    }
+  },
+  "free_datasets": {
+    "data_gov_in": {
+      "name": "data.gov.in - Company Master Data",
+      "url": "https://www.data.gov.in/catalog/company-master-data",
+      "description": "Official MCA company registration data (17M+ companies)",
+      "format": "CSV (ZIP compressed)",
+      "requires_api": false,
+      "manual_download": true
+    },
+    "aws_open_data": {
+      "name": "AWS Open Data - Indian High Court Judgments",
+      "url": "https://registry.opendata.aws/indian-high-court-judgments/",
+      "description": "Judgments from 25 High Courts",
+      "format": "JSON + Parquet",
+      "requires_api": false,
+      "bulk_download": true
+    },
+    "ecourts": {
+      "name": "eCourts Judgment Portal",
+      "url": "https://judgments.ecourts.gov.in",
+      "description": "Official High Court judgments",
+      "format": "Web search only",
+      "requires_api": false,
+      "manual_download": true
+    },
+    "zenodo": {
+      "name": "Zenodo - Central Acts Dataset",
+      "url": "https://zenodo.org/records/5088102",
+      "description": "858 annotated Central Acts (1838-2020)",
+      "format": "JSON",
+      "requires_api": false,
+      "direct_download": true
+    },
+    "github_indian_law": {
+      "name": "GitHub - Indian Law JSON",
+      "url": "https://github.com/civictech-India/Indian-Law-Penal-Code-Json",
+      "description": "IPC, Motor Vehicles Act, and more in JSON",
+      "format": "JSON + SQLite",
+      "requires_api": false,
+      "direct_download": true
+    }
+  }
+}

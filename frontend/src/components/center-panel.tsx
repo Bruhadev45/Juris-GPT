@@ -1,0 +1,190 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import {
+  Search,
+  FileText,
+  FileSearch,
+  Plus,
+  SlidersHorizontal,
+  ArrowUp,
+  Bell,
+  ShieldCheck,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
+interface ActionCard {
+  icon: React.ElementType;
+  title: string;
+  description: string;
+}
+
+const actionCards: ActionCard[] = [
+  {
+    icon: Search,
+    title: "Research Case Law",
+    description: "Search Supreme Court, High Courts & Tribunal judgments",
+  },
+  {
+    icon: FileText,
+    title: "Draft Document",
+    description: "Create legal notices, petitions, contracts & opinions",
+  },
+  {
+    icon: FileSearch,
+    title: "Analyze Document",
+    description: "Extract key points, risks & obligations from documents",
+  },
+];
+
+interface CenterPanelProps {
+  sidebarCollapsed?: boolean;
+  onToggleSidebar?: () => void;
+}
+
+export function CenterPanel({
+  sidebarCollapsed,
+  onToggleSidebar,
+}: CenterPanelProps) {
+  const [input, setInput] = useState("");
+  const [greeting, setGreeting] = useState("Good morning");
+
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting("Good morning");
+    else if (hour < 17) setGreeting("Good afternoon");
+    else setGreeting("Good evening");
+  }, []);
+
+  const handleSubmit = () => {
+    if (!input.trim()) return;
+    setInput("");
+  };
+
+  return (
+    <div className="flex h-full flex-1 flex-col bg-background">
+      {/* Header */}
+      <header className="flex items-center justify-between border-b border-border/50 bg-background/50 backdrop-blur-sm px-6 py-4">
+        <div className="flex items-center gap-3">
+          {sidebarCollapsed && (
+            <button
+              onClick={onToggleSidebar}
+              className="mr-2 rounded-lg p-2 text-muted-foreground hover:bg-secondary hover:text-primary transition-colors"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            </button>
+          )}
+          <span className="text-[15px] font-semibold text-foreground/80">
+            New chat
+          </span>
+        </div>
+        <div className="flex items-center gap-4">
+          <button className="relative rounded-full p-2 text-muted-foreground/70 hover:bg-secondary hover:text-primary transition-all">
+            <Bell className="h-5 w-5" />
+            <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-primary" />
+          </button>
+          <Avatar className="h-9 w-9 cursor-pointer border-2 border-primary/10 transition-transform hover:scale-105">
+            <AvatarFallback className="bg-primary text-white text-sm font-bold">
+              S
+            </AvatarFallback>
+          </Avatar>
+        </div>
+      </header>
+
+      {/* Main content area */}
+      <div className="flex flex-1 flex-col items-center justify-center px-6">
+        <div className="w-full max-w-2xl">
+          {/* Greeting */}
+          <div className="mb-10 text-center">
+            <h1 className="text-4xl font-bold tracking-tight">
+              <span className="text-primary/80">{greeting} Shankar,</span>
+            </h1>
+            <h2 className="mt-2 text-4xl font-bold tracking-tight text-foreground/80">
+              How can I help you today?
+            </h2>
+          </div>
+
+            {/* Action cards */}
+            <div className="mb-8 grid grid-cols-3 gap-5">
+              {actionCards.map((card, idx) => {
+                const Icon = card.icon;
+                return (
+                  <button
+                    key={idx}
+                    className="group flex flex-col items-start rounded-2xl border border-border bg-card p-5 text-left transition-all hover:border-primary/20 hover:shadow-md"
+                  >
+                    <Icon className="mb-4 h-7 w-7 text-primary/70 group-hover:text-primary transition-colors" />
+                    <h3 className="mb-1.5 text-[15px] font-semibold text-primary">
+                      {card.title}
+                    </h3>
+                    <p className="text-[13px] leading-relaxed text-muted-foreground/80">
+                      {card.description}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+
+          {/* Input area */}
+          <div className="rounded-3xl border border-border/60 bg-card p-5 shadow-lg shadow-primary/5">
+            <Textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Ask a legal question, search for cases, or describe a document you need..."
+              className="min-h-[100px] resize-none border-0 bg-transparent p-0 text-[16px] placeholder:text-muted-foreground/60 focus-visible:ring-0"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmit();
+                }
+              }}
+            />
+            <div className="mt-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <button className="rounded-xl p-2.5 text-muted-foreground/70 hover:bg-secondary hover:text-primary transition-colors">
+                  <Plus className="h-5 w-5" />
+                </button>
+                <button className="rounded-xl p-2.5 text-muted-foreground/70 hover:bg-secondary hover:text-primary transition-colors">
+                  <SlidersHorizontal className="h-5 w-5" />
+                </button>
+              </div>
+              <button
+                onClick={handleSubmit}
+                disabled={!input.trim()}
+                className={cn(
+                  "flex h-11 w-11 items-center justify-center rounded-xl transition-all",
+                  input.trim()
+                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:scale-105"
+                    : "bg-secondary text-muted-foreground/50"
+                )}
+              >
+                <ArrowUp className="h-6 w-6" />
+              </button>
+            </div>
+          </div>
+
+          {/* Security notice */}
+          <div className="mt-4 flex items-center justify-center gap-2 text-sm text-primary">
+            <ShieldCheck className="h-4 w-4" />
+            <span>All chats are confidential and encrypted</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

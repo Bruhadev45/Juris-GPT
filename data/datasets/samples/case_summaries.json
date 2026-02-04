@@ -1,0 +1,18 @@
+[
+  {
+    "case_name": "Salomon v. Salomon & Co. Ltd",
+    "citation": "(1897) AC 22",
+    "court": "House of Lords",
+    "principle": "Separate Legal Entity",
+    "summary": "A company is a separate legal entity distinct from its members.",
+    "relevance": "Foundation of company law"
+  },
+  {
+    "case_name": "Tata Consultancy Services v. State of AP",
+    "citation": "(2005) 1 SCC 308",
+    "court": "Supreme Court of India",
+    "principle": "Software as Goods",
+    "summary": "Computer software on medium is goods liable to sales tax.",
+    "relevance": "Important for tech companies"
+  }
+]
