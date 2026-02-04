@@ -19,3 +19,13 @@ datasets>=2.16.0
 kaggle>=1.5.16
 unstructured>=0.12.0
 faiss-cpu>=1.7.4
+
+# Cloud Storage (optional - install based on provider)
+# For AWS S3:
+# boto3>=1.34.0
+
+# For Google Cloud Storage:
+# google-cloud-storage>=2.14.0
+
+# For Azure Blob Storage:
+# azure-storage-blob>=12.19.0
