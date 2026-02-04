@@ -76,3 +76,7 @@ pdf_env/
 *.pyc
 __pycache__/
 .pytest_cache/
+
+# Cloud storage config (contains credentials)
+data/cloud_config.json
+cloud_config.json
