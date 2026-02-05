@@ -1,14 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { Scale, FileCheck, Clock, Gavel, Shield, Zap, ArrowRight, Sparkles, CheckCircle, Users, TrendingUp, Award, BookOpen, FileText, Lock, Globe, Star, ChevronRight, X, Check, BarChart3, Target, Building2, Mail, Phone, MessageSquare, HelpCircle, AlertCircle, Eye, Key, Database, Server, Code, Rocket, Timer, DollarSign, Briefcase, Handshake, FileSearch, PenTool, Layers, Network, BarChart, ArrowUp, Send } from "lucide-react";
-import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import { Scale, FileCheck, Clock, Gavel, Shield, Zap, ArrowRight, Sparkles, CheckCircle, Award, FileText, Lock, Globe, Star, X, Database, MessageSquare, Timer, DollarSign, Layers, BarChart, ArrowUp, Send, Menu, Moon, Sun } from "lucide-react";
+import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useState, useEffect } from "react";
 
 export default function Home() {
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [showStickyCTA, setShowStickyCTA] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isDark, setIsDark] = useState(false);
   const { scrollY } = useScroll();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
@@ -23,7 +25,26 @@ export default function Home() {
   useEffect(() => {
     // Smooth scroll behavior
     document.documentElement.style.scrollBehavior = "smooth";
+    // Check system/stored theme preference
+    const stored = localStorage.getItem("theme");
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    if (stored === "dark" || (!stored && prefersDark)) {
+      document.documentElement.classList.add("dark");
+      setIsDark(true);
+    }
   }, []);
+
+  const toggleDarkMode = () => {
+    const next = !isDark;
+    setIsDark(next);
+    if (next) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/30 overflow-hidden relative">
@@ -62,6 +83,14 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Skip to Content - Accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[60] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md"
+      >
+        Skip to main content
+      </a>
+
       {/* Navigation */}
       <motion.nav
         initial={{ y: -100, opacity: 0 }}
@@ -86,7 +115,9 @@ export default function Home() {
               <span className="text-xl font-bold text-foreground">JurisGPT</span>
             </motion.div>
           </Link>
-          <div className="flex gap-4">
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-4">
             <Link
               href="/dashboard"
               className="px-4 py-2 text-foreground/70 hover:text-foreground transition-all hover:scale-105"
@@ -94,6 +125,13 @@ export default function Home() {
             >
               Dashboard
             </Link>
+            <button
+              onClick={toggleDarkMode}
+              className="p-2 text-foreground/70 hover:text-foreground hover:bg-secondary rounded-md transition-all"
+              aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
                 href="/agreements/new"
@@ -104,7 +142,56 @@ export default function Home() {
               </Link>
             </motion.div>
           </div>
+
+          {/* Mobile Menu Button */}
+          <div className="flex items-center gap-2 md:hidden">
+            <button
+              onClick={toggleDarkMode}
+              className="p-2 text-foreground/70 hover:text-foreground hover:bg-secondary rounded-md transition-all"
+              aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 text-foreground/70 hover:text-foreground hover:bg-secondary rounded-md transition-all"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileMenuOpen}
+            >
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Menu Dropdown */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+              className="md:hidden border-t border-border bg-card overflow-hidden"
+            >
+              <div className="container mx-auto px-4 py-4 flex flex-col gap-3">
+                <Link
+                  href="/dashboard"
+                  className="px-4 py-3 text-foreground/70 hover:text-foreground hover:bg-secondary rounded-md transition-all"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  href="/agreements/new"
+                  className="px-4 py-3 bg-primary text-primary-foreground rounded-md text-center font-semibold hover:shadow-lg transition-all"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Get Started
+                </Link>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.nav>
 
       {/* Sticky CTA Bar */}
@@ -170,7 +257,7 @@ export default function Home() {
       </motion.button>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-20 relative z-10">
+      <section id="main-content" className="container mx-auto px-4 py-20 relative z-10">
         <div className="max-w-6xl mx-auto">
           {/* Law-themed background image overlay */}
           <div 
@@ -1420,7 +1507,7 @@ export default function Home() {
           </div>
           <div className="border-t border-border pt-8 flex justify-between items-center">
             <p className="text-base text-muted-foreground">
-              © 2024 JurisGPT. All rights reserved.
+              © {new Date().getFullYear()} JurisGPT. All rights reserved.
             </p>
             <div className="flex gap-4">
               <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">

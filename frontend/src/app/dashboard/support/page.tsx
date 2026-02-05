@@ -42,7 +42,7 @@ const supportCategories = [
     id: "1",
     title: "Getting Started",
     icon: Book,
-    description: "Learn the basics of using Legalwork",
+    description: "Learn the basics of using JurisGPT",
     articles: 12,
   },
   {

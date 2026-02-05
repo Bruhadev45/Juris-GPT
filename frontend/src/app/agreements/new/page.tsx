@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Link from "next/link";
+import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -67,7 +68,7 @@ export default function NewAgreementPage() {
       setStep(2);
     } catch (error) {
       console.error("Failed to create company:", error);
-      alert("Failed to create company. Please try again.");
+      toast.error("Failed to create company. Please try again.");
     }
   };
 
@@ -76,7 +77,7 @@ export default function NewAgreementPage() {
 
     const totalEquity = founders.reduce((sum, f) => sum + f.equity_percentage, 0);
     if (Math.abs(totalEquity - 100) > 0.01) {
-      alert("Total equity must equal 100%");
+      toast.error("Total equity must equal 100%");
       return;
     }
 
@@ -91,7 +92,7 @@ export default function NewAgreementPage() {
       window.location.href = `/agreements/${matter.id}`;
     } catch (error) {
       console.error("Failed to create matter:", error);
-      alert("Failed to create agreement. Please try again.");
+      toast.error("Failed to create agreement. Please try again.");
     }
   };
 

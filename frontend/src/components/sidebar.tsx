@@ -103,12 +103,12 @@ export function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
       <div className="flex items-center justify-between px-4 py-5 border-b border-border">
         {!collapsed && (
           <Link href="/dashboard" className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-primary">Legalwork</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-primary">JurisGPT</h1>
           </Link>
         )}
         {collapsed && (
           <Link href="/dashboard" className="w-8 h-8 bg-primary rounded flex items-center justify-center mx-auto">
-            <span className="text-white font-bold text-xs">L</span>
+            <span className="text-white font-bold text-xs">J</span>
           </Link>
         )}
         {!collapsed && (

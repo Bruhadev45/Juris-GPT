@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Scale } from "lucide-react";
+import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { adminApi } from "@/lib/api";
@@ -45,10 +46,10 @@ export default function AdminReviewsPage() {
     try {
       await adminApi.approveReview(reviewId);
       await loadReviews();
-      alert("Document approved!");
+      toast.success("Document approved!");
     } catch (error) {
       console.error("Failed to approve:", error);
-      alert("Failed to approve document.");
+      toast.error("Failed to approve document.");
     }
   };
 
@@ -59,15 +60,22 @@ export default function AdminReviewsPage() {
     try {
       await adminApi.requestChanges(reviewId, changes);
       await loadReviews();
-      alert("Changes requested!");
+      toast.success("Changes requested!");
     } catch (error) {
       console.error("Failed to request changes:", error);
-      alert("Failed to request changes.");
+      toast.error("Failed to request changes.");
     }
   };
 
   if (loading) {
-    return <div className="container mx-auto px-4 py-8">Loading...</div>;
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
+        <div className="animate-pulse">
+          <Scale className="h-10 w-10 text-primary" />
+        </div>
+        <p className="text-muted-foreground text-sm">Loading reviews...</p>
+      </div>
+    );
   }
 
   return (

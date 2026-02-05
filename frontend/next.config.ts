@@ -4,21 +4,19 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: '**',
-      },
-      {
-        protocol: 'http',
-        hostname: '**',
+        protocol: "https",
+        hostname: "images.unsplash.com",
       },
     ],
   },
   typescript: {
+    // TODO: Remove once all type errors are resolved
     ignoreBuildErrors: true,
   },
   eslint: {
+    // TODO: Remove once all lint errors are resolved
     ignoreDuringBuilds: true,
   },
-} as NextConfig;
+};
 
 export default nextConfig;

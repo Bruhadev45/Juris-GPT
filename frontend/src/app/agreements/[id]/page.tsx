@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
+import { Scale } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { mattersApi, documentsApi } from "@/lib/api";
 import type { LegalMatter } from "@/types";
@@ -37,21 +39,37 @@ export default function AgreementDetailPage() {
     try {
       await documentsApi.generate(matterId);
       await loadMatter();
-      alert("Document generation started! You will be notified when it's ready.");
+      toast.success("Document generation started! You will be notified when it's ready.");
     } catch (error) {
       console.error("Failed to generate document:", error);
-      alert("Failed to generate document. Please try again.");
+      toast.error("Failed to generate document. Please try again.");
     } finally {
       setGenerating(false);
     }
   };
 
   if (loading) {
-    return <div className="container mx-auto px-4 py-8">Loading...</div>;
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
+        <div className="animate-pulse">
+          <Scale className="h-10 w-10 text-primary" />
+        </div>
+        <p className="text-muted-foreground text-sm">Loading agreement...</p>
+      </div>
+    );
   }
 
   if (!matter) {
-    return <div className="container mx-auto px-4 py-8">Agreement not found</div>;
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
+        <Scale className="h-10 w-10 text-muted-foreground" />
+        <h2 className="text-xl font-semibold text-foreground">Agreement not found</h2>
+        <p className="text-muted-foreground">The agreement you're looking for doesn't exist or has been removed.</p>
+        <Link href="/dashboard">
+          <Button variant="outline">Back to Dashboard</Button>
+        </Link>
+      </div>
+    );
   }
 
   const statusColors: Record<string, string> = {
@@ -135,7 +153,7 @@ export default function AgreementDetailPage() {
               )}
               {matter.status === "completed" && (
                 <Button onClick={() => {
-                  alert("Download functionality coming soon");
+                  toast.info("Download functionality coming soon");
                 }}>
                   Download Document
                 </Button>
