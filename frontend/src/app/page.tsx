@@ -1,1435 +1,1145 @@
 "use client";
 
 import Link from "next/link";
-import { Scale, FileCheck, Clock, Gavel, Shield, Zap, ArrowRight, Sparkles, CheckCircle, Users, TrendingUp, Award, BookOpen, FileText, Lock, Globe, Star, ChevronRight, X, Check, BarChart3, Target, Building2, Mail, Phone, MessageSquare, HelpCircle, AlertCircle, Eye, Key, Database, Server, Code, Rocket, Timer, DollarSign, Briefcase, Handshake, FileSearch, PenTool, Layers, Network, BarChart, ArrowUp, Send } from "lucide-react";
+import {
+  Scale,
+  FileCheck,
+  Clock,
+  Gavel,
+  Shield,
+  Zap,
+  ArrowRight,
+  Sparkles,
+  CheckCircle,
+  Users,
+  TrendingUp,
+  Award,
+  BookOpen,
+  FileText,
+  Lock,
+  Globe,
+  Star,
+  ChevronRight,
+  Check,
+  ArrowUp,
+  Send,
+  MessageSquare,
+  Briefcase,
+  Building2,
+  UserCheck,
+  Search,
+  Calculator,
+  FileSearch,
+  Handshake,
+  IndianRupee,
+} from "lucide-react";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { useState, useEffect } from "react";
+
+const services = [
+  {
+    icon: FileText,
+    title: "Contracts",
+    desc: "NDA, MSA, employment, freelancer agreements, MoU, rental and more",
+  },
+  {
+    icon: Shield,
+    title: "Compliance",
+    desc: "GST, ROC filings, TDS, PF/ESI, Shops Act and state-wise tracking",
+  },
+  {
+    icon: Building2,
+    title: "Corporate",
+    desc: "Incorporation, DPIIT registration, equity, ESOP pools, board resolutions",
+  },
+  {
+    icon: Users,
+    title: "Employment",
+    desc: "Offer letters, employment contracts, ESOP, contractor setup, policies",
+  },
+  {
+    icon: Search,
+    title: "Legal Research",
+    desc: "AI-powered search across 16M+ Indian judgments, statutes and case law",
+  },
+  {
+    icon: UserCheck,
+    title: "Fractional GC",
+    desc: "On-demand general counsel for your day-to-day legal needs",
+  },
+];
+
+const howItWorks = [
+  {
+    step: "01",
+    title: "Submit a legal matter",
+    desc: "Share your legal need at no cost. Contracts, compliance, research — anything.",
+    icon: Send,
+  },
+  {
+    step: "02",
+    title: "Get fixed pricing",
+    desc: "Transparent upfront pricing in INR. No hourly billing, no surprises.",
+    icon: IndianRupee,
+  },
+  {
+    step: "03",
+    title: "AI gets to work",
+    desc: "Our AI handles 80% of the work — drafting, research, analysis. You pay only for the final 20%.",
+    icon: Zap,
+  },
+  {
+    step: "04",
+    title: "Lawyer reviews",
+    desc: "Experienced Indian lawyers review and finalize every deliverable. Same-day turnaround.",
+    icon: Scale,
+  },
+];
+
+const pricingPlans = [
+  {
+    name: "Naagrik",
+    subtitle: "Citizen",
+    price: "Free",
+    period: "",
+    description: "Get started with your first legal matter",
+    features: [
+      "Submit your first legal matter free",
+      "Basic legal information & rights guide",
+      "Secure document storage",
+      "Connect with a verified lawyer",
+      "Pay per case after first matter",
+    ],
+    cta: "Get Started Free",
+    highlighted: false,
+  },
+  {
+    name: "Udyami",
+    subtitle: "Entrepreneur",
+    price: "999",
+    period: "/mo",
+    description: "For startups and small businesses",
+    features: [
+      "Everything in Naagrik",
+      "5 contracts per month",
+      "Compliance deadline alerts",
+      "AI legal research access",
+      "Free 1:1 lawyer consultation",
+      "Email support",
+    ],
+    cta: "Start Free Trial",
+    highlighted: true,
+  },
+  {
+    name: "Vyapar",
+    subtitle: "Business",
+    price: "4,999",
+    period: "/mo",
+    description: "For growing companies",
+    features: [
+      "Everything in Udyami",
+      "Unlimited contracts",
+      "Full compliance tracking & filing",
+      "Contract analyzer & risk scoring",
+      "Document vault with version history",
+      "Priority lawyer review",
+      "Phone & chat support",
+    ],
+    cta: "Get in Touch",
+    highlighted: false,
+  },
+  {
+    name: "Nigam",
+    subtitle: "Enterprise",
+    price: "Custom",
+    period: "",
+    description: "For large organizations",
+    features: [
+      "Everything in Vyapar",
+      "Dedicated account manager",
+      "Custom workflows & playbooks",
+      "API access & integrations",
+      "Advanced security controls",
+      "Team management & RBAC",
+      "SLA guarantee",
+    ],
+    cta: "Contact Sales",
+    highlighted: false,
+  },
+];
+
+const testimonials = [
+  {
+    name: "Rajesh Kumar",
+    role: "Co-founder, TechStart",
+    content:
+      "JurisGPT delivered our founder agreement the same day for under ₹1,000. They move at startup speed and keep costs founder-friendly.",
+    rating: 5,
+  },
+  {
+    name: "Priya Sharma",
+    role: "Founder, HealthTech India",
+    content:
+      "The AI handles the heavy lifting and the lawyer review catches everything. We moved fast without worrying about legal risk.",
+    rating: 5,
+  },
+  {
+    name: "Amit Patel",
+    role: "CEO, FinServ Solutions",
+    content:
+      "JurisGPT delivered fast, actionable guidance on a complex corporate structuring issue. Their compliance tracking alone saves us hours.",
+    rating: 5,
+  },
+];
+
+const faqs = [
+  {
+    question: "What is JurisGPT?",
+    answer:
+      "JurisGPT is an AI-powered legal services platform for India. We combine advanced AI that handles 80% of legal work with experienced Indian lawyers who finalize the remaining 20% — delivering fast, affordable, and reliable legal services.",
+  },
+  {
+    question: "What does 'lawyer review' mean?",
+    answer:
+      "Every legal deliverable is reviewed by an experienced Indian lawyer before it reaches you. Our lawyers are Bar Council verified and bound by professional duties including confidentiality and attorney-client privilege.",
+  },
+  {
+    question: "How is pricing determined?",
+    answer:
+      "We provide fixed, upfront pricing for every matter — no hourly billing, no surprises. Our AI handles 80% of the work, which means you only pay for the final 20% of lawyer time. This makes our services 60-80% cheaper than traditional law firms.",
+  },
+  {
+    question: "Is my data secure?",
+    answer:
+      "Absolutely. We use end-to-end encryption, comply with DPDPA (Digital Personal Data Protection Act, 2023), and store all data on Indian servers. Attorney-client privilege is maintained on every matter.",
+  },
+  {
+    question: "What types of legal matters can I submit?",
+    answer:
+      "Contracts (NDA, MSA, employment, freelancer, rental, MoU, PoA), compliance (GST, ROC, TDS, PF/ESI), corporate matters (incorporation, equity, ESOP), legal research, RTI applications, and more. If it's a legal need, we can help.",
+  },
+  {
+    question: "How fast is the turnaround?",
+    answer:
+      "Most matters are delivered same-day. AI-generated drafts are ready in minutes, and lawyer review typically completes within 24 hours. Our average turnaround is under 18 hours.",
+  },
+  {
+    question: "Is there a free trial?",
+    answer:
+      "Yes! Your first legal matter is completely free on the Naagrik plan. Submit any legal need — a contract, a compliance question, legal research — and experience the platform before committing.",
+  },
+];
 
 export default function Home() {
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const [showStickyCTA, setShowStickyCTA] = useState(false);
   const { scrollY } = useScroll();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setShowBackToTop(latest > 400);
-    setShowStickyCTA(latest > 600);
   });
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-    useEffect(() => {
-      // Set smooth scrolling via data attribute (Next.js compatible)
-      document.documentElement.setAttribute("data-scroll-behavior", "smooth");
-    }, []);
+  const scrollToSection = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/30 relative">
-      {/* Law-themed Background Images */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        {/* Hero Background - Scales of Justice */}
-        <div 
-          className="absolute top-0 left-0 w-full h-[100vh] opacity-10 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1920&q=80')",
-            backgroundPosition: "center",
-            backgroundSize: "cover",
-          }}
-        ></div>
-        
-        {/* Overlay for readability */}
-        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm"></div>
-        
-        {/* Additional law-themed decorative elements */}
-        <div className="absolute top-20 right-10 w-96 h-96 opacity-5">
-          <div 
-            className="w-full h-full bg-cover bg-center"
-            style={{
-              backgroundImage: "url('https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&q=80')",
-            }}
-          ></div>
-        </div>
-        
-        <div className="absolute bottom-20 left-10 w-80 h-80 opacity-5">
-          <div 
-            className="w-full h-full bg-cover bg-center"
-            style={{
-              backgroundImage: "url('https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=80')",
-            }}
-          ></div>
-        </div>
+    <main className="min-h-screen bg-background relative">
+      {/* Subtle gradient background */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] via-transparent to-accent/[0.02]" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-primary/[0.03] rounded-full blur-3xl" />
       </div>
 
-      {/* Navigation */}
-      <motion.nav
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="border-b border-border bg-card/90 backdrop-blur-md sticky top-0 z-50 shadow-sm relative"
-        role="navigation"
-        aria-label="Main navigation"
-      >
+      {/* Navigation — Arcline-style sticky nav */}
+      <nav className="border-b border-border bg-background/80 backdrop-blur-md sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-2 cursor-pointer" aria-label="JurisGPT Home">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="flex items-center gap-2"
-            >
-              <motion.div
-                animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-              >
-                <Scale className="h-6 w-6 text-primary" aria-hidden="true" />
-              </motion.div>
-                <span className="text-xl font-bold text-foreground">JurisGPT</span>
-            </motion.div>
+          <Link href="/" className="flex items-center gap-2">
+            <Scale className="h-6 w-6 text-primary" />
+            <span className="text-xl font-bold text-foreground">JurisGPT</span>
           </Link>
-          <div className="flex gap-4">
+
+          <div className="hidden md:flex items-center gap-8">
+            <button
+              onClick={() => scrollToSection("solutions")}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Solutions
+            </button>
+            <button
+              onClick={() => scrollToSection("pricing")}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Pricing
+            </button>
+            <button
+              onClick={() => scrollToSection("faq")}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Questions
+            </button>
+          </div>
+
+          <div className="flex items-center gap-3">
             <Link
               href="/dashboard"
-              className="px-4 py-2 text-foreground/70 hover:text-foreground transition-all hover:scale-105"
-              aria-label="Go to Dashboard"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:block"
             >
-              Dashboard
+              Login
             </Link>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link
-                href="/agreements/new"
-                className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:shadow-lg transition-all transform hover:-translate-y-0.5"
-                aria-label="Get Started - Create Founder Agreement"
-              >
-                Get Started
-              </Link>
-            </motion.div>
-          </div>
-        </div>
-      </motion.nav>
-
-      {/* Sticky CTA Bar */}
-      <motion.div
-        initial={{ y: 100, opacity: 0 }}
-        animate={{ 
-          y: showStickyCTA ? 0 : 100,
-          opacity: showStickyCTA ? 1 : 0,
-        }}
-        transition={{ duration: 0.3 }}
-        className="fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-md border-t border-border shadow-lg"
-        style={{ display: showStickyCTA ? "block" : "none" }}
-      >
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="hidden md:block">
-            <p className="text-base font-semibold text-foreground">Ready to get started?</p>
-            <p className="text-sm text-muted-foreground">Create your Founder Agreement in minutes</p>
-          </div>
-          <div className="flex gap-3">
             <Link
               href="/agreements/new"
-              className="px-6 py-2 bg-primary text-primary-foreground rounded-md font-semibold hover:shadow-lg transition-all flex items-center gap-2"
-              aria-label="Create Founder Agreement"
+              className="px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-md hover:bg-primary/90 transition-colors"
             >
               Get Started
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link
-              href="/dashboard"
-              className="px-6 py-2 bg-card border-2 border-primary text-primary rounded-md font-semibold hover:bg-secondary transition-all"
-              aria-label="View Dashboard"
-            >
-              View Dashboard
             </Link>
           </div>
         </div>
-      </motion.div>
+      </nav>
 
-      {/* Back to Top Button */}
+      {/* Back to Top */}
       <motion.button
         initial={{ scale: 0, opacity: 0 }}
-        animate={{ 
+        animate={{
           scale: showBackToTop ? 1 : 0,
           opacity: showBackToTop ? 1 : 0,
         }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={scrollToTop}
-        className="fixed bottom-24 right-6 z-40 w-12 h-12 bg-primary text-primary-foreground rounded-full shadow-lg flex items-center justify-center hover:shadow-xl transition-all"
-        aria-label="Back to top"
+        className="fixed bottom-6 right-6 z-40 w-10 h-10 bg-primary text-primary-foreground rounded-full shadow-lg flex items-center justify-center"
       >
-        <ArrowUp className="h-5 w-5" />
+        <ArrowUp className="h-4 w-4" />
       </motion.button>
 
-      {/* Live Chat Widget */}
-      <motion.button
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-accent text-accent-foreground rounded-full shadow-lg flex items-center justify-center hover:shadow-xl transition-all"
-        aria-label="Open live chat"
-      >
-        <MessageSquare className="h-6 w-6" />
-      </motion.button>
-
-      {/* Hero Section */}
-      <section className="container mx-auto px-4 py-20 relative z-10">
-        <div className="max-w-6xl mx-auto">
-          {/* Law-themed background image overlay */}
-          <div 
-            className="absolute inset-0 opacity-5 rounded-3xl overflow-hidden"
-            style={{
-              backgroundImage: "url('https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1920&q=80')",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          ></div>
-
-          <div className="max-w-4xl mx-auto text-center relative z-10">
+      {/* ======================== HERO ======================== */}
+      <section className="relative z-10 pt-20 pb-24">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-accent/10 border border-accent/20 rounded-full mb-6 hover:bg-accent/20 transition-all cursor-pointer group"
+              transition={{ delay: 0.1 }}
+              className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/5 border border-primary/10 rounded-full mb-8"
             >
-              <Sparkles className="h-4 w-4 text-accent group-hover:rotate-180 transition-transform duration-500" />
-              <span className="text-sm font-medium text-accent">Legal Technology</span>
+              <Sparkles className="h-3.5 w-3.5 text-primary" />
+              <span className="text-xs font-medium text-primary">
+                AI-Native Legal Platform for India
+              </span>
             </motion.div>
 
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-6xl md:text-7xl font-bold mb-6 text-foreground leading-tight"
+              transition={{ delay: 0.2 }}
+              className="text-5xl md:text-7xl font-bold mb-6 text-foreground leading-[1.1] tracking-tight"
             >
-              Professional Legal
+              Legal for Indian
               <br />
-              <motion.span
-                className="text-primary inline-block"
-                animate={{
-                  backgroundPosition: ["0%", "100%"],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                }}
-                style={{
-                  backgroundImage: "linear-gradient(90deg, #1F2937, #374151, #1F2937)",
-                  backgroundSize: "200% auto",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
-              >
-                Documents
-              </motion.span>{" "}
-              for Startups
+              startups.{" "}
+              <span className="text-primary">Done right.</span>
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="text-xl md:text-2xl text-muted-foreground mb-4 max-w-2xl mx-auto"
+              transition={{ delay: 0.3 }}
+              className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed"
             >
-              AI-Powered Founder Agreements with Expert Lawyer Review
-            </motion.p>
-
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="text-base md:text-lg text-muted-foreground/80 mb-12 max-w-xl mx-auto"
-            >
-              Generate legally compliant Founder Agreements in minutes. Reviewed by experienced lawyers. Delivered within 24 hours.
+              AI-powered legal designed for Indian startups and MSMEs. Our AI
+              handles 80% of the work. Elite lawyers finalize the rest.
+              Same-day delivery. Fixed pricing.
             </motion.p>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
+              transition={{ delay: 0.4 }}
               className="flex gap-4 justify-center flex-wrap"
             >
-              <motion.div
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                className="group"
+              <Link
+                href="/agreements/new"
+                className="px-8 py-3.5 bg-primary text-primary-foreground rounded-md font-medium shadow-sm hover:bg-primary/90 transition-all flex items-center gap-2"
               >
-                <Link
-                  href="/agreements/new"
-                  className="px-8 py-4 bg-primary text-primary-foreground rounded-md font-semibold shadow-lg hover:shadow-xl transition-all transform flex items-center gap-2 inline-block"
-                >
-                  Create Founder Agreement
-                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </motion.div>
-              <motion.div
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
+                Start Your First Matter — Free
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/dashboard"
+                className="px-8 py-3.5 bg-background border border-border text-foreground rounded-md font-medium hover:bg-secondary/50 transition-all"
               >
-                <Link
-                  href="/dashboard"
-                  className="px-8 py-4 bg-card border-2 border-primary text-primary rounded-md font-semibold hover:bg-secondary transition-all transform hover:shadow-lg inline-block"
-                >
-                  View Dashboard
-                </Link>
-              </motion.div>
+                Book a Demo
+              </Link>
             </motion.div>
 
-            {/* Trust Badges */}
+            {/* Trust line */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
-              className="mt-12 flex flex-wrap items-center justify-center gap-6 text-base text-muted-foreground"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="mt-12 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground"
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <Shield className="h-4 w-4 text-primary" />
-                <span>Secure & Confidential</span>
+                <span>Bar Council Verified Lawyers</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Award className="h-4 w-4 text-primary" />
-                <span>Lawyer Reviewed</span>
+              <div className="flex items-center gap-1.5">
+                <Lock className="h-4 w-4 text-primary" />
+                <span>DPDPA Compliant</span>
               </div>
-                <div className="flex items-center gap-2">
-                  <Lock className="h-4 w-4 text-primary" />
-                  <span>DPDPA Compliant</span>
-                </div>
+              <div className="flex items-center gap-1.5">
+                <Globe className="h-4 w-4 text-primary" />
+                <span>Indian Data Residency</span>
+              </div>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Statistics Section */}
-      <section className="container mx-auto px-4 py-20 relative z-10">
-        <div 
-          className="absolute inset-0 opacity-5 rounded-3xl"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1920&q=80')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        ></div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="max-w-6xl mx-auto relative z-10"
-        >
-          <div className="grid md:grid-cols-4 gap-6">
+      {/* ======================== STATS BAR ======================== */}
+      <section className="relative z-10 py-12 border-y border-border/50 bg-secondary/20">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-wrap items-center justify-center gap-12 md:gap-20">
             {[
-              { value: "500+", label: "Agreements Generated", icon: FileCheck, color: "text-primary" },
-              { value: "98%", label: "Client Satisfaction", icon: Star, color: "text-yellow-500" },
-              { value: "18hrs", label: "Average Turnaround", icon: Timer, color: "text-accent" },
-              { value: "₹1.2M+", label: "Legal Costs Saved", icon: DollarSign, color: "text-green-600" },
-            ].map((stat, index) => {
-              const Icon = stat.icon;
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ scale: 1.05, y: -5 }}
-                  className="p-6 bg-card rounded-lg shadow-md border border-border hover:shadow-xl transition-all duration-300 text-center group"
-                >
-                  <motion.div
-                    animate={{ rotate: [0, 10, -10, 0] }}
-                    transition={{ duration: 3, repeat: Infinity, repeatDelay: 2, delay: index * 0.3 }}
-                    className={`w-12 h-12 ${stat.color} mx-auto mb-4`}
-                  >
-                    <Icon className="h-full w-full" />
-                  </motion.div>
-                  <motion.p
-                    initial={{ scale: 0 }}
-                    whileInView={{ scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ type: "spring", delay: index * 0.1 }}
-                    className="text-3xl md:text-4xl font-bold text-primary mb-2"
-                  >
-                    {stat.value}
-                  </motion.p>
-                  <p className="text-base text-muted-foreground">{stat.label}</p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Features with 3D Cards */}
-      <section className="container mx-auto px-4 py-20 relative z-10">
-        <div 
-          className="absolute inset-0 opacity-5 rounded-3xl"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1920&q=80')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        ></div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="mt-32 relative z-10"
-        >
-          <div className="text-center mb-12">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-4xl font-bold mb-4"
-            >
-                Why Choose JurisGPT?
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-xl text-muted-foreground max-w-2xl mx-auto"
-            >
-              Everything you need to create legally sound founder agreements
-            </motion.p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              whileHover={{
-                y: -10,
-                rotateY: 5,
-                rotateX: 5,
-                scale: 1.02,
-              }}
-              className="group perspective-1000"
-            >
-              <div className="p-8 bg-card rounded-lg shadow-lg border-l-4 border-primary hover:shadow-2xl transition-all duration-300 transform-gpu h-full relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all"></div>
-                <motion.div
-                  whileHover={{ rotate: [0, -10, 10, 0] }}
-                  transition={{ duration: 0.5 }}
-                  className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 relative z-10"
-                >
-                  <FileCheck className="h-6 w-6 text-primary" />
-                </motion.div>
-                <h3 className="text-xl md:text-2xl font-semibold mb-3 group-hover:text-primary transition-colors">AI-Powered Generation</h3>
-                <p className="text-base text-muted-foreground leading-relaxed">
-                  GPT-4 generates your Founder Agreement based on your company details and legal preferences. Professional quality, every time.
-                </p>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              whileHover={{
-                y: -10,
-                rotateY: -5,
-                rotateX: 5,
-                scale: 1.02,
-              }}
-              className="group perspective-1000"
-            >
-              <div className="p-8 bg-card rounded-lg shadow-lg border-l-4 border-accent hover:shadow-2xl transition-all duration-300 transform-gpu h-full relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-full blur-2xl group-hover:bg-accent/10 transition-all"></div>
-                <motion.div
-                  whileHover={{ rotate: [0, 10, -10, 0] }}
-                  transition={{ duration: 0.5 }}
-                  className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4 relative z-10"
-                >
-                  <Scale className="h-6 w-6 text-accent" />
-                </motion.div>
-                <h3 className="text-xl md:text-2xl font-semibold mb-3 group-hover:text-accent transition-colors">Lawyer Reviewed</h3>
-                <p className="text-base text-muted-foreground leading-relaxed">
-                  Every document is reviewed by experienced Indian corporate lawyers to ensure legal compliance and accuracy.
-                </p>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              whileHover={{
-                y: -10,
-                rotateY: 5,
-                rotateX: -5,
-                scale: 1.02,
-              }}
-              className="group perspective-1000"
-            >
-              <div className="p-8 bg-card rounded-lg shadow-lg border-l-4 border-primary hover:shadow-2xl transition-all duration-300 transform-gpu h-full relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all"></div>
-                <motion.div
-                  whileHover={{ rotate: 360 }}
-                  transition={{ duration: 0.8 }}
-                  className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 relative z-10"
-                >
-                  <Clock className="h-6 w-6 text-primary" />
-                </motion.div>
-                <h3 className="text-xl md:text-2xl font-semibold mb-3 group-hover:text-primary transition-colors">24-Hour Delivery</h3>
-                <p className="text-base text-muted-foreground leading-relaxed">
-                  Get your finalized Founder Agreement within 24 hours of submission. Fast, reliable, and professional.
-                </p>
-              </div>
-            </motion.div>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* How It Works */}
-      <section className="container mx-auto px-4 py-20 bg-card/70 backdrop-blur-sm rounded-3xl my-20 relative z-10 overflow-hidden">
-        <div 
-          className="absolute inset-0 opacity-10 rounded-3xl"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1920&q=80')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        ></div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="max-w-6xl mx-auto relative z-10"
-        >
-          <div className="text-center mb-12">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-4xl font-bold mb-4"
-            >
-              How It Works
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-xl text-muted-foreground"
-            >
-              Simple, fast, and reliable process
-            </motion.p>
-          </div>
-
-          <div className="grid md:grid-cols-4 gap-6">
-            {[
-              { step: "01", title: "Fill Details", desc: "Enter company and founder information", icon: FileText },
-              { step: "02", title: "AI Generation", desc: "Our AI creates your agreement", icon: Zap },
-              { step: "03", title: "Lawyer Review", desc: "Expert lawyers review and approve", icon: Scale },
-              { step: "04", title: "Get Document", desc: "Receive your finalized agreement", icon: CheckCircle },
-            ].map((item, index) => {
-              const Icon = item.icon;
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ y: -5, scale: 1.05 }}
-                  className="text-center group"
-                >
-                  <div className="relative mb-4">
-                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto group-hover:bg-primary/20 transition-all">
-                      <Icon className="h-8 w-8 text-primary" />
-                    </div>
-                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-xs md:text-sm font-bold">
-                      {item.step}
-                    </div>
-                  </div>
-                  <h3 className="text-lg md:text-xl font-semibold mb-2 group-hover:text-primary transition-colors">{item.title}</h3>
-                  <p className="text-base text-muted-foreground">{item.desc}</p>
-                  {index < 3 && (
-                    <div className="hidden md:block absolute top-8 left-full w-full h-0.5 bg-primary/20 transform translate-x-4"></div>
-                  )}
-                </motion.div>
-              );
-            })}
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Benefits Section */}
-      <section className="container mx-auto px-4 py-20 bg-gradient-to-b from-card/70 to-background/90 backdrop-blur-sm relative z-10 overflow-hidden">
-        <div 
-          className="absolute inset-0 opacity-8"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1920&q=80')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        ></div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="max-w-6xl mx-auto relative z-10"
-        >
-          <div className="text-center mb-12">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-4xl font-bold mb-4"
-            >
-              Why Startups Love Us
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-xl text-muted-foreground"
-            >
-              Save time, money, and legal headaches
-            </motion.p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            {[
-              { title: "90% Cost Savings", desc: "Compared to traditional law firms", icon: DollarSign },
-              { title: "10x Faster", desc: "Get documents in hours, not weeks", icon: Zap },
-              { title: "Always Updated", desc: "Compliant with latest Indian laws", icon: Shield },
-              { title: "Expert Review", desc: "Every document reviewed by lawyers", icon: Award },
-            ].map((benefit, index) => {
-              const Icon = benefit.icon;
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ x: index % 2 === 0 ? -5 : 5, scale: 1.02 }}
-                  className="p-6 bg-card rounded-lg shadow-md border-l-4 border-primary hover:shadow-xl transition-all duration-300 group"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center group-hover:bg-primary/20 group-hover:scale-110 transition-all flex-shrink-0">
-                      <Icon className="h-6 w-6 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-lg md:text-xl mb-1 group-hover:text-primary transition-colors">{benefit.title}</h3>
-                      <p className="text-base text-muted-foreground">{benefit.desc}</p>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Use Cases */}
-      <section className="container mx-auto px-4 py-20 relative z-10">
-        <div 
-          className="absolute inset-0 opacity-5 rounded-3xl"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1920&q=80')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        ></div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="max-w-6xl mx-auto relative z-10"
-        >
-          <div className="text-center mb-12">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-4xl font-bold mb-4"
-            >
-              Perfect For
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-xl text-muted-foreground"
-            >
-              Trusted by startups across India
-            </motion.p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { title: "Tech Startups", desc: "SaaS, FinTech, EdTech companies", icon: Zap },
-              { title: "E-commerce", desc: "Online marketplaces and retail", icon: Globe },
-              { title: "Healthcare", desc: "HealthTech and medical startups", icon: Shield },
-            ].map((useCase, index) => {
-              const Icon = useCase.icon;
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ scale: 1.05, rotateY: 5 }}
-                  className="p-6 bg-card rounded-lg shadow-md border border-border hover:shadow-xl transition-all duration-300 group cursor-pointer"
-                >
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-primary/20 group-hover:scale-110 transition-all">
-                    <Icon className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="font-semibold text-lg md:text-xl mb-2 group-hover:text-primary transition-colors">{useCase.title}</h3>
-                  <p className="text-base text-muted-foreground">{useCase.desc}</p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Comparison Table */}
-      <section className="container mx-auto px-4 py-20 bg-card/60 backdrop-blur-sm rounded-3xl my-20 relative z-10 overflow-hidden">
-        <div 
-          className="absolute inset-0 opacity-10 rounded-3xl"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1920&q=80')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        ></div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="max-w-5xl mx-auto relative z-10"
-        >
-          <div className="text-center mb-12">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-4xl font-bold mb-4"
-            >
-                JurisGPT vs Traditional Law Firms
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-lg text-muted-foreground"
-            >
-              See why startups choose us
-            </motion.p>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left p-4 font-semibold">Feature</th>
-                    <th className="text-center p-4 font-semibold text-primary">JurisGPT</th>
-                  <th className="text-center p-4 font-semibold text-muted-foreground">Traditional Firms</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                    { feature: "Price", jurisgpt: "₹999", traditional: "₹15,000 - ₹50,000" },
-                  { feature: "Turnaround Time", jurisgpt: "24 hours", traditional: "2-4 weeks" },
-                  { feature: "AI-Powered", jurisgpt: "✓", traditional: "✗" },
-                  { feature: "Lawyer Review", jurisgpt: "✓ Included", traditional: "✓ Included" },
-                  { feature: "Revisions", jurisgpt: "Unlimited", traditional: "Limited" },
-                  { feature: "Online Platform", jurisgpt: "✓", traditional: "✗" },
-                ].map((row, index) => (
-                  <motion.tr
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ backgroundColor: "rgba(124, 58, 237, 0.05)" }}
-                    className="border-b border-border/50 hover:bg-primary/5 transition-colors"
-                  >
-                    <td className="p-4 font-medium">{row.feature}</td>
-                    <td className="p-4 text-center">
-                      {row.jurisgpt === "✓" ? (
-                        <CheckCircle className="h-5 w-5 text-green-600 mx-auto" />
-                      ) : row.jurisgpt === "✗" ? (
-                        <X className="h-5 w-5 text-red-600 mx-auto" />
-                      ) : (
-                        <span className="text-primary font-semibold">{row.jurisgpt}</span>
-                      )}
-                    </td>
-                    <td className="p-4 text-center text-muted-foreground">{row.traditional}</td>
-                  </motion.tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Pricing with 3D Effect */}
-      <section className="container mx-auto px-4 py-20 relative z-10">
-        <div 
-          className="absolute inset-0 opacity-5 rounded-3xl"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1920&q=80')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        ></div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="mt-32 text-center relative z-10"
-        >
-          <motion.div
-            initial={{ scale: 0 }}
-            whileInView={{ scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ type: "spring", stiffness: 200 }}
-            className="inline-block px-6 py-3 bg-accent/10 border border-accent/20 rounded-full mb-6"
-          >
-            <span className="text-base font-medium text-accent">Transparent Pricing</span>
-          </motion.div>
-
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-4xl font-bold mb-6"
-          >
-            Simple, Fixed Pricing
-          </motion.h2>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            whileHover={{
-              rotateY: 5,
-              rotateX: -5,
-              scale: 1.05,
-            }}
-            className="inline-block p-8 bg-card rounded-lg shadow-xl border-2 border-primary/20 hover:shadow-2xl transition-all duration-300 transform-gpu perspective-1000"
-          >
-            <motion.p
-              animate={{
-                scale: [1, 1.05, 1],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                repeatDelay: 2,
-              }}
-              className="text-5xl font-bold text-primary mb-2"
-              >
-                ₹999
-              </motion.p>
-              <p className="text-lg text-muted-foreground">Per Founder Agreement</p>
-              <p className="text-base text-muted-foreground/70 mt-2">No hidden fees. First consultation free.</p>
-          </motion.div>
-
-          {/* Features List */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3 }}
-            className="mt-8 grid md:grid-cols-3 gap-4 max-w-3xl mx-auto"
-          >
-            {["AI-Powered Generation", "Lawyer Review", "24-Hour Delivery", "Unlimited Revisions", "Legal Compliance", "Email Support"].map((feature, idx) => (
+              { value: "16M+", label: "Indian Judgments" },
+              { value: "100+", label: "Verified Lawyers" },
+              { value: "500+", label: "Startups Served" },
+              { value: "18hrs", label: "Avg. Turnaround" },
+            ].map((stat, i) => (
               <motion.div
-                key={idx}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                className="flex items-center gap-2 text-sm"
-              >
-                <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
-                <span className="text-muted-foreground">{feature}</span>
-              </motion.div>
-            ))}
-          </motion.div>
-        </motion.div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="container mx-auto px-4 py-20 relative z-10">
-        <div 
-          className="absolute inset-0 opacity-5 rounded-3xl"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1920&q=80')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        ></div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="max-w-6xl mx-auto relative z-10"
-        >
-          <div className="text-center mb-12">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-4xl font-bold mb-4"
-            >
-              Trusted by Founders
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-xl text-muted-foreground"
-            >
-              See what our clients say
-            </motion.p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                name: "Rajesh Kumar",
-                role: "Co-founder, TechStart",
-                content: "Got our founder agreement in 18 hours. The quality was excellent and lawyer review caught important clauses we missed.",
-                rating: 5,
-              },
-              {
-                name: "Priya Sharma",
-                role: "Founder, HealthTech India",
-                content: "The AI-generated document was comprehensive. Our lawyer only needed minor tweaks. Highly recommended!",
-                rating: 5,
-              },
-              {
-                name: "Amit Patel",
-                role: "CEO, FinTech Solutions",
-                content: "Saved us weeks of legal work. Professional, fast, and affordable. Exactly what startups need.",
-                rating: 5,
-              },
-            ].map((testimonial, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -5, scale: 1.02 }}
-                className="p-6 bg-card rounded-lg shadow-md border border-border hover:shadow-xl transition-all duration-300"
-              >
-                <div className="flex gap-1 mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-base text-muted-foreground mb-4 italic">"{testimonial.content}"</p>
-                <div>
-                  <p className="font-semibold text-lg text-foreground">{testimonial.name}</p>
-                  <p className="text-base text-muted-foreground">{testimonial.role}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Security & Privacy Section */}
-      <section className="container mx-auto px-4 py-20 relative z-10">
-        <div 
-          className="absolute inset-0 opacity-5 rounded-3xl"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1920&q=80')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        ></div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="max-w-6xl mx-auto relative z-10"
-        >
-          <div className="text-center mb-12">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-4xl font-bold mb-4"
-            >
-              Security & Privacy First
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-xl text-muted-foreground"
-            >
-              Your data is protected with enterprise-grade security
-            </motion.p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { title: "End-to-End Encryption", desc: "All documents encrypted in transit and at rest", icon: Lock },
-                { title: "DPDPA Compliant", desc: "Full compliance with India's Digital Personal Data Protection Act, 2023", icon: Shield },
-              { title: "Secure Storage", desc: "Documents stored in secure cloud infrastructure", icon: Database },
-            ].map((item, index) => {
-              const Icon = item.icon;
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ y: -5, scale: 1.02 }}
-                  className="p-6 bg-card rounded-lg shadow-md border border-border hover:shadow-xl transition-all duration-300 group"
-                >
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-primary/20 group-hover:scale-110 transition-all">
-                    <Icon className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="font-semibold text-lg md:text-xl mb-2 group-hover:text-primary transition-colors">{item.title}</h3>
-                  <p className="text-base text-muted-foreground">{item.desc}</p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </motion.div>
-      </section>
-
-      {/* FAQ Section */}
-      <section className="container mx-auto px-4 py-20 bg-card/70 backdrop-blur-sm rounded-3xl my-20 relative z-10 overflow-hidden">
-        <div 
-          className="absolute inset-0 opacity-10 rounded-3xl"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1920&q=80')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        ></div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="max-w-4xl mx-auto relative z-10"
-        >
-          <div className="text-center mb-12">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-4xl font-bold mb-4"
-            >
-              Frequently Asked Questions
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-xl text-muted-foreground"
-            >
-              Everything you need to know
-            </motion.p>
-          </div>
-
-          <Accordion type="single" collapsible className="w-full">
-            {[
-              {
-                question: "How long does it take to get my Founder Agreement?",
-                answer: "Typically within 24 hours. After you submit your details, our AI generates the document within minutes. Then our expert lawyers review it and send you the finalized version within 24 hours.",
-              },
-              {
-                question: "Is the document legally valid in India?",
-                answer: "Yes! All documents are reviewed by experienced Indian corporate lawyers and comply with the Companies Act, 2013 and other relevant Indian laws. They are legally binding and enforceable.",
-              },
-              {
-                question: "What if I need revisions?",
-                answer: "We offer unlimited revisions until you're satisfied. Our team works with you to ensure the agreement meets all your requirements.",
-              },
-              {
-                question: "How secure is my company information?",
-                  answer: "We use end-to-end encryption and follow DPDPA (Digital Personal Data Protection Act, 2023) compliance standards. Your data is stored securely in India and never shared with third parties. All documents are confidential.",
-              },
-              {
-                question: "Can I use this for multiple founders?",
-                answer: "Absolutely! Our Founder Agreement template supports multiple founders. Simply add all founder details during the form submission process.",
-              },
-              {
-                question: "What happens after I receive the document?",
-                answer: "You'll receive a finalized Word document (.docx) that you can review, sign, and use. Our lawyers are available for any questions or clarifications you might have.",
-              },
-            ].map((faq, index) => (
-              <motion.div
-                key={index}
+                key={i}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ delay: i * 0.1 }}
+                className="text-center"
               >
-                <AccordionItem value={`item-${index}`} className="border-b border-border/50">
-                  <AccordionTrigger className="text-left hover:text-primary transition-colors py-4">
-                    {faq.question}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-base text-muted-foreground pb-4">
-                    {faq.answer}
-                  </AccordionContent>
-                </AccordionItem>
+                <p className="text-3xl md:text-4xl font-bold text-foreground">
+                  {stat.value}
+                </p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {stat.label}
+                </p>
               </motion.div>
             ))}
-          </Accordion>
-        </motion.div>
+          </div>
+        </div>
       </section>
 
-      {/* Trust Indicators */}
-      <section className="container mx-auto px-4 py-20 relative z-10">
-        <div 
-          className="absolute inset-0 opacity-5 rounded-3xl"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1920&q=80')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        ></div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="mt-32 pt-16 border-t border-border relative z-10"
-        >
-          <div className="grid md:grid-cols-3 gap-8 text-center max-w-4xl mx-auto">
-            {[
-              { value: "100%", label: "Lawyer Reviewed", icon: Shield },
-              { value: "24hrs", label: "Average Delivery", icon: Zap },
-              { value: "India", label: "Companies Act Compliant", icon: Gavel },
-            ].map((item, index) => {
-              const Icon = item.icon;
-              return (
+      {/* ======================== SERVICES GRID ======================== */}
+      <section id="solutions" className="relative z-10 py-24">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                AI-powered legal designed for startups
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                From contracts to compliance to corporate structuring — everything
+                your business needs, powered by AI and verified by lawyers.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              {services.map((service, index) => {
+                const Icon = service.icon;
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.08 }}
+                    className="group p-6 bg-card rounded-xl border border-border hover:border-primary/30 hover:shadow-md transition-all duration-300 cursor-pointer"
+                  >
+                    <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-primary/15 transition-colors">
+                      <Icon className="h-5 w-5 text-primary" />
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
+                      {service.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {service.desc}
+                    </p>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              className="text-center mt-10"
+            >
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+              >
+                Explore all services
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ======================== HOW IT WORKS ======================== */}
+      <section className="relative z-10 py-24 bg-secondary/20">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                How It Works
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                Simple, fast, and reliable. From submission to delivery.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-4 gap-8">
+              {howItWorks.map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                    className="relative text-center"
+                  >
+                    <div className="relative inline-block mb-5">
+                      <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                        <Icon className="h-6 w-6 text-primary" />
+                      </div>
+                      <div className="absolute -top-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center text-[10px] font-bold text-primary-foreground">
+                        {item.step}
+                      </div>
+                    </div>
+                    <h3 className="text-base font-semibold mb-2">
+                      {item.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {item.desc}
+                    </p>
+                    {index < 3 && (
+                      <div className="hidden md:block absolute top-7 left-[60%] w-[80%] h-px bg-border" />
+                    )}
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ======================== DONE RIGHT (Value Prop) ======================== */}
+      <section className="relative z-10 py-24">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Done Right
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                AI does the heavy lifting. Lawyers ensure perfection. You get
+                results at a fraction of the cost and time.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              {[
+                {
+                  icon: Zap,
+                  title: "80% AI, 20% Lawyer",
+                  desc: "Our AI workflows draft, research, and analyze. Lawyers focus on what matters — review and finalization.",
+                },
+                {
+                  icon: IndianRupee,
+                  title: "60-80% Cost Savings",
+                  desc: "Same quality as top law firms at a fraction of the price. Fixed upfront pricing — no hourly surprises.",
+                },
+                {
+                  icon: Clock,
+                  title: "Same-Day Turnaround",
+                  desc: "AI-generated drafts in minutes. Lawyer review within hours. Most matters delivered the same day.",
+                },
+                {
+                  icon: Award,
+                  title: "Elite Lawyer Network",
+                  desc: "Bar Council verified lawyers from top Indian law firms. Every deliverable professionally reviewed.",
+                },
+              ].map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.08 }}
+                    className="flex gap-4 p-5 rounded-xl border border-border hover:border-primary/20 hover:bg-card transition-all"
+                  >
+                    <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Icon className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold mb-1">{item.title}</h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {item.desc}
+                      </p>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ======================== COMPARISON TABLE ======================== */}
+      <section className="relative z-10 py-24 bg-secondary/20">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                JurisGPT vs Traditional Law Firms
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                See why Indian startups choose us
+              </p>
+            </motion.div>
+
+            <div className="bg-card rounded-xl border border-border overflow-hidden">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-border bg-secondary/30">
+                    <th className="text-left p-4 text-sm font-semibold">
+                      Feature
+                    </th>
+                    <th className="text-center p-4 text-sm font-semibold text-primary">
+                      JurisGPT
+                    </th>
+                    <th className="text-center p-4 text-sm font-semibold text-muted-foreground">
+                      Traditional Firms
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    {
+                      feature: "Contract Price",
+                      jurisgpt: "From ₹999",
+                      traditional: "₹15,000 - ₹50,000",
+                    },
+                    {
+                      feature: "Turnaround Time",
+                      jurisgpt: "Same day",
+                      traditional: "2-4 weeks",
+                    },
+                    {
+                      feature: "AI-Powered",
+                      jurisgpt: true,
+                      traditional: false,
+                    },
+                    {
+                      feature: "Lawyer Review",
+                      jurisgpt: true,
+                      traditional: true,
+                    },
+                    {
+                      feature: "Compliance Tracking",
+                      jurisgpt: true,
+                      traditional: false,
+                    },
+                    {
+                      feature: "Legal Research (16M+ cases)",
+                      jurisgpt: true,
+                      traditional: false,
+                    },
+                    {
+                      feature: "Fixed Pricing",
+                      jurisgpt: true,
+                      traditional: false,
+                    },
+                    {
+                      feature: "Unlimited Revisions",
+                      jurisgpt: true,
+                      traditional: false,
+                    },
+                  ].map((row, index) => (
+                    <tr
+                      key={index}
+                      className="border-b border-border/50 last:border-0"
+                    >
+                      <td className="p-4 text-sm font-medium">
+                        {row.feature}
+                      </td>
+                      <td className="p-4 text-center">
+                        {typeof row.jurisgpt === "boolean" ? (
+                          row.jurisgpt ? (
+                            <CheckCircle className="h-5 w-5 text-green-600 mx-auto" />
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )
+                        ) : (
+                          <span className="text-sm font-semibold text-primary">
+                            {row.jurisgpt}
+                          </span>
+                        )}
+                      </td>
+                      <td className="p-4 text-center">
+                        {typeof row.traditional === "boolean" ? (
+                          row.traditional ? (
+                            <CheckCircle className="h-5 w-5 text-green-600 mx-auto" />
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )
+                        ) : (
+                          <span className="text-sm text-muted-foreground">
+                            {row.traditional}
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ======================== PRICING ======================== */}
+      <section id="pricing" className="relative z-10 py-24">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Flexible pricing that scales with you
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                Platform access is separate from individual case quotes.
+                No hidden fees.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {pricingPlans.map((plan, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.08 }}
+                  className={`p-6 rounded-xl border ${
+                    plan.highlighted
+                      ? "border-primary bg-primary/[0.02] shadow-md ring-1 ring-primary/20"
+                      : "border-border bg-card"
+                  } flex flex-col`}
+                >
+                  {plan.highlighted && (
+                    <div className="text-xs font-medium text-primary bg-primary/10 rounded-full px-3 py-1 w-fit mb-4">
+                      Most Popular
+                    </div>
+                  )}
+                  <div className="mb-1">
+                    <h3 className="text-lg font-bold">{plan.name}</h3>
+                    <p className="text-xs text-muted-foreground">
+                      {plan.subtitle}
+                    </p>
+                  </div>
+                  <div className="mt-4 mb-2">
+                    {plan.price === "Free" || plan.price === "Custom" ? (
+                      <span className="text-3xl font-bold">{plan.price}</span>
+                    ) : (
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-3xl font-bold">
+                          ₹{plan.price}
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                          {plan.period}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-6">
+                    {plan.description}
+                  </p>
+                  <ul className="space-y-3 mb-8 flex-1">
+                    {plan.features.map((feature, i) => (
+                      <li
+                        key={i}
+                        className="flex items-start gap-2 text-sm"
+                      >
+                        <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                        <span className="text-muted-foreground">
+                          {feature}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href={plan.highlighted ? "/agreements/new" : "/dashboard"}
+                    className={`w-full py-2.5 rounded-md text-sm font-medium text-center block transition-colors ${
+                      plan.highlighted
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                        : "bg-secondary text-foreground hover:bg-secondary/80"
+                    }`}
+                  >
+                    {plan.cta}
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ======================== TESTIMONIALS ======================== */}
+      <section className="relative z-10 py-24 bg-secondary/20">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                See why founders love using JurisGPT
+              </h2>
+            </motion.div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              {testimonials.map((testimonial, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  whileHover={{ scale: 1.1, y: -5 }}
-                  className="group"
+                  className="p-6 bg-card rounded-xl border border-border"
                 >
-                  <motion.div
-                    animate={{
-                      rotate: [0, 5, -5, 0],
-                    }}
-                    transition={{
-                      duration: 3,
-                      repeat: Infinity,
-                      repeatDelay: 2,
-                      delay: index * 0.5,
-                    }}
-                    className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-all"
-                  >
-                    <Icon className="h-8 w-8 text-primary" />
-                  </motion.div>
-                  <motion.p
-                    animate={{
-                      scale: [1, 1.05, 1],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      repeatDelay: 1,
-                      delay: index * 0.3,
-                    }}
-                    className="text-3xl md:text-4xl font-bold text-primary mb-2"
-                  >
-                    {item.value}
-                  </motion.p>
-                  <p className="text-base text-muted-foreground">{item.label}</p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Additional Features Grid */}
-      <section className="container mx-auto px-4 py-20 relative z-10">
-        <div 
-          className="absolute inset-0 opacity-5 rounded-3xl"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1920&q=80')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        ></div>
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="max-w-6xl mx-auto relative z-10"
-        >
-          <div className="text-center mb-12">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-4xl font-bold mb-4"
-            >
-              Powerful Features
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-xl text-muted-foreground"
-            >
-              Everything you need in one platform
-            </motion.p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { title: "Smart Templates", desc: "Pre-built templates for common scenarios", icon: FileText },
-              { title: "Version Control", desc: "Track changes and revisions easily", icon: Layers },
-              { title: "Export Options", desc: "Download in Word, PDF formats", icon: FileCheck },
-              { title: "Legal Compliance", desc: "Always up-to-date with Indian laws", icon: Shield },
-              { title: "Expert Support", desc: "Get help from our legal team", icon: MessageSquare },
-              { title: "Dashboard Access", desc: "Manage all your documents in one place", icon: BarChart },
-            ].map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ scale: 1.05, rotateY: 5 }}
-                  className="p-6 bg-card rounded-lg shadow-md border border-border hover:shadow-xl transition-all duration-300 group cursor-pointer"
-                >
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-primary/20 group-hover:scale-110 transition-all">
-                    <Icon className="h-6 w-6 text-primary" />
+                  <div className="flex gap-0.5 mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className="h-4 w-4 fill-yellow-400 text-yellow-400"
+                      />
+                    ))}
                   </div>
-                  <h3 className="font-semibold text-lg md:text-xl mb-2 group-hover:text-primary transition-colors">{feature.title}</h3>
-                  <p className="text-base text-muted-foreground">{feature.desc}</p>
+                  <p className="text-sm text-muted-foreground mb-6 leading-relaxed italic">
+                    &ldquo;{testimonial.content}&rdquo;
+                  </p>
+                  <div>
+                    <p className="text-sm font-semibold">
+                      {testimonial.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {testimonial.role}
+                    </p>
+                  </div>
                 </motion.div>
-              );
-            })}
+              ))}
+            </div>
           </div>
-        </motion.div>
+        </div>
       </section>
 
-      {/* Newsletter Signup */}
-      <section className="container mx-auto px-4 py-16 relative z-10">
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="max-w-2xl mx-auto p-8 bg-card rounded-2xl shadow-lg border border-border"
-        >
-          <div className="text-center mb-6">
-            <motion.h3
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-2xl font-bold mb-2"
-            >
-              Stay Updated
-            </motion.h3>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-base text-muted-foreground"
-            >
-              Get legal tips, updates, and exclusive offers delivered to your inbox
-            </motion.p>
-          </div>
-          <motion.form
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="flex gap-3"
-            onSubmit={(e) => {
-              e.preventDefault();
-              // Handle newsletter signup
-            }}
-          >
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="flex-1 px-4 py-3 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-              aria-label="Email address"
-            />
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              type="submit"
-              className="px-6 py-3 bg-primary text-primary-foreground rounded-md font-semibold hover:shadow-lg transition-all flex items-center gap-2"
-            >
-              Subscribe
-              <Send className="h-4 w-4" />
-            </motion.button>
-          </motion.form>
-        </motion.div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="container mx-auto px-4 py-20 relative z-10">
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="max-w-4xl mx-auto text-center p-12 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 backdrop-blur-md rounded-3xl border border-primary/30 relative overflow-hidden"
-        >
-          <div 
-            className="absolute inset-0 opacity-20 rounded-3xl"
-            style={{
-              backgroundImage: "url('https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1920&q=80')",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          ></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-accent/5 animate-gradient"></div>
-          <motion.div
-            animate={{
-              scale: [1, 1.05, 1],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-            }}
-            className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"
-          ></motion.div>
-          <div className="relative z-10">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-4xl font-bold mb-4"
-            >
-              Ready to Get Started?
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-xl text-muted-foreground mb-8"
-            >
-              Create your Founder Agreement in minutes. No credit card required.
-            </motion.p>
+      {/* ======================== SECURITY ======================== */}
+      <section className="relative z-10 py-24">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="flex gap-4 justify-center flex-wrap"
+              className="text-center mb-12"
             >
-              <motion.div whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }}>
-                <Link
-                  href="/agreements/new"
-                  className="px-8 py-4 bg-primary text-primary-foreground rounded-md font-semibold shadow-lg hover:shadow-xl transition-all transform flex items-center gap-2 inline-block"
-                  aria-label="Create Founder Agreement Now"
-                >
-                  Create Agreement Now
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </motion.div>
-              <motion.div whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }}>
-                <Link
-                  href="/dashboard"
-                  className="px-8 py-4 bg-card border-2 border-primary text-primary rounded-md font-semibold hover:bg-secondary transition-all transform hover:shadow-lg inline-block"
-                  aria-label="View Examples"
-                >
-                  View Examples
-                </Link>
-              </motion.div>
-            </motion.div>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Footer */}
-      <motion.footer
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        className="border-t border-border bg-card/80 backdrop-blur-md mt-32 relative z-10"
-      >
-        <div 
-          className="absolute inset-0 opacity-5"
-          style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1920&q=80')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        ></div>
-        <div className="container mx-auto px-4 py-12">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                className="flex items-center gap-2 cursor-pointer mb-4"
-              >
-                <Scale className="h-5 w-5 text-primary" />
-                <span className="font-semibold text-lg">JurisGPT</span>
-              </motion.div>
-              <p className="text-base text-muted-foreground">
-                AI-powered legal document generation for Indian startups.
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Enterprise-grade security
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                Your data is protected. Attorney-client privilege is maintained.
               </p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-base text-muted-foreground">
-                <li><Link href="/agreements/new" className="hover:text-primary transition-colors">Founder Agreements</Link></li>
-                <li><Link href="/dashboard" className="hover:text-primary transition-colors">Dashboard</Link></li>
-                <li><Link href="/dashboard/forms" className="hover:text-primary transition-colors">Legal Forms</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Company</h4>
-              <ul className="space-y-2 text-base text-muted-foreground">
-                <li><Link href="/dashboard/support" className="hover:text-primary transition-colors">Support</Link></li>
-                <li><Link href="/dashboard/team" className="hover:text-primary transition-colors">About</Link></li>
-                <li><Link href="/dashboard/settings" className="hover:text-primary transition-colors">Settings</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2 text-base text-muted-foreground">
-                <li><Link href="#" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
-                <li><Link href="#" className="hover:text-primary transition-colors">Terms of Service</Link></li>
-                <li><Link href="#" className="hover:text-primary transition-colors">Compliance</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-border pt-8 flex justify-between items-center">
-            <p className="text-base text-muted-foreground">
-              &copy; 2025 JurisGPT. All rights reserved.
-            </p>
-            <div className="flex gap-4">
-              <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                <Globe className="h-5 w-5" />
-              </Link>
+            </motion.div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                {
+                  icon: Lock,
+                  title: "End-to-End Encryption",
+                  desc: "All documents encrypted in transit and at rest using AES-256.",
+                },
+                {
+                  icon: Shield,
+                  title: "DPDPA Compliant",
+                  desc: "Full compliance with India's Digital Personal Data Protection Act, 2023.",
+                },
+                {
+                  icon: Globe,
+                  title: "Indian Data Residency",
+                  desc: "All data stored on Indian servers. Never shared with third parties.",
+                },
+              ].map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.08 }}
+                    className="p-5 rounded-xl border border-border bg-card"
+                  >
+                    <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                      <Icon className="h-5 w-5 text-primary" />
+                    </div>
+                    <h3 className="font-semibold mb-1">{item.title}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {item.desc}
+                    </p>
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
         </div>
-      </motion.footer>
+      </section>
+
+      {/* ======================== FAQ ======================== */}
+      <section id="faq" className="relative z-10 py-24 bg-secondary/20">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Questions
+              </h2>
+            </motion.div>
+
+            <Accordion type="single" collapsible className="w-full">
+              {faqs.map((faq, index) => (
+                <AccordionItem
+                  key={index}
+                  value={`item-${index}`}
+                  className="border-b border-border/50"
+                >
+                  <AccordionTrigger className="text-left text-sm font-medium hover:text-primary transition-colors py-4">
+                    {faq.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground pb-4 leading-relaxed">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        </div>
+      </section>
+
+      {/* ======================== CTA ======================== */}
+      <section className="relative z-10 py-24">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="max-w-3xl mx-auto text-center p-12 bg-card rounded-2xl border border-border shadow-sm"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Ready to get started?
+            </h2>
+            <p className="text-lg text-muted-foreground mb-8">
+              Submit your first legal matter for free. No credit card required.
+            </p>
+            <div className="flex gap-4 justify-center flex-wrap">
+              <Link
+                href="/agreements/new"
+                className="px-8 py-3.5 bg-primary text-primary-foreground rounded-md font-medium shadow-sm hover:bg-primary/90 transition-all flex items-center gap-2"
+              >
+                Get Started Free
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/dashboard"
+                className="px-8 py-3.5 bg-background border border-border text-foreground rounded-md font-medium hover:bg-secondary/50 transition-all"
+              >
+                Book a Demo
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ======================== FOOTER ======================== */}
+      <footer className="border-t border-border bg-card relative z-10">
+        <div className="container mx-auto px-4 py-12">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Scale className="h-5 w-5 text-primary" />
+                <span className="font-semibold text-lg">JurisGPT</span>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                AI-powered legal services platform for Indian startups, MSMEs,
+                and individuals. Bridging the justice gap with technology.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-sm mb-4">Product</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>
+                  <Link
+                    href="/dashboard/forms"
+                    className="hover:text-primary transition-colors"
+                  >
+                    Legal Forms
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/dashboard/search"
+                    className="hover:text-primary transition-colors"
+                  >
+                    Legal Research
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/dashboard/compliance"
+                    className="hover:text-primary transition-colors"
+                  >
+                    Compliance
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/dashboard/chat"
+                    className="hover:text-primary transition-colors"
+                  >
+                    AI Chat
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-sm mb-4">Company</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>
+                  <Link
+                    href="/dashboard/support"
+                    className="hover:text-primary transition-colors"
+                  >
+                    Support
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/dashboard/team"
+                    className="hover:text-primary transition-colors"
+                  >
+                    About
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/dashboard"
+                    className="hover:text-primary transition-colors"
+                  >
+                    Dashboard
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-sm mb-4">Legal</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>
+                  <Link
+                    href="#"
+                    className="hover:text-primary transition-colors"
+                  >
+                    Privacy Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#"
+                    className="hover:text-primary transition-colors"
+                  >
+                    Terms of Service
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="#"
+                    className="hover:text-primary transition-colors"
+                  >
+                    Trust Portal
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-border pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+              <p className="text-xs text-muted-foreground">
+                &copy; 2026 JurisGPT. All rights reserved. JurisGPT connects
+                users with independent attorneys and is not a law firm.
+              </p>
+              <div className="flex gap-4">
+                <Link
+                  href="#"
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                >
+                  <Globe className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }

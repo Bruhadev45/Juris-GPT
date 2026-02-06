@@ -1,0 +1,412 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { use } from "react";
+import Link from "next/link";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Loader2,
+  AlertCircle,
+  ArrowLeft,
+  CheckCircle2,
+  IndianRupee,
+  FileText,
+  Download,
+} from "lucide-react";
+import { templatesApi, type TemplateDetail } from "@/lib/api";
+
+export default function TemplateFormPage({
+  params,
+}: {
+  params: Promise<{ templateId: string }>;
+}) {
+  const { templateId } = use(params);
+  const [template, setTemplate] = useState<TemplateDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [formData, setFormData] = useState<Record<string, unknown>>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [generateResult, setGenerateResult] = useState<Record<string, unknown> | null>(null);
+
+  useEffect(() => {
+    async function fetchTemplate() {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await templatesApi.get(templateId);
+        setTemplate(data);
+
+        // Initialize form data with defaults
+        const defaults: Record<string, unknown> = {};
+        for (const field of data.fields) {
+          if (field.default !== undefined) {
+            defaults[field.name] = field.default;
+          } else if (field.type === "boolean") {
+            defaults[field.name] = false;
+          } else {
+            defaults[field.name] = "";
+          }
+        }
+        setFormData(defaults);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load template");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchTemplate();
+  }, [templateId]);
+
+  function updateField(name: string, value: unknown) {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!template) return;
+
+    try {
+      setSubmitting(true);
+      setError(null);
+      const result = await templatesApi.generate(templateId, formData);
+      setGenerateResult(result);
+      setSuccess(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to generate document");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  function renderField(field: TemplateDetail["fields"][number]) {
+    const value = formData[field.name];
+
+    switch (field.type) {
+      case "text":
+        return (
+          <Input
+            id={field.name}
+            type="text"
+            placeholder={field.placeholder || ""}
+            value={(value as string) || ""}
+            onChange={(e) => updateField(field.name, e.target.value)}
+            required={field.required}
+          />
+        );
+
+      case "textarea":
+        return (
+          <Textarea
+            id={field.name}
+            placeholder={field.placeholder || ""}
+            value={(value as string) || ""}
+            onChange={(e) => updateField(field.name, e.target.value)}
+            required={field.required}
+            rows={4}
+          />
+        );
+
+      case "number":
+        return (
+          <Input
+            id={field.name}
+            type="number"
+            placeholder={field.placeholder || ""}
+            value={(value as string | number) ?? ""}
+            onChange={(e) => updateField(field.name, e.target.value === "" ? "" : Number(e.target.value))}
+            required={field.required}
+          />
+        );
+
+      case "date":
+        return (
+          <Input
+            id={field.name}
+            type="date"
+            value={(value as string) || ""}
+            onChange={(e) => updateField(field.name, e.target.value)}
+            required={field.required}
+          />
+        );
+
+      case "select":
+        return (
+          <Select
+            value={(value as string) || ""}
+            onValueChange={(v) => updateField(field.name, v)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder={field.placeholder || "Select an option"} />
+            </SelectTrigger>
+            <SelectContent>
+              {(field.options || []).map((option) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        );
+
+      case "boolean":
+        return (
+          <div className="flex items-center gap-3">
+            <Switch
+              id={field.name}
+              checked={!!value}
+              onCheckedChange={(checked) => updateField(field.name, checked)}
+            />
+            <Label htmlFor={field.name} className="text-sm text-muted-foreground cursor-pointer">
+              {value ? "Yes" : "No"}
+            </Label>
+          </div>
+        );
+
+      default:
+        return (
+          <Input
+            id={field.name}
+            type="text"
+            placeholder={field.placeholder || ""}
+            value={(value as string) || ""}
+            onChange={(e) => updateField(field.name, e.target.value)}
+            required={field.required}
+          />
+        );
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex h-screen bg-background">
+        <div className="flex-1 flex flex-col">
+          <header className="bg-card border-b border-border px-6 py-4">
+            <h1 className="text-xl font-semibold text-foreground">Loading Template...</h1>
+          </header>
+          <div className="flex-1 flex items-center justify-center">
+            <div className="flex flex-col items-center gap-3">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <p className="text-muted-foreground text-sm">Loading template details...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && !template) {
+    return (
+      <div className="flex h-screen bg-background">
+        <div className="flex-1 flex flex-col">
+          <header className="bg-card border-b border-border px-6 py-4">
+            <div className="flex items-center gap-3">
+              <Link href="/dashboard/forms">
+                <Button variant="ghost" size="sm">
+                  <ArrowLeft className="h-4 w-4 mr-1" />
+                  Back
+                </Button>
+              </Link>
+              <h1 className="text-xl font-semibold text-foreground">Template Not Found</h1>
+            </div>
+          </header>
+          <div className="flex-1 flex items-center justify-center">
+            <div className="flex flex-col items-center gap-3 text-center">
+              <AlertCircle className="h-8 w-8 text-destructive" />
+              <p className="text-destructive font-medium">Failed to load template</p>
+              <p className="text-muted-foreground text-sm">{error}</p>
+              <div className="flex gap-2">
+                <Link href="/dashboard/forms">
+                  <Button variant="outline">Back to Forms</Button>
+                </Link>
+                <Button variant="outline" onClick={() => window.location.reload()}>
+                  Retry
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!template) return null;
+
+  if (success) {
+    return (
+      <div className="flex h-screen bg-background">
+        <div className="flex-1 flex flex-col">
+          <header className="bg-card border-b border-border px-6 py-4">
+            <div className="flex items-center gap-3">
+              <Link href="/dashboard/forms">
+                <Button variant="ghost" size="sm">
+                  <ArrowLeft className="h-4 w-4 mr-1" />
+                  Back
+                </Button>
+              </Link>
+              <h1 className="text-xl font-semibold text-foreground">{template.name}</h1>
+            </div>
+          </header>
+          <div className="flex-1 flex items-center justify-center p-6">
+            <Card className="shadow-sm border-border max-w-lg w-full">
+              <CardContent className="p-8 text-center">
+                <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-4" />
+                <h2 className="text-2xl font-bold text-foreground mb-2">Document Generated</h2>
+                <p className="text-muted-foreground mb-6">
+                  Your {template.name} has been successfully generated and is ready for download.
+                </p>
+                {generateResult && (generateResult as Record<string, unknown>).document_id && (
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Document ID: {String((generateResult as Record<string, unknown>).document_id)}
+                  </p>
+                )}
+                <div className="flex flex-col gap-3">
+                  {generateResult && (generateResult as Record<string, unknown>).download_url && (
+                    <Button className="w-full gap-2" asChild>
+                      <a href={String((generateResult as Record<string, unknown>).download_url)} download>
+                        <Download className="h-4 w-4" />
+                        Download Document
+                      </a>
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => {
+                      setSuccess(false);
+                      setGenerateResult(null);
+                    }}
+                  >
+                    Generate Another
+                  </Button>
+                  <Link href="/dashboard/forms" className="w-full">
+                    <Button variant="ghost" className="w-full">
+                      Back to Forms
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-screen bg-background">
+      <div className="flex-1 flex flex-col">
+        <header className="bg-card border-b border-border px-6 py-4">
+          <div className="flex items-center gap-3">
+            <Link href="/dashboard/forms">
+              <Button variant="ghost" size="sm">
+                <ArrowLeft className="h-4 w-4 mr-1" />
+                Back
+              </Button>
+            </Link>
+            <h1 className="text-xl font-semibold text-foreground">{template.name}</h1>
+          </div>
+        </header>
+        <div className="flex-1 overflow-y-auto p-6 bg-background">
+          <div className="max-w-3xl mx-auto space-y-6">
+            {/* Template Info */}
+            <Card className="shadow-sm border-border">
+              <CardHeader>
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-primary/10 text-primary">
+                    <FileText className="h-6 w-6" />
+                  </div>
+                  <div className="flex-1">
+                    <CardTitle className="text-xl">{template.name}</CardTitle>
+                    <CardDescription className="mt-1">{template.description}</CardDescription>
+                    <div className="flex flex-wrap items-center gap-3 mt-3">
+                      <Badge variant="outline">{template.category}</Badge>
+                      <span className="text-sm text-muted-foreground">
+                        {template.estimated_time}
+                      </span>
+                      <span className="flex items-center gap-1 text-sm font-medium text-foreground">
+                        <IndianRupee className="h-3.5 w-3.5" />
+                        {template.price.toLocaleString("en-IN")}
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        {template.fields.length} fields
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </CardHeader>
+            </Card>
+
+            {/* Dynamic Form */}
+            <Card className="shadow-sm border-border">
+              <CardHeader>
+                <CardTitle>Fill in the Details</CardTitle>
+                <CardDescription>
+                  Complete all required fields to generate your document. Fields marked with * are required.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  {template.fields.map((field) => (
+                    <div key={field.name} className="space-y-2">
+                      <Label htmlFor={field.name} className="text-sm font-medium">
+                        {field.label}
+                        {field.required && <span className="text-destructive ml-0.5">*</span>}
+                      </Label>
+                      {renderField(field)}
+                    </div>
+                  ))}
+
+                  {error && (
+                    <div className="flex items-center gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+                      <AlertCircle className="h-4 w-4 text-destructive flex-shrink-0" />
+                      <p className="text-sm text-destructive">{error}</p>
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-3 pt-4 border-t border-border">
+                    <Button
+                      type="submit"
+                      disabled={submitting}
+                      className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2"
+                    >
+                      {submitting ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <FileText className="h-4 w-4" />
+                          Generate Document
+                        </>
+                      )}
+                    </Button>
+                    <Link href="/dashboard/forms">
+                      <Button type="button" variant="outline">
+                        Cancel
+                      </Button>
+                    </Link>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
