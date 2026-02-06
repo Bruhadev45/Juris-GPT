@@ -1,5 +1,5 @@
 /**
- * API client for JurisGPT backend
+ * API client for NyayaSetu backend
  */
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -100,7 +100,8 @@ class ApiClient {
     if (options?.search) params.append("search", options.search);
 
     const query = params.toString();
-    return this.fetch<CompaniesActSection[]>(`/api/legal/companies-act${query ? `?${query}` : ""}`);
+    const response = await this.fetch<{ data: CompaniesActSection[]; total: number }>(`/api/legal/companies-act${query ? `?${query}` : ""}`);
+    return response.data;
   }
 
   async getLegalDataStats(): Promise<LegalDataStats> {
@@ -109,3 +110,107 @@ class ApiClient {
 }
 
 export const apiClient = new ApiClient();
+
+// Chat API
+export interface ChatMessageResponse {
+  success: boolean;
+  message: string;
+  sources: Array<{
+    title: string;
+    content: string;
+    doc_type: string;
+    source: string;
+    relevance: string;
+  }>;
+  suggestions: string[];
+  error?: string;
+}
+
+export interface ChatSuggestionCategory {
+  category: string;
+  questions: string[];
+}
+
+export const chatApi = {
+  async sendMessage(message: string, context?: Record<string, unknown>): Promise<ChatMessageResponse> {
+    const response = await fetch(`${API_URL}/api/chat/message`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message, context }),
+    });
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.json();
+  },
+
+  async getSuggestions(): Promise<{ suggestions: ChatSuggestionCategory[] }> {
+    const response = await fetch(`${API_URL}/api/chat/suggestions`);
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.json();
+  },
+};
+
+// Companies API
+export const companiesApi = {
+  async create(data: {
+    name: string;
+    description?: string;
+    state: string;
+    authorized_capital: number;
+  }) {
+    const response = await fetch(`${API_URL}/api/companies`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.json();
+  },
+
+  async get(companyId: string) {
+    const response = await fetch(`${API_URL}/api/companies/${companyId}`);
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.json();
+  },
+};
+
+// Matters API
+export const mattersApi = {
+  async create(data: {
+    matter_data: { company_id: string };
+    founders: Array<{
+      name: string;
+      email: string;
+      role: string;
+      equity_percentage: number;
+      vesting_months: number;
+      cliff_months: number;
+    }>;
+    preferences: {
+      non_compete: boolean;
+      non_compete_months: number;
+      dispute_resolution: string;
+      governing_law: string;
+      additional_terms?: string;
+    };
+  }) {
+    const response = await fetch(`${API_URL}/api/matters`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.json();
+  },
+
+  async get(matterId: string) {
+    const response = await fetch(`${API_URL}/api/matters/${matterId}`);
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.json();
+  },
+
+  async getStatus(matterId: string) {
+    const response = await fetch(`${API_URL}/api/matters/${matterId}/status`);
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.json();
+  },
+};

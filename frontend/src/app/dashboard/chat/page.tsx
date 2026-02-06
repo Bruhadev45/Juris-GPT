@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Search,
   FileText,
@@ -10,11 +10,13 @@ import {
   ArrowUp,
   Bell,
   ShieldCheck,
-  ChevronLeft,
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useChat } from "./chat-context";
+import type { ChatMessage } from "@/types/chat";
 
 interface ActionCard {
   icon: React.ElementType;
@@ -40,18 +42,15 @@ const actionCards: ActionCard[] = [
   },
 ];
 
-interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  timestamp: Date;
-}
-
 export default function ChatPage() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const { activeConversation, activeConversationId, addMessage } = useChat();
   const [input, setInput] = useState("");
   const [greeting, setGreeting] = useState("Good morning");
-  const [hasMessages, setHasMessages] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const messages = activeConversation?.messages ?? [];
+  const hasMessages = messages.length > 0;
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -60,30 +59,60 @@ export default function ChatPage() {
     else setGreeting("Good evening");
   }, []);
 
-  const handleSubmit = () => {
-    if (!input.trim()) return;
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
+  const handleSubmit = async () => {
+    if (!input.trim() || isLoading) return;
+
+    const userMessage: ChatMessage = {
+      id: crypto.randomUUID(),
       role: "user",
       content: input,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
     };
 
-    setMessages([...messages, userMessage]);
+    addMessage(userMessage);
     setInput("");
-    setHasMessages(true);
+    setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
+    try {
+      const response = await fetch("http://localhost:8000/api/chat/message", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: input,
+          conversation_id: activeConversationId,
+        }),
+      });
+
+      const data = await response.json();
+
+      const aiMessage: ChatMessage = {
+        id: crypto.randomUUID(),
         role: "assistant",
-        content: "I understand your question. Let me help you with that...",
-        timestamp: new Date(),
+        content:
+          data.message ||
+          "I couldn't process your request. Please try again.",
+        timestamp: new Date().toISOString(),
       };
-      setMessages((prev) => [...prev, aiMessage]);
-    }, 1000);
+      addMessage(aiMessage);
+    } catch (error) {
+      console.error("Chat API error:", error);
+      const errorMessage: ChatMessage = {
+        id: crypto.randomUUID(),
+        role: "assistant",
+        content:
+          "Sorry, I couldn't connect to the server. Please make sure the backend is running on http://localhost:8000",
+        timestamp: new Date().toISOString(),
+      };
+      addMessage(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -92,7 +121,7 @@ export default function ChatPage() {
       <header className="flex items-center justify-between border-b border-border/50 bg-background/50 backdrop-blur-sm px-6 py-4">
         <div className="flex items-center gap-3">
           <span className="text-[15px] font-semibold text-foreground/80">
-            New chat
+            {activeConversation?.title ?? "New chat"}
           </span>
         </div>
         <div className="flex items-center gap-4">
@@ -168,15 +197,19 @@ export default function ChatPage() {
                 </div>
                 <button
                   onClick={handleSubmit}
-                  disabled={!input.trim()}
+                  disabled={!input.trim() || isLoading}
                   className={cn(
                     "flex h-11 w-11 items-center justify-center rounded-xl transition-all",
-                    input.trim()
+                    input.trim() && !isLoading
                       ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:scale-105"
                       : "bg-secondary text-muted-foreground/50"
                   )}
                 >
-                  <ArrowUp className="h-6 w-6" />
+                  {isLoading ? (
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  ) : (
+                    <ArrowUp className="h-6 w-6" />
+                  )}
                 </button>
               </div>
             </div>
@@ -200,8 +233,10 @@ export default function ChatPage() {
                 }`}
               >
                 {message.role === "assistant" && (
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-primary text-white text-xs">AI</AvatarFallback>
+                  <Avatar className="h-8 w-8 flex-shrink-0">
+                    <AvatarFallback className="bg-primary text-white text-xs">
+                      AI
+                    </AvatarFallback>
                   </Avatar>
                 )}
                 <div
@@ -212,15 +247,40 @@ export default function ChatPage() {
                       : "bg-card text-card-foreground border border-border"
                   )}
                 >
-                  <p className="text-sm">{message.content}</p>
+                  {message.role === "assistant" ? (
+                    <div className="text-sm prose prose-sm prose-neutral dark:prose-invert max-w-none prose-p:my-1 prose-li:my-0.5 prose-headings:my-2 prose-headings:text-primary">
+                      <ReactMarkdown>{message.content}</ReactMarkdown>
+                    </div>
+                  ) : (
+                    <p className="text-sm">{message.content}</p>
+                  )}
                 </div>
                 {message.role === "user" && (
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-blue-500 text-white text-xs">S</AvatarFallback>
+                  <Avatar className="h-8 w-8 flex-shrink-0">
+                    <AvatarFallback className="bg-blue-500 text-white text-xs">
+                      S
+                    </AvatarFallback>
                   </Avatar>
                 )}
               </div>
             ))}
+            {isLoading && (
+              <div className="flex gap-4 justify-start">
+                <Avatar className="h-8 w-8 flex-shrink-0">
+                  <AvatarFallback className="bg-primary text-white text-xs">
+                    AI
+                  </AvatarFallback>
+                </Avatar>
+                <div className="bg-card text-card-foreground border border-border rounded-lg p-4">
+                  <div className="flex gap-1.5">
+                    <div className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-bounce [animation-delay:0ms]" />
+                    <div className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-bounce [animation-delay:150ms]" />
+                    <div className="h-2 w-2 rounded-full bg-muted-foreground/40 animate-bounce [animation-delay:300ms]" />
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
           </div>
 
           {/* Input area */}
@@ -250,15 +310,19 @@ export default function ChatPage() {
                   </div>
                   <button
                     onClick={handleSubmit}
-                    disabled={!input.trim()}
+                    disabled={!input.trim() || isLoading}
                     className={cn(
                       "flex h-11 w-11 items-center justify-center rounded-xl transition-all",
-                      input.trim()
+                      input.trim() && !isLoading
                         ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:scale-105"
                         : "bg-secondary text-muted-foreground/50"
                     )}
                   >
-                    <ArrowUp className="h-6 w-6" />
+                    {isLoading ? (
+                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    ) : (
+                      <ArrowUp className="h-6 w-6" />
+                    )}
                   </button>
                 </div>
               </div>

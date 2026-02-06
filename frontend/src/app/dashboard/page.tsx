@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import {
   Search,
   Plus,
-  Filter,
   Bell,
   User,
   Eye,
@@ -65,7 +64,10 @@ export default function DashboardPage() {
         <header className="bg-card border-b border-border px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4 flex-1">
-              <h1 className="text-2xl font-bold text-foreground">AI Analysis Overview</h1>
+              <Link href="/" className="flex items-center gap-2 mr-4">
+                <Scale className="h-5 w-5 text-primary" />
+                <span className="font-bold text-foreground">NyayaSetu</span>
+              </Link>
               <div className="flex-1 max-w-md">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -76,21 +78,26 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <button className="p-2 hover:bg-secondary rounded-lg transition-all hover:scale-110 hover:rotate-90 duration-300 group">
-                <Plus className="h-5 w-5 text-foreground group-hover:text-primary transition-colors" />
+            <div className="flex items-center gap-2">
+              <Link href="/chat">
+                <Button variant="outline" size="sm" className="gap-1.5">
+                  <BookOpen className="h-4 w-4" />
+                  Legal Chat
+                </Button>
+              </Link>
+              <Link href="/agreements/new">
+                <Button size="sm" className="gap-1.5">
+                  <Plus className="h-4 w-4" />
+                  New Agreement
+                </Button>
+              </Link>
+              <button className="p-2 hover:bg-secondary rounded-lg transition-all relative group ml-2">
+                <Bell className="h-5 w-5 text-foreground group-hover:text-primary transition-all" />
+                <span className="absolute top-1 right-1 h-2 w-2 bg-primary rounded-full"></span>
               </button>
-              <button className="p-2 hover:bg-secondary rounded-lg transition-all hover:scale-110 duration-300 group">
-                <Filter className="h-5 w-5 text-foreground group-hover:text-primary group-hover:rotate-180 transition-all duration-300" />
-              </button>
-              <button className="p-2 hover:bg-secondary rounded-lg transition-all hover:scale-110 duration-300 relative group">
-                <Bell className="h-5 w-5 text-foreground group-hover:text-primary group-hover:animate-ring transition-all" />
-                <span className="absolute top-1 right-1 h-2 w-2 bg-primary rounded-full group-hover:animate-pulse"></span>
-              </button>
-              <button className="p-2 hover:bg-secondary rounded-lg transition-all hover:scale-110 duration-300 group">
+              <button className="p-2 hover:bg-secondary rounded-lg transition-all group">
                 <User className="h-5 w-5 text-foreground group-hover:text-primary transition-colors" />
               </button>
-              <span className="text-sm text-muted-foreground">Legal Insight AI Tool</span>
             </div>
           </div>
         </header>

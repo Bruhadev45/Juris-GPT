@@ -37,6 +37,13 @@ class CompaniesActSection(BaseModel):
     content: str
 
 
+class PaginatedCompaniesActResponse(BaseModel):
+    data: List[CompaniesActSection]
+    total: int
+    limit: int
+    offset: int
+
+
 @router.get("/laws/{law_name}", response_model=List[LawSection])
 async def get_law_sections(
     law_name: str,
@@ -127,7 +134,7 @@ async def get_case_summaries(
         raise HTTPException(status_code=500, detail=f"Error reading cases file: {str(e)}")
 
 
-@router.get("/companies-act", response_model=List[CompaniesActSection])
+@router.get("/companies-act", response_model=PaginatedCompaniesActResponse)
 async def get_companies_act_sections(
     section: Optional[str] = Query(None, description="Filter by section number"),
     limit: int = Query(50, ge=1, le=500),

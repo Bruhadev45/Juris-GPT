@@ -1,5 +1,5 @@
 """
-JurisGPT Chatbot Service
+NyayaSetu Chatbot Service
 Integrates RAG pipeline with FastAPI backend
 """
 
@@ -35,7 +35,7 @@ class ChatResponse(BaseModel):
     error: Optional[str] = None
 
 
-class JurisGPTChatbotService:
+class NyayaSetuChatbotService:
     """Chatbot service for legal assistance"""
 
     def __init__(self):
@@ -49,10 +49,10 @@ class JurisGPTChatbotService:
             return
 
         try:
-            from rag_pipeline import JurisGPTRAG
-            self.rag = JurisGPTRAG()
+            from rag_pipeline import NyayaSetuRAG
+            self.rag = NyayaSetuRAG()
             self._initialized = True
-            print("✅ JurisGPT RAG Pipeline initialized")
+            print("✅ NyayaSetu RAG Pipeline initialized")
         except ImportError as e:
             self._initialization_error = f"RAG dependencies not installed: {e}"
             print(f"⚠️ {self._initialization_error}")
@@ -190,7 +190,7 @@ Non-compete agreements during employment are generally enforceable. However, pos
             success=True,
             message=f"""I understand you're asking about: **{query}**
 
-I'm JurisGPT, your AI legal assistant for Indian startup law. I can help with:
+I'm NyayaSetu, your AI legal assistant for Indian startup law. I can help with:
 
 • **Company Formation** - Incorporation, compliance, MCA filings
 • **Founder Agreements** - Equity split, vesting, roles
@@ -289,4 +289,4 @@ Please provide guidance on:
 
 
 # Singleton instance
-chatbot_service = JurisGPTChatbotService()
+chatbot_service = NyayaSetuChatbotService()

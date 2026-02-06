@@ -20,13 +20,13 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  useEffect(() => {
-    // Smooth scroll behavior
-    document.documentElement.style.scrollBehavior = "smooth";
-  }, []);
+    useEffect(() => {
+      // Set smooth scrolling via data attribute (Next.js compatible)
+      document.documentElement.setAttribute("data-scroll-behavior", "smooth");
+    }, []);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/30 overflow-hidden relative">
+    <main className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/30 relative">
       {/* Law-themed Background Images */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         {/* Hero Background - Scales of Justice */}
@@ -72,7 +72,7 @@ export default function Home() {
         aria-label="Main navigation"
       >
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-2 cursor-pointer" aria-label="JurisGPT Home">
+          <Link href="/" className="flex items-center gap-2 cursor-pointer" aria-label="NyayaSetu Home">
             <motion.div
               whileHover={{ scale: 1.05 }}
               className="flex items-center gap-2"
@@ -83,7 +83,7 @@ export default function Home() {
               >
                 <Scale className="h-6 w-6 text-primary" aria-hidden="true" />
               </motion.div>
-              <span className="text-xl font-bold text-foreground">JurisGPT</span>
+                <span className="text-xl font-bold text-foreground">NyayaSetu</span>
             </motion.div>
           </Link>
           <div className="flex gap-4">
@@ -289,10 +289,10 @@ export default function Home() {
                 <Award className="h-4 w-4 text-primary" />
                 <span>Lawyer Reviewed</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Lock className="h-4 w-4 text-primary" />
-                <span>GDPR Compliant</span>
-              </div>
+                <div className="flex items-center gap-2">
+                  <Lock className="h-4 w-4 text-primary" />
+                  <span>DPDPA Compliant</span>
+                </div>
             </motion.div>
           </div>
         </div>
@@ -380,7 +380,7 @@ export default function Home() {
               viewport={{ once: true }}
               className="text-4xl font-bold mb-4"
             >
-              Why Choose JurisGPT?
+                Why Choose NyayaSetu?
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -716,7 +716,7 @@ export default function Home() {
               viewport={{ once: true }}
               className="text-4xl font-bold mb-4"
             >
-              JurisGPT vs Traditional Law Firms
+                NyayaSetu vs Traditional Law Firms
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -734,13 +734,13 @@ export default function Home() {
               <thead>
                 <tr className="border-b border-border">
                   <th className="text-left p-4 font-semibold">Feature</th>
-                  <th className="text-center p-4 font-semibold text-primary">JurisGPT</th>
+                    <th className="text-center p-4 font-semibold text-primary">NyayaSetu</th>
                   <th className="text-center p-4 font-semibold text-muted-foreground">Traditional Firms</th>
                 </tr>
               </thead>
               <tbody>
                 {[
-                  { feature: "Price", jurisgpt: "₹1,999", traditional: "₹15,000 - ₹50,000" },
+                    { feature: "Price", jurisgpt: "₹999", traditional: "₹15,000 - ₹50,000" },
                   { feature: "Turnaround Time", jurisgpt: "24 hours", traditional: "2-4 weeks" },
                   { feature: "AI-Powered", jurisgpt: "✓", traditional: "✗" },
                   { feature: "Lawyer Review", jurisgpt: "✓ Included", traditional: "✓ Included" },
@@ -831,11 +831,11 @@ export default function Home() {
                 repeatDelay: 2,
               }}
               className="text-5xl font-bold text-primary mb-2"
-            >
-              ₹1,999
-            </motion.p>
-            <p className="text-lg text-muted-foreground">Per Founder Agreement</p>
-            <p className="text-base text-muted-foreground/70 mt-2">No hidden fees • No subscriptions</p>
+              >
+                ₹999
+              </motion.p>
+              <p className="text-lg text-muted-foreground">Per Founder Agreement</p>
+              <p className="text-base text-muted-foreground/70 mt-2">No hidden fees. First consultation free.</p>
           </motion.div>
 
           {/* Features List */}
@@ -984,7 +984,7 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-6">
             {[
               { title: "End-to-End Encryption", desc: "All documents encrypted in transit and at rest", icon: Lock },
-              { title: "GDPR Compliant", desc: "Full compliance with data protection regulations", icon: Shield },
+                { title: "DPDPA Compliant", desc: "Full compliance with India's Digital Personal Data Protection Act, 2023", icon: Shield },
               { title: "Secure Storage", desc: "Documents stored in secure cloud infrastructure", icon: Database },
             ].map((item, index) => {
               const Icon = item.icon;
@@ -1062,7 +1062,7 @@ export default function Home() {
               },
               {
                 question: "How secure is my company information?",
-                answer: "We use end-to-end encryption and follow GDPR compliance standards. Your data is stored securely and never shared with third parties. All documents are confidential.",
+                  answer: "We use end-to-end encryption and follow DPDPA (Digital Personal Data Protection Act, 2023) compliance standards. Your data is stored securely in India and never shared with third parties. All documents are confidential.",
               },
               {
                 question: "Can I use this for multiple founders?",
@@ -1387,7 +1387,7 @@ export default function Home() {
                 className="flex items-center gap-2 cursor-pointer mb-4"
               >
                 <Scale className="h-5 w-5 text-primary" />
-                <span className="font-semibold text-lg">JurisGPT</span>
+                <span className="font-semibold text-lg">NyayaSetu</span>
               </motion.div>
               <p className="text-base text-muted-foreground">
                 AI-powered legal document generation for Indian startups.
@@ -1420,7 +1420,7 @@ export default function Home() {
           </div>
           <div className="border-t border-border pt-8 flex justify-between items-center">
             <p className="text-base text-muted-foreground">
-              © 2024 JurisGPT. All rights reserved.
+              &copy; 2025 NyayaSetu. All rights reserved.
             </p>
             <div className="flex gap-4">
               <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">

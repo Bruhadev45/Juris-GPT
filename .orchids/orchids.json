@@ -1,0 +1,9 @@
+{
+  "projectId": "62b9ee7f-c0c3-4150-9f2d-c087f138d274",
+  "createdAt": 1770331687466,
+  "version": "1.0",
+  "startupCommands": [
+    "cd frontend; bun install; bun run dev",
+    "cd backend; source venv/bin/activate && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000"
+  ]
+}

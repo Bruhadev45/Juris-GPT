@@ -9,20 +9,20 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "JurisGPT - AI-Powered Legal Services for Indian Startups",
-  description: "Generate legally compliant Founder Agreements in minutes with AI assistance and expert lawyer review. Trusted by 500+ Indian startups. Get your documents within 24 hours.",
-  keywords: ["legal documents", "founder agreement", "AI legal services", "Indian startups", "legal compliance", "lawyer review", "startup legal"],
-  authors: [{ name: "JurisGPT" }],
+  title: "NyayaSetu - AI-Powered Legal Services for Indian Startups & MSMEs",
+  description: "India's AI-first legal platform. Generate legally compliant Founder Agreements, get instant legal guidance on Companies Act, Contract Act & more. Lawyer-reviewed. DPDPA compliant.",
+  keywords: ["legal documents", "founder agreement", "AI legal services", "Indian startups", "MSME legal", "Companies Act", "lawyer review", "NyayaSetu", "legal compliance India"],
+  authors: [{ name: "NyayaSetu" }],
   openGraph: {
-    title: "JurisGPT - AI-Powered Legal Services for Indian Startups",
-    description: "Generate legally compliant Founder Agreements in minutes with AI assistance and expert lawyer review.",
+    title: "NyayaSetu - AI-Powered Legal Services for Indian Startups & MSMEs",
+    description: "India's AI-first legal platform. Founder Agreements, legal Q&A, compliance guidance. Lawyer-reviewed.",
     type: "website",
     locale: "en_IN",
   },
   twitter: {
     card: "summary_large_image",
-    title: "JurisGPT - AI-Powered Legal Services",
-    description: "Generate legally compliant Founder Agreements in minutes.",
+    title: "NyayaSetu - AI-Powered Legal Services for India",
+    description: "Generate legally compliant Founder Agreements in minutes. Lawyer-reviewed.",
   },
   robots: {
     index: true,
@@ -36,11 +36,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${inter.variable} antialiased font-sans`}
-        style={{ fontFamily: "var(--font-inter), system-ui, -apple-system, sans-serif" }}
-      >
+    <html lang="en" suppressHydrationWarning>
+        <body
+          className={`${inter.variable} antialiased font-sans`}
+          style={{ fontFamily: "var(--font-inter), system-ui, -apple-system, sans-serif" }}
+          suppressHydrationWarning
+        >
         {children}
       </body>
     </html>

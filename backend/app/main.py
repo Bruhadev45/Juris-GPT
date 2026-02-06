@@ -4,8 +4,8 @@ from app.config import settings
 from app.routes import companies, matters, documents, admin, chatbot, legal_data
 
 app = FastAPI(
-    title="JurisGPT API",
-    description="AI-powered legal services platform for Indian startups",
+    title="NyayaSetu API",
+    description="AI-powered legal services platform for Indian startups and MSMEs",
     version="0.1.0",
 )
 

@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 """
-JurisGPT RAG Pipeline
+NyayaSetu RAG Pipeline
 Retrieval-Augmented Generation for Indian Legal Queries
 """
 
 import json
+import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv(Path(__file__).parent / ".env")
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 
@@ -34,8 +39,8 @@ class RAGResponse:
     model_used: str
 
 
-class JurisGPTRAG:
-    """RAG Pipeline for JurisGPT Legal Chatbot"""
+class NyayaSetuRAG:
+    """RAG Pipeline for NyayaSetu Legal Chatbot"""
 
     def __init__(
         self,
@@ -57,7 +62,7 @@ class JurisGPTRAG:
 
     def _initialize(self):
         """Initialize embeddings, vector store, and LLM"""
-        print("🔧 Initializing JurisGPT RAG Pipeline...")
+        print("🔧 Initializing NyayaSetu RAG Pipeline...")
 
         # Initialize embeddings
         self._init_embeddings()
@@ -155,7 +160,7 @@ class JurisGPTRAG:
                 self.llm = ChatOpenAI(
                     model="gpt-4o-mini",
                     temperature=0.3,
-                    max_tokens=2000
+                    max_tokens=4000
                 )
                 print("   🤖 Using OpenAI GPT-4o-mini")
                 return
@@ -228,27 +233,44 @@ class JurisGPTRAG:
         ])
 
         # System prompt for legal assistant
-        system_prompt = """You are JurisGPT, an AI legal assistant specializing in Indian law, particularly for startups and company formation.
+        system_prompt = """You are NyayaSetu, an AI legal assistant specializing in Indian law, particularly for startups and company formation.
 
 Your role is to:
 1. Answer legal questions accurately based on the provided context
 2. Cite specific acts, sections, and case laws when relevant
 3. Explain legal concepts in simple terms
 4. Provide practical guidance for Indian startups
+5. Draft legal documents, templates, notices, petitions, agreements, and case files when asked
 
-Important guidelines:
-- Only answer based on the provided context
-- If the context doesn't contain relevant information, say so
-- Always mention relevant legal provisions (e.g., "Section 7 of Companies Act, 2013")
+DOCUMENT DRAFTING:
+When the user asks you to draft, create, generate, or provide a template for any legal document (e.g., case file, legal notice, petition, agreement, affidavit, contract, MoU, NDA, power of attorney, complaint, FIR draft, lease agreement, employment contract, board resolution, etc.):
+- Generate a COMPLETE, professionally formatted legal document
+- Include all standard sections, clauses, and legal language
+- Use proper legal formatting with numbered sections and subsections
+- Include placeholder text in [BRACKETS] for details the user needs to fill in (e.g., [PARTY NAME], [DATE], [ADDRESS])
+- Reference applicable Indian laws, acts, and sections
+- Add a disclaimer at the end that the document should be reviewed by a qualified lawyer before use
+- Make the document as comprehensive and ready-to-use as possible
+
+FORMATTING RULES:
+- Use markdown formatting for better readability
+- Use **bold** for section headings and important terms
+- Use numbered lists (1, 2, 3) for clauses and sections
+- Use --- for section separators in documents
+- For legal documents, use proper structure: Title, Parties, Recitals, Clauses, Signatures
+
+Other guidelines:
+- Answer based on the provided context and your legal knowledge
+- Always mention relevant legal provisions (e.g., Section 7 of Companies Act, 2013)
 - Highlight important caveats or when professional legal advice is needed
-- Be concise but comprehensive
+- Be comprehensive - especially when drafting documents
 
 Context from legal database:
 {context}
 """
 
         # Create prompt
-        from langchain.prompts import ChatPromptTemplate
+        from langchain_core.prompts import ChatPromptTemplate
         prompt = ChatPromptTemplate.from_messages([
             ("system", system_prompt),
             ("human", "{query}")
@@ -265,16 +287,15 @@ Context from legal database:
 
     def _format_retrieval_only_response(self, docs: List[RetrievedDocument]) -> str:
         """Format response when no LLM is available"""
-        response = "📚 **Retrieved Legal Information:**\n\n"
+        response = "Retrieved Legal Information:\n\n"
 
         for i, doc in enumerate(docs, 1):
-            response += f"### {i}. {doc.title}\n"
-            response += f"**Type:** {doc.doc_type} | **Source:** {doc.source}\n"
-            response += f"**Relevance Score:** {doc.score:.2%}\n\n"
-            response += f"{doc.content[:500]}...\n\n"
-            response += "---\n\n"
+            response += f"{i}. {doc.title}\n"
+            response += f"   Type: {doc.doc_type} | Source: {doc.source}\n"
+            response += f"   Relevance Score: {doc.score:.0%}\n\n"
+            response += f"   {doc.content[:500]}...\n\n"
 
-        response += "\n💡 *Set OPENAI_API_KEY for AI-generated answers based on this context.*"
+        response += "\nNote: Set OPENAI_API_KEY for AI-generated answers based on this context."
         return response
 
     def query(self, query: str, top_k: int = None) -> RAGResponse:
@@ -310,7 +331,7 @@ Context from legal database:
         return output
 
 
-class JurisGPTChatbot:
+class NyayaSetuChatbot:
     """Chatbot wrapper for integration with FastAPI backend"""
 
     def __init__(self):
@@ -321,7 +342,7 @@ class JurisGPTChatbot:
         """Lazy initialization"""
         if not self._initialized:
             try:
-                self.rag = JurisGPTRAG()
+                self.rag = NyayaSetuRAG()
                 self._initialized = True
             except Exception as e:
                 print(f"⚠️ RAG initialization failed: {e}")
@@ -366,27 +387,27 @@ class JurisGPTChatbot:
 
 
 # Global chatbot instance for FastAPI
-chatbot = JurisGPTChatbot()
+chatbot = NyayaSetuChatbot()
 
 
 def main():
     """CLI interface for testing"""
     import argparse
 
-    parser = argparse.ArgumentParser(description="JurisGPT RAG Pipeline")
+    parser = argparse.ArgumentParser(description="NyayaSetu RAG Pipeline")
     parser.add_argument("--query", "-q", type=str, help="Legal query to answer")
     parser.add_argument("--interactive", "-i", action="store_true", help="Interactive mode")
 
     args = parser.parse_args()
 
     # Initialize RAG
-    rag = JurisGPTRAG()
+    rag = NyayaSetuRAG()
 
     if args.query:
         print(rag.chat(args.query))
     elif args.interactive:
         print("\n" + "="*60)
-        print("🤖 JurisGPT Legal Assistant")
+        print("🤖 NyayaSetu Legal Assistant")
         print("="*60)
         print("Ask any legal question about Indian law, company formation,")
         print("or founder agreements. Type 'quit' to exit.\n")

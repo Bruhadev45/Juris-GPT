@@ -1,5 +1,5 @@
 """
-JurisGPT Chatbot API Routes
+NyayaSetu Chatbot API Routes
 """
 
 from fastapi import APIRouter, HTTPException
@@ -12,7 +12,7 @@ from app.services.chatbot_service import (
     ChatResponse
 )
 
-router = APIRouter(prefix="/chat", tags=["Chatbot"])
+router = APIRouter(tags=["Chatbot"])
 
 
 class ChatMessageRequest(BaseModel):
@@ -41,7 +41,7 @@ class DocumentAssistanceRequest(BaseModel):
 @router.post("/message", response_model=ChatMessageResponse)
 async def send_chat_message(request: ChatMessageRequest):
     """
-    Send a message to the JurisGPT legal assistant.
+    Send a message to the NyayaSetu legal assistant.
 
     The chatbot uses RAG (Retrieval-Augmented Generation) to provide
     accurate legal information based on Indian law, case precedents,
