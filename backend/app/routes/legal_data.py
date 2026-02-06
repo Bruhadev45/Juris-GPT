@@ -30,6 +30,15 @@ class CaseSummary(BaseModel):
     relevance: str
 
 
+class CreateCaseRequest(BaseModel):
+    case_name: str
+    citation: str
+    court: str
+    principle: str
+    summary: str
+    relevance: str
+
+
 class CompaniesActSection(BaseModel):
     act: str
     section: str
@@ -132,6 +141,35 @@ async def get_case_summaries(
         return paginated_cases
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error reading cases file: {str(e)}")
+
+
+@router.post("/cases", response_model=CaseSummary, status_code=201)
+async def create_case(case: CreateCaseRequest):
+    """Add a new case summary"""
+    cases_file = DATA_DIR / "samples" / "case_summaries.json"
+
+    # Load existing cases
+    cases = []
+    if cases_file.exists():
+        try:
+            with open(cases_file, "r", encoding="utf-8") as f:
+                cases = json.load(f)
+        except Exception:
+            cases = []
+
+    new_case = case.model_dump()
+    cases.append(new_case)
+
+    # Ensure directory exists
+    cases_file.parent.mkdir(parents=True, exist_ok=True)
+
+    try:
+        with open(cases_file, "w", encoding="utf-8") as f:
+            json.dump(cases, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error saving case: {str(e)}")
+
+    return new_case
 
 
 @router.get("/companies-act", response_model=PaginatedCompaniesActResponse)
