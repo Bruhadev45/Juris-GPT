@@ -67,6 +67,9 @@ data/processed/*.json
 # Large dataset files
 data/datasets/indian_legal/**/*.arrow
 data/datasets/indian_law_json/**/*.db
+data/datasets/kaggle/
+data/processed/all_chunks.json
+*.csv
 
 # PDF files (can be regenerated)
 *.pdf
