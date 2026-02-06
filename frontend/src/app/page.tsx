@@ -72,7 +72,7 @@ export default function Home() {
         aria-label="Main navigation"
       >
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-2 cursor-pointer" aria-label="NyayaSetu Home">
+          <Link href="/" className="flex items-center gap-2 cursor-pointer" aria-label="JurisGPT Home">
             <motion.div
               whileHover={{ scale: 1.05 }}
               className="flex items-center gap-2"
@@ -83,7 +83,7 @@ export default function Home() {
               >
                 <Scale className="h-6 w-6 text-primary" aria-hidden="true" />
               </motion.div>
-                <span className="text-xl font-bold text-foreground">NyayaSetu</span>
+                <span className="text-xl font-bold text-foreground">JurisGPT</span>
             </motion.div>
           </Link>
           <div className="flex gap-4">
@@ -380,7 +380,7 @@ export default function Home() {
               viewport={{ once: true }}
               className="text-4xl font-bold mb-4"
             >
-                Why Choose NyayaSetu?
+                Why Choose JurisGPT?
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -716,7 +716,7 @@ export default function Home() {
               viewport={{ once: true }}
               className="text-4xl font-bold mb-4"
             >
-                NyayaSetu vs Traditional Law Firms
+                JurisGPT vs Traditional Law Firms
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -734,7 +734,7 @@ export default function Home() {
               <thead>
                 <tr className="border-b border-border">
                   <th className="text-left p-4 font-semibold">Feature</th>
-                    <th className="text-center p-4 font-semibold text-primary">NyayaSetu</th>
+                    <th className="text-center p-4 font-semibold text-primary">JurisGPT</th>
                   <th className="text-center p-4 font-semibold text-muted-foreground">Traditional Firms</th>
                 </tr>
               </thead>
@@ -1387,7 +1387,7 @@ export default function Home() {
                 className="flex items-center gap-2 cursor-pointer mb-4"
               >
                 <Scale className="h-5 w-5 text-primary" />
-                <span className="font-semibold text-lg">NyayaSetu</span>
+                <span className="font-semibold text-lg">JurisGPT</span>
               </motion.div>
               <p className="text-base text-muted-foreground">
                 AI-powered legal document generation for Indian startups.
@@ -1420,7 +1420,7 @@ export default function Home() {
           </div>
           <div className="border-t border-border pt-8 flex justify-between items-center">
             <p className="text-base text-muted-foreground">
-              &copy; 2025 NyayaSetu. All rights reserved.
+              &copy; 2025 JurisGPT. All rights reserved.
             </p>
             <div className="flex gap-4">
               <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">

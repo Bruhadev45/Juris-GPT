@@ -73,7 +73,7 @@ export default function ChatPage() {
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <Scale className="h-5 w-5 text-primary" />
-          <h1 className="text-lg font-semibold">NyayaSetu Legal Assistant</h1>
+          <h1 className="text-lg font-semibold">JurisGPT Legal Assistant</h1>
         </div>
         <div className="flex gap-2">
           <Link href="/dashboard">

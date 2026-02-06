@@ -1,5 +1,5 @@
 /**
- * API client for NyayaSetu backend
+ * API client for JurisGPT backend
  */
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";

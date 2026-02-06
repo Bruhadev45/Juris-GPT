@@ -66,7 +66,7 @@ export default function DashboardPage() {
             <div className="flex items-center gap-4 flex-1">
               <Link href="/" className="flex items-center gap-2 mr-4">
                 <Scale className="h-5 w-5 text-primary" />
-                <span className="font-bold text-foreground">NyayaSetu</span>
+                <span className="font-bold text-foreground">JurisGPT</span>
               </Link>
               <div className="flex-1 max-w-md">
                 <div className="relative">
