@@ -4,7 +4,7 @@
     "citation": "(1897) AC 22",
     "court": "House of Lords",
     "principle": "Separate Legal Entity",
-    "summary": "A company is a separate legal entity distinct from its members.",
+    "summary": "A company is a separate legal entity distinct from its members. Even a one-man company has a separate existence from its sole shareholder.",
     "relevance": "Foundation of company law"
   },
   {
@@ -14,5 +14,109 @@
     "principle": "Software as Goods",
     "summary": "Computer software on medium is goods liable to sales tax.",
     "relevance": "Important for tech companies"
+  },
+  {
+    "case_name": "Kesavananda Bharati v. State of Kerala",
+    "citation": "AIR 1973 SC 1461",
+    "court": "Supreme Court of India",
+    "principle": "Basic Structure Doctrine",
+    "summary": "Parliament can amend the Constitution but cannot alter its basic structure. The basic structure includes supremacy of the Constitution, rule of law, separation of powers, and fundamental rights.",
+    "relevance": "Most important constitutional law case in India"
+  },
+  {
+    "case_name": "Maneka Gandhi v. Union of India",
+    "citation": "AIR 1978 SC 597",
+    "court": "Supreme Court of India",
+    "principle": "Right to Life and Personal Liberty",
+    "summary": "Article 21 does not merely guarantee the right against deprivation of life or personal liberty but also the right to live with dignity. Any procedure depriving a person of life or liberty must be just, fair, and reasonable.",
+    "relevance": "Expanded scope of Article 21 significantly"
+  },
+  {
+    "case_name": "Vishaka v. State of Rajasthan",
+    "citation": "AIR 1997 SC 3011",
+    "court": "Supreme Court of India",
+    "principle": "Sexual Harassment at Workplace",
+    "summary": "The Supreme Court laid down guidelines to prevent sexual harassment of women at the workplace. These guidelines were binding until the enactment of the Sexual Harassment of Women at Workplace Act, 2013.",
+    "relevance": "Led to POSH Act 2013"
+  },
+  {
+    "case_name": "Navtej Singh Johar v. Union of India",
+    "citation": "(2018) 10 SCC 1",
+    "court": "Supreme Court of India",
+    "principle": "Decriminalization of Homosexuality",
+    "summary": "Section 377 of IPC was struck down to the extent it criminalized consensual sexual conduct between adults. The court held it violated Articles 14, 15, 19, and 21 of the Constitution.",
+    "relevance": "Landmark LGBTQ rights case"
+  },
+  {
+    "case_name": "K.S. Puttaswamy v. Union of India",
+    "citation": "(2017) 10 SCC 1",
+    "court": "Supreme Court of India",
+    "principle": "Right to Privacy",
+    "summary": "Right to privacy is a fundamental right under Article 21 of the Constitution. It includes informational privacy, bodily autonomy, and the privacy of personal choices.",
+    "relevance": "Foundation for data protection law in India"
+  },
+  {
+    "case_name": "Shreya Singhal v. Union of India",
+    "citation": "AIR 2015 SC 1523",
+    "court": "Supreme Court of India",
+    "principle": "Freedom of Speech Online",
+    "summary": "Section 66A of the IT Act was struck down as unconstitutional for being vague and overbroad, violating the right to freedom of speech and expression under Article 19(1)(a).",
+    "relevance": "Key internet freedom and free speech case"
+  },
+  {
+    "case_name": "M.C. Mehta v. Union of India",
+    "citation": "AIR 1987 SC 1086",
+    "court": "Supreme Court of India",
+    "principle": "Absolute Liability",
+    "summary": "An enterprise engaged in a hazardous or inherently dangerous activity owes an absolute duty to the community to ensure no harm. No exceptions or defences are available — stricter than the Rylands v. Fletcher rule.",
+    "relevance": "Foundation of environmental law in India"
+  },
+  {
+    "case_name": "S.R. Bommai v. Union of India",
+    "citation": "AIR 1994 SC 1918",
+    "court": "Supreme Court of India",
+    "principle": "President's Rule and Federalism",
+    "summary": "The imposition of President's Rule under Article 356 is subject to judicial review. Secularism is a basic feature of the Constitution. The court restricted misuse of Article 356 by the central government.",
+    "relevance": "Landmark federalism and secularism case"
+  },
+  {
+    "case_name": "Olga Tellis v. Bombay Municipal Corporation",
+    "citation": "AIR 1986 SC 180",
+    "court": "Supreme Court of India",
+    "principle": "Right to Livelihood",
+    "summary": "The right to livelihood is included in the right to life under Article 21. Pavement dwellers cannot be evicted without following due process of law and providing them a hearing.",
+    "relevance": "Expanded Article 21 to include right to livelihood"
+  },
+  {
+    "case_name": "Indian Young Lawyers Association v. State of Kerala",
+    "citation": "(2019) 11 SCC 1",
+    "court": "Supreme Court of India",
+    "principle": "Sabarimala Temple Entry",
+    "summary": "The ban on entry of women aged 10-50 into Sabarimala temple was held to be violative of their fundamental rights under Articles 14, 15, 25, and 26 of the Constitution.",
+    "relevance": "Religious rights vs gender equality"
+  },
+  {
+    "case_name": "Arnesh Kumar v. State of Bihar",
+    "citation": "(2014) 8 SCC 273",
+    "court": "Supreme Court of India",
+    "principle": "Guidelines on Arrest",
+    "summary": "Police must not automatically arrest the accused in cases under Section 498A IPC. Magistrates must not mechanically authorize detention. Laid down specific guidelines to prevent misuse of arrest powers.",
+    "relevance": "Prevents misuse of arrest provisions"
+  },
+  {
+    "case_name": "Lalita Kumari v. Government of UP",
+    "citation": "(2014) 2 SCC 1",
+    "court": "Supreme Court of India",
+    "principle": "Mandatory FIR Registration",
+    "summary": "Registration of FIR under Section 154 CrPC is mandatory if the information discloses commission of a cognizable offence. Police cannot refuse to register an FIR.",
+    "relevance": "Ensures access to criminal justice system"
+  },
+  {
+    "case_name": "Shayara Bano v. Union of India",
+    "citation": "(2017) 9 SCC 1",
+    "court": "Supreme Court of India",
+    "principle": "Triple Talaq",
+    "summary": "The practice of instant triple talaq (talaq-e-biddat) was declared unconstitutional. It violated the fundamental rights of Muslim women under Articles 14, 15, and 21.",
+    "relevance": "Led to Muslim Women (Protection of Rights on Marriage) Act, 2019"
   }
 ]
