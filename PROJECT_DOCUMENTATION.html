@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JurisGPT — Project Documentation</title>
+  <style>
+    /* ============================================================
+       BASE & TYPOGRAPHY
+       ============================================================ */
+    :root {
+      --navy:       #0f1b2d;
+      --navy-light: #1a2d47;
+      --blue:       #2563eb;
+      --blue-light: #dbeafe;
+      --slate:      #475569;
+      --slate-light:#94a3b8;
+      --border:     #e2e8f0;
+      --bg:         #ffffff;
+      --bg-alt:     #f8fafc;
+      --success:    #16a34a;
+      --success-bg: #dcfce7;
+      --amber:      #d97706;
+      --amber-bg:   #fef3c7;
+      --red:        #dc2626;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { font-size: 15px; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                   "Helvetica Neue", Arial, sans-serif;
+      color: #1e293b;
+      line-height: 1.7;
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ============================================================
+       PRINT RULES
+       ============================================================ */
+    @media print {
+      html { font-size: 12px; }
+      body { background: #fff; }
+      .no-print { display: none !important; }
+      .page-break { page-break-before: always; }
+      a { color: inherit; text-decoration: none; }
+      .container { max-width: 100%; padding: 0; }
+      .header-bar { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      table { font-size: 11px; }
+      pre, code { font-size: 10px; }
+      .section { padding: 1.5rem 0; }
+    }
+
+    @page {
+      size: A4;
+      margin: 18mm 15mm 20mm 15mm;
+    }
+
+    /* ============================================================
+       LAYOUT
+       ============================================================ */
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* ============================================================
+       HEADER
+       ============================================================ */
+    .header-bar {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+      color: #fff;
+      padding: 3rem 0 2.5rem;
+      margin-bottom: 0;
+    }
+    .header-bar .brand {
+      font-size: 2.4rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 0.25rem;
+    }
+    .header-bar .brand span {
+      color: #60a5fa;
+    }
+    .header-bar .tagline {
+      font-size: 1.1rem;
+      color: #94a3b8;
+      font-weight: 400;
+      margin-bottom: 1.25rem;
+    }
+    .header-bar .doc-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      border-top: 1px solid rgba(255,255,255,0.15);
+      padding-top: 1.25rem;
+      margin-top: 0.5rem;
+    }
+    .header-meta {
+      display: flex;
+      gap: 2rem;
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+    .header-meta span { display: inline-flex; align-items: center; gap: 0.35rem; }
+
+    /* ============================================================
+       TABLE OF CONTENTS
+       ============================================================ */
+    .toc {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.75rem 2rem;
+      margin: 2.5rem 0;
+    }
+    .toc h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .toc ol {
+      list-style: none;
+      counter-reset: toc-counter;
+      padding: 0;
+      columns: 2;
+      column-gap: 2rem;
+    }
+    .toc li {
+      counter-increment: toc-counter;
+      margin-bottom: 0.5rem;
+      break-inside: avoid;
+    }
+    .toc li::before {
+      content: counter(toc-counter, decimal-leading-zero) ".";
+      color: var(--blue);
+      font-weight: 700;
+      margin-right: 0.5rem;
+      font-size: 0.85rem;
+    }
+    .toc a {
+      color: var(--slate);
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: color 0.2s;
+    }
+    .toc a:hover { color: var(--blue); }
+
+    /* ============================================================
+       SECTIONS
+       ============================================================ */
+    .section {
+      padding: 2.5rem 0 1.5rem;
+    }
+    .section-number {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--blue);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.25rem;
+      display: block;
+    }
+    h2.section-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 0.35rem;
+      line-height: 1.3;
+    }
+    .section-rule {
+      width: 48px;
+      height: 3px;
+      background: var(--blue);
+      border: none;
+      border-radius: 2px;
+      margin: 0.75rem 0 1.5rem;
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--navy-light);
+      margin: 1.75rem 0 0.75rem;
+    }
+
+    h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--slate);
+      margin: 1.25rem 0 0.5rem;
+    }
+
+    p { margin-bottom: 0.85rem; color: var(--slate); }
+
+    ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; color: var(--slate); }
+    li { margin-bottom: 0.35rem; }
+
+    strong { color: #1e293b; }
+
+    /* ============================================================
+       INFO CARDS
+       ============================================================ */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.25rem 0;
+    }
+    .info-card {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem 1.25rem;
+    }
+    .info-card .label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.75px;
+      color: var(--slate-light);
+      margin-bottom: 0.25rem;
+    }
+    .info-card .value {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--navy);
+    }
+
+    /* ============================================================
+       TABLES
+       ============================================================ */
+    .table-wrapper {
+      overflow-x: auto;
+      margin: 1rem 0 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    thead {
+      background: var(--navy);
+      color: #fff;
+    }
+    thead th {
+      padding: 0.7rem 1rem;
+      font-weight: 600;
+      text-align: left;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    tbody tr { border-bottom: 1px solid var(--border); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:nth-child(even) { background: var(--bg-alt); }
+    tbody td {
+      padding: 0.6rem 1rem;
+      vertical-align: top;
+    }
+    .status-done {
+      display: inline-block;
+      background: var(--success-bg);
+      color: var(--success);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+    }
+    .status-planned {
+      display: inline-block;
+      background: var(--amber-bg);
+      color: var(--amber);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+    }
+
+    /* ============================================================
+       CODE BLOCKS
+       ============================================================ */
+    pre {
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      margin: 1rem 0 1.5rem;
+    }
+    code {
+      font-family: "SF Mono", "Fira Code", "Cascadia Code", Menlo, Consolas, monospace;
+    }
+    :not(pre) > code {
+      background: #f1f5f9;
+      color: #be185d;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.85em;
+    }
+
+    /* ============================================================
+       API ENDPOINT GROUPS
+       ============================================================ */
+    .endpoint-group {
+      margin-bottom: 1.5rem;
+    }
+    .endpoint-group h4 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.6rem;
+    }
+    .endpoint-group h4 .badge {
+      background: var(--navy);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .endpoint-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .endpoint-list li {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      padding: 0.35rem 0;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 0.88rem;
+    }
+    .endpoint-list li:last-child { border-bottom: none; }
+    .method {
+      display: inline-block;
+      min-width: 3.2rem;
+      text-align: center;
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      font-family: "SF Mono", Menlo, monospace;
+    }
+    .method-get { background: #dbeafe; color: #1d4ed8; }
+    .method-post { background: #dcfce7; color: #15803d; }
+    .method-put { background: #fef3c7; color: #b45309; }
+    .method-delete { background: #fee2e2; color: #dc2626; }
+    .endpoint-path {
+      font-family: "SF Mono", Menlo, monospace;
+      color: var(--navy);
+      font-size: 0.85rem;
+    }
+
+    /* ============================================================
+       FILE TREE
+       ============================================================ */
+    .file-tree {
+      background: #0f172a;
+      color: #cbd5e1;
+      border-radius: 8px;
+      padding: 1.5rem 2rem;
+      font-family: "SF Mono", "Fira Code", Menlo, monospace;
+      font-size: 0.82rem;
+      line-height: 1.7;
+      overflow-x: auto;
+      margin: 1rem 0 1.5rem;
+    }
+    .file-tree .dir { color: #60a5fa; font-weight: 600; }
+    .file-tree .file { color: #e2e8f0; }
+    .file-tree .comment { color: #64748b; font-style: italic; }
+
+    /* ============================================================
+       PRICING CARDS
+       ============================================================ */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin: 1.25rem 0;
+    }
+    @media (max-width: 700px) { .pricing-grid { grid-template-columns: 1fr 1fr; } }
+    .pricing-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .pricing-card.featured {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 1px var(--blue);
+    }
+    .pricing-card.featured::before {
+      content: "POPULAR";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      background: var(--blue);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 0.2rem;
+    }
+    .pricing-card .plan-name {
+      font-weight: 800;
+      color: var(--navy);
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
+    }
+    .pricing-card.featured .plan-name { margin-top: 0.75rem; }
+    .pricing-card .plan-price {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--blue);
+      margin-bottom: 0.5rem;
+    }
+    .pricing-card ul {
+      list-style: none;
+      padding: 0;
+      text-align: left;
+      font-size: 0.8rem;
+      color: var(--slate);
+    }
+    .pricing-card li { padding: 0.2rem 0; }
+    .pricing-card li::before { content: "- "; color: var(--slate-light); }
+
+    /* ============================================================
+       ROADMAP
+       ============================================================ */
+    .roadmap-item {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      align-items: flex-start;
+    }
+    .roadmap-number {
+      flex-shrink: 0;
+      width: 2rem;
+      height: 2rem;
+      background: var(--blue);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+    .roadmap-content { flex: 1; }
+    .roadmap-content strong { display: block; color: var(--navy); margin-bottom: 0.15rem; }
+    .roadmap-content p { margin: 0; font-size: 0.9rem; }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 0;
+      margin-top: 3rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--slate-light);
+    }
+    .footer strong { color: var(--slate); }
+
+    /* ============================================================
+       MIGRATION TABLE
+       ============================================================ */
+    .migration-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    .migration-card {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem 1.25rem;
+    }
+    .migration-card .label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .migration-card .label .arrow { color: var(--blue); }
+    .migration-card ul {
+      list-style: none;
+      padding: 0;
+      font-size: 0.88rem;
+    }
+    .migration-card li { padding: 0.2rem 0; color: var(--slate); }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       HEADER
+       ============================================================ -->
+  <header class="header-bar">
+    <div class="container">
+      <div class="brand">Juris<span>GPT</span></div>
+      <div class="tagline">AI-Powered Legal Services for Indian Startups &amp; MSMEs</div>
+      <div class="doc-title">Project Documentation</div>
+      <div class="header-meta">
+        <span><strong>Version:</strong>&nbsp;1.0</span>
+        <span><strong>Date:</strong>&nbsp;February 6, 2026</span>
+        <span><strong>Status:</strong>&nbsp;Phase 2 Complete</span>
+        <span><strong>Formerly:</strong>&nbsp;NyayaSetu</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- TABLE OF CONTENTS -->
+    <nav class="toc">
+      <h2>Table of Contents</h2>
+      <ol>
+        <li><a href="#overview">Project Overview</a></li>
+        <li><a href="#tech-stack">Tech Stack</a></li>
+        <li><a href="#features">What Was Built (Phase 1 + Phase 2)</a></li>
+        <li><a href="#data-storage">Data Storage Architecture</a></li>
+        <li><a href="#api-endpoints">API Endpoints (Complete List)</a></li>
+        <li><a href="#file-structure">File Structure</a></li>
+        <li><a href="#roadmap">Future Development Roadmap</a></li>
+        <li><a href="#run-locally">How to Run Locally</a></li>
+        <li><a href="#pricing">Pricing Model</a></li>
+      </ol>
+    </nav>
+
+    <!-- ============================================================
+         SECTION 1: PROJECT OVERVIEW
+         ============================================================ -->
+    <section id="overview" class="section">
+      <span class="section-number">Section 01</span>
+      <h2 class="section-title">Project Overview</h2>
+      <hr class="section-rule">
+
+      <p>
+        <strong>JurisGPT</strong> (formerly NyayaSetu) is an AI-powered legal services platform designed specifically
+        for Indian startups and MSMEs. It combines the power of large language models with structured legal
+        knowledge to provide affordable, accessible, and reliable legal assistance.
+      </p>
+      <p>
+        The platform operates on an <strong>80% AI + 20% Lawyer</strong> hybrid model &mdash; AI handles routine
+        legal tasks such as document drafting, compliance tracking, and legal research, while qualified lawyers
+        review critical outputs and handle complex matters that require human judgment.
+      </p>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="label">Project Name</div>
+          <div class="value">JurisGPT (formerly NyayaSetu)</div>
+        </div>
+        <div class="info-card">
+          <div class="label">Architecture</div>
+          <div class="value">Next.js 15 + FastAPI + Supabase + GPT-4o</div>
+        </div>
+        <div class="info-card">
+          <div class="label">Model</div>
+          <div class="value">80% AI + 20% Lawyer Hybrid</div>
+        </div>
+        <div class="info-card">
+          <div class="label">Target Users</div>
+          <div class="value">Indian Startups &amp; MSMEs</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 2: TECH STACK
+         ============================================================ -->
+    <section id="tech-stack" class="section page-break">
+      <span class="section-number">Section 02</span>
+      <h2 class="section-title">Tech Stack</h2>
+      <hr class="section-rule">
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Layer</th>
+              <th>Technology</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Frontend</strong></td>
+              <td>Next.js 15, React 19, TypeScript 5</td>
+              <td>App Router, Server Components, Client Components</td>
+            </tr>
+            <tr>
+              <td><strong>Styling</strong></td>
+              <td>Tailwind CSS 4, shadcn/ui</td>
+              <td>Utility-first CSS with accessible component library</td>
+            </tr>
+            <tr>
+              <td><strong>Animations</strong></td>
+              <td>Framer Motion</td>
+              <td>Page transitions, micro-interactions, scroll animations</td>
+            </tr>
+            <tr>
+              <td><strong>Charts</strong></td>
+              <td>Recharts</td>
+              <td>Dashboard analytics and data visualization</td>
+            </tr>
+            <tr>
+              <td><strong>Backend</strong></td>
+              <td>FastAPI (Python)</td>
+              <td>Async REST API with automatic OpenAPI docs</td>
+            </tr>
+            <tr>
+              <td><strong>Validation</strong></td>
+              <td>Pydantic</td>
+              <td>Request/response model validation</td>
+            </tr>
+            <tr>
+              <td><strong>Database</strong></td>
+              <td>Supabase (PostgreSQL)</td>
+              <td>Companies, legal matters, documents, lawyer reviews</td>
+            </tr>
+            <tr>
+              <td><strong>AI / LLM</strong></td>
+              <td>OpenAI GPT-4o</td>
+              <td>Legal chat, document generation, contract analysis</td>
+            </tr>
+            <tr>
+              <td><strong>Vector Store</strong></td>
+              <td>ChromaDB</td>
+              <td>RAG pipeline for legal document embeddings</td>
+            </tr>
+            <tr>
+              <td><strong>Embeddings</strong></td>
+              <td>sentence-transformers</td>
+              <td>Legal text embeddings for semantic search</td>
+            </tr>
+            <tr>
+              <td><strong>Auth</strong></td>
+              <td>Supabase Auth</td>
+              <td>Planned &mdash; email/password + OAuth providers</td>
+            </tr>
+            <tr>
+              <td><strong>Deployment</strong></td>
+              <td>Vercel + Railway/Render</td>
+              <td>Frontend on Vercel, backend on Railway or Render</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 3: WHAT WAS BUILT
+         ============================================================ -->
+    <section id="features" class="section page-break">
+      <span class="section-number">Section 03</span>
+      <h2 class="section-title">What Was Built (Phase 1 + Phase 2)</h2>
+      <hr class="section-rule">
+
+      <h3>Phase 1 &mdash; Core Platform</h3>
+      <p>The foundational platform covering all essential legal service features.</p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Frontend Page</th>
+              <th>Backend Route</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Landing Page</strong> (Arcline-style)</td>
+              <td><code>/</code> (page.tsx)</td>
+              <td>N/A</td>
+              <td><span class="status-done">Done</span></td>
+            </tr>
+            <tr>
+              <td><strong>Dashboard</strong></td>
+              <td><code>/dashboard</code></td>
+              <td>N/A</td>
+              <td><span class="status-done">Done</span></td>
+            </tr>
+            <tr>
+              <td><strong>Cases</strong></td>
+              <td><code>/dashboard/cases</code></td>
+              <td><code>/api/companies</code>, <code>/api/matters</code>, <code>/api/documents</code></td>
+              <td><span class="status-done">Done</span></td>
+            </tr>
+            <tr>
+              <td><strong>Chat</strong> (AI Legal Assistant)</td>
+              <td><code>/dashboard/chat</code></td>
+              <td><code>/api/chat/message</code>, <code>/api/chat/suggestions</code></td>
+              <td><span class="status-done">Done</span></td>
+            </tr>
+            <tr>
+              <td><strong>Legal Search</strong></td>
+              <td><code>/dashboard/search</code></td>
+              <td><code>/api/legal/laws</code>, <code>/api/legal/cases</code>, <code>/api/legal/companies-act</code></td>
+              <td><span class="status-done">Done</span></td>
+            </tr>
+            <tr>
+              <td><strong>Compliance View</strong></td>
+              <td><code>/dashboard/compliance</code></td>
+              <td><code>/api/compliance/deadlines</code>, <code>/api/compliance/upcoming</code></td>
+              <td><span class="status-done">Done</span></td>
+            </tr>
+            <tr>
+              <td><strong>Legal Forms</strong> (7 templates)</td>
+              <td><code>/dashboard/forms</code>, <code>/dashboard/forms/[templateId]</code></td>
+              <td><code>/api/templates</code>, <code>/api/templates/{id}/generate</code></td>
+              <td><span class="status-done">Done</span></td>
+            </tr>
+            <tr>
+              <td><strong>Smart Review</strong></td>
+              <td><code>/dashboard/review</code></td>
+              <td><code>/api/reviews/upload</code>, <code>/api/reviews/{id}/analyze</code></td>
+              <td><span class="status-done">Done</span></td>
+            </tr>
+            <tr>
+              <td><strong>Settings</strong></td>
+              <td><code>/dashboard/settings</code></td>
+              <td><code>/api/settings</code></td>
+              <td><span class="status-done">Done</span></td>
+            </tr>
+            <tr>
+              <td><strong>Support</strong></td>
+              <td><code>/dashboard/support</code></td>
+              <td><code>/api/support/tickets</code></td>
+              <td><span class="status-done">Done</span></td>
+            </tr>
+            <tr>
+              <td><strong>Team Management</strong></td>
+              <td><code>/dashboard/team</code></td>
+              <td><code>/api/team</code></td>
+              <td><span class="status-done">Done</span></td>
+            </tr>
+            <tr>
+              <td><strong>Integrations</strong></td>
+              <td><code>/dashboard/integrations</code></td>
+              <td><code>/api/integrations</code></td>
+              <td><span class="status-done">Done</span></td>
+            </tr>
+            <tr>
+              <td><strong>Agreements</strong> (Founder)</td>
+              <td><code>/agreements/new</code>, <code>/agreements/[id]</code></td>
+              <td><code>/api/matters</code>, <code>/api/documents/generate</code></td>
+              <td><span class="status-done">Done</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Phase 2 &mdash; Advanced Features</h3>
+      <p>Additional tools and utilities that extend the platform's capabilities.</p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Frontend Page</th>
+              <th>Backend Route</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Document Vault</strong></td>
+              <td><code>/dashboard/vault</code></td>
+              <td><code>/api/vault</code></td>
+              <td><span class="status-done">Done</span></td>
+            </tr>
+            <tr>
+              <td><strong>Contract Analyzer</strong></td>
+              <td><code>/dashboard/analyzer</code></td>
+              <td><code>/api/analyzer</code></td>
+              <td><span class="status-done">Done</span></td>
+            </tr>
+            <tr>
+              <td><strong>Compliance Calendar</strong></td>
+              <td><code>/dashboard/calendar</code></td>
+              <td>Reuses <code>/api/compliance/deadlines</code></td>
+              <td><span class="status-done">Done</span></td>
+            </tr>
+            <tr>
+              <td><strong>Legal Calculator</strong> (6 types)</td>
+              <td><code>/dashboard/calculator</code></td>
+              <td>Client-side computation</td>
+              <td><span class="status-done">Done</span></td>
+            </tr>
+            <tr>
+              <td><strong>RTI Assistant</strong></td>
+              <td><code>/dashboard/rti</code></td>
+              <td><code>/api/rti</code></td>
+              <td><span class="status-done">Done</span></td>
+            </tr>
+            <tr>
+              <td><strong>Legal News Feed</strong></td>
+              <td><code>/dashboard/news</code></td>
+              <td><code>/api/news</code></td>
+              <td><span class="status-done">Done</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 4: DATA STORAGE ARCHITECTURE
+         ============================================================ -->
+    <section id="data-storage" class="section page-break">
+      <span class="section-number">Section 04</span>
+      <h2 class="section-title">Data Storage Architecture</h2>
+      <hr class="section-rule">
+
+      <h3>Current Storage (MVP)</h3>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Storage Type</th>
+              <th>Purpose</th>
+              <th>Data Stored</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>JSON File-Based</strong></td>
+              <td>Rapid prototyping, MVP data</td>
+              <td>Compliance deadlines, legal news, settings, support tickets, team members, vault documents, analyzer results, RTI applications</td>
+            </tr>
+            <tr>
+              <td><strong>Supabase PostgreSQL</strong></td>
+              <td>Persistent relational data</td>
+              <td>Companies, legal_matters, documents, lawyer_reviews</td>
+            </tr>
+            <tr>
+              <td><strong>ChromaDB</strong></td>
+              <td>Vector store for RAG</td>
+              <td>Legal document embeddings for semantic search</td>
+            </tr>
+            <tr>
+              <td><strong>Local Filesystem</strong></td>
+              <td>File uploads</td>
+              <td>Uploaded files (vault, reviews)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Data Files Location</h3>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>File Path</th>
+              <th>Description</th>
+              <th>Records</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>data/datasets/samples/compliance_deadlines.json</code></td>
+              <td>Indian compliance deadlines</td>
+              <td>25</td>
+            </tr>
+            <tr>
+              <td><code>data/datasets/samples/legal_news.json</code></td>
+              <td>Legal news articles</td>
+              <td>25</td>
+            </tr>
+            <tr>
+              <td><code>data/datasets/samples/case_summaries.json</code></td>
+              <td>Supreme Court case summaries</td>
+              <td>&mdash;</td>
+            </tr>
+            <tr>
+              <td><code>data/datasets/samples/companies_act_sections.json</code></td>
+              <td>Companies Act 2013 sections</td>
+              <td>&mdash;</td>
+            </tr>
+            <tr>
+              <td><code>data/vault_documents.json</code></td>
+              <td>Vault document metadata</td>
+              <td>&mdash;</td>
+            </tr>
+            <tr>
+              <td><code>data/analyzer_results.json</code></td>
+              <td>Contract analysis results</td>
+              <td>&mdash;</td>
+            </tr>
+            <tr>
+              <td><code>data/rti_applications.json</code></td>
+              <td>RTI application records</td>
+              <td>&mdash;</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 5: API ENDPOINTS
+         ============================================================ -->
+    <section id="api-endpoints" class="section page-break">
+      <span class="section-number">Section 05</span>
+      <h2 class="section-title">API Endpoints (Complete List)</h2>
+      <hr class="section-rule">
+      <p>All endpoints are served from the FastAPI backend at <code>http://localhost:8000</code>.
+         Interactive API documentation is available at <code>/docs</code> (Swagger UI).</p>
+
+      <!-- Legal Data -->
+      <div class="endpoint-group">
+        <h4><span class="badge">Legal Data</span> Legal Research &amp; Search</h4>
+        <ul class="endpoint-list">
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/legal/laws</span></li>
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/legal/laws/{name}</span></li>
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/legal/cases</span></li>
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/legal/companies-act</span></li>
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/legal/stats</span></li>
+        </ul>
+      </div>
+
+      <!-- Chat -->
+      <div class="endpoint-group">
+        <h4><span class="badge">Chat</span> AI Legal Assistant</h4>
+        <ul class="endpoint-list">
+          <li><span class="method method-post">POST</span> <span class="endpoint-path">/api/chat/message</span></li>
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/chat/suggestions</span></li>
+        </ul>
+      </div>
+
+      <!-- Companies -->
+      <div class="endpoint-group">
+        <h4><span class="badge">Companies</span> Company Management</h4>
+        <ul class="endpoint-list">
+          <li><span class="method method-post">POST</span> <span class="endpoint-path">/api/companies</span></li>
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/companies/{id}</span></li>
+        </ul>
+      </div>
+
+      <!-- Matters -->
+      <div class="endpoint-group">
+        <h4><span class="badge">Matters</span> Legal Matters</h4>
+        <ul class="endpoint-list">
+          <li><span class="method method-post">POST</span> <span class="endpoint-path">/api/matters</span></li>
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/matters/{id}</span></li>
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/matters/{id}/status</span></li>
+        </ul>
+      </div>
+
+      <!-- Documents -->
+      <div class="endpoint-group">
+        <h4><span class="badge">Documents</span> Document Generation</h4>
+        <ul class="endpoint-list">
+          <li><span class="method method-post">POST</span> <span class="endpoint-path">/api/documents/generate</span></li>
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/documents/{id}</span></li>
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/documents/{id}/download</span></li>
+        </ul>
+      </div>
+
+      <!-- Admin -->
+      <div class="endpoint-group">
+        <h4><span class="badge">Admin</span> Lawyer Review Administration</h4>
+        <ul class="endpoint-list">
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/admin/reviews/pending</span></li>
+          <li><span class="method method-post">POST</span> <span class="endpoint-path">/api/admin/reviews/{id}/approve</span></li>
+          <li><span class="method method-post">POST</span> <span class="endpoint-path">/api/admin/reviews/{id}/request-changes</span></li>
+        </ul>
+      </div>
+
+      <!-- Compliance -->
+      <div class="endpoint-group">
+        <h4><span class="badge">Compliance</span> Compliance Tracking</h4>
+        <ul class="endpoint-list">
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/compliance/deadlines</span></li>
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/compliance/upcoming</span></li>
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/compliance/categories</span></li>
+        </ul>
+      </div>
+
+      <!-- Templates -->
+      <div class="endpoint-group">
+        <h4><span class="badge">Templates</span> Legal Form Templates</h4>
+        <ul class="endpoint-list">
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/templates</span></li>
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/templates/{id}</span></li>
+          <li><span class="method method-post">POST</span> <span class="endpoint-path">/api/templates/{id}/generate</span></li>
+        </ul>
+      </div>
+
+      <!-- Reviews -->
+      <div class="endpoint-group">
+        <h4><span class="badge">Reviews</span> Smart Review</h4>
+        <ul class="endpoint-list">
+          <li><span class="method method-post">POST</span> <span class="endpoint-path">/api/reviews/upload</span></li>
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/reviews</span></li>
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/reviews/{id}</span></li>
+          <li><span class="method method-post">POST</span> <span class="endpoint-path">/api/reviews/{id}/analyze</span></li>
+        </ul>
+      </div>
+
+      <!-- Settings -->
+      <div class="endpoint-group">
+        <h4><span class="badge">Settings</span> User Settings</h4>
+        <ul class="endpoint-list">
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/settings</span></li>
+          <li><span class="method method-put">PUT</span> <span class="endpoint-path">/api/settings/profile</span></li>
+          <li><span class="method method-put">PUT</span> <span class="endpoint-path">/api/settings/notifications</span></li>
+          <li><span class="method method-put">PUT</span> <span class="endpoint-path">/api/settings/appearance</span></li>
+        </ul>
+      </div>
+
+      <!-- Support -->
+      <div class="endpoint-group">
+        <h4><span class="badge">Support</span> Support Tickets</h4>
+        <ul class="endpoint-list">
+          <li><span class="method method-post">POST</span> <span class="endpoint-path">/api/support/tickets</span></li>
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/support/tickets</span></li>
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/support/tickets/{id}</span></li>
+        </ul>
+      </div>
+
+      <!-- Team -->
+      <div class="endpoint-group">
+        <h4><span class="badge">Team</span> Team Management</h4>
+        <ul class="endpoint-list">
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/team</span></li>
+          <li><span class="method method-post">POST</span> <span class="endpoint-path">/api/team</span></li>
+          <li><span class="method method-put">PUT</span> <span class="endpoint-path">/api/team/{id}</span></li>
+          <li><span class="method method-delete">DELETE</span> <span class="endpoint-path">/api/team/{id}</span></li>
+        </ul>
+      </div>
+
+      <!-- Integrations -->
+      <div class="endpoint-group">
+        <h4><span class="badge">Integrations</span> Third-Party Integrations</h4>
+        <ul class="endpoint-list">
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/integrations</span></li>
+        </ul>
+      </div>
+
+      <!-- Vault -->
+      <div class="endpoint-group">
+        <h4><span class="badge">Vault</span> Document Vault</h4>
+        <ul class="endpoint-list">
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/vault</span></li>
+          <li><span class="method method-post">POST</span> <span class="endpoint-path">/api/vault/upload</span></li>
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/vault/{id}</span></li>
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/vault/{id}/download</span></li>
+          <li><span class="method method-delete">DELETE</span> <span class="endpoint-path">/api/vault/{id}</span></li>
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/vault/categories</span></li>
+        </ul>
+      </div>
+
+      <!-- Analyzer -->
+      <div class="endpoint-group">
+        <h4><span class="badge">Analyzer</span> Contract Analyzer</h4>
+        <ul class="endpoint-list">
+          <li><span class="method method-post">POST</span> <span class="endpoint-path">/api/analyzer/upload</span></li>
+          <li><span class="method method-post">POST</span> <span class="endpoint-path">/api/analyzer/{id}/analyze</span></li>
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/analyzer/{id}</span></li>
+        </ul>
+      </div>
+
+      <!-- Calculator -->
+      <div class="endpoint-group">
+        <h4><span class="badge">Calculator</span> Legal Calculator</h4>
+        <ul class="endpoint-list">
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/calculator/types</span></li>
+          <li><span class="method method-post">POST</span> <span class="endpoint-path">/api/calculator/stamp-duty</span></li>
+          <li><span class="method method-post">POST</span> <span class="endpoint-path">/api/calculator/court-fees</span></li>
+          <li><span class="method method-post">POST</span> <span class="endpoint-path">/api/calculator/gst</span></li>
+          <li><span class="method method-post">POST</span> <span class="endpoint-path">/api/calculator/tds</span></li>
+          <li><span class="method method-post">POST</span> <span class="endpoint-path">/api/calculator/gratuity</span></li>
+          <li><span class="method method-post">POST</span> <span class="endpoint-path">/api/calculator/emi</span></li>
+        </ul>
+      </div>
+
+      <!-- RTI -->
+      <div class="endpoint-group">
+        <h4><span class="badge">RTI</span> RTI Assistant</h4>
+        <ul class="endpoint-list">
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/rti/departments</span></li>
+          <li><span class="method method-post">POST</span> <span class="endpoint-path">/api/rti/generate</span></li>
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/rti/applications</span></li>
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/rti/applications/{id}</span></li>
+        </ul>
+      </div>
+
+      <!-- News -->
+      <div class="endpoint-group">
+        <h4><span class="badge">News</span> Legal News</h4>
+        <ul class="endpoint-list">
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/news</span></li>
+          <li><span class="method method-get">GET</span> <span class="endpoint-path">/api/news/categories</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 6: FILE STRUCTURE
+         ============================================================ -->
+    <section id="file-structure" class="section page-break">
+      <span class="section-number">Section 06</span>
+      <h2 class="section-title">File Structure</h2>
+      <hr class="section-rule">
+
+      <p>Key directories and files that make up the JurisGPT project.</p>
+
+      <div class="file-tree"><span class="dir">JurisGPT/</span>
+<span class="dir">  frontend/</span>
+<span class="dir">    src/</span>
+<span class="dir">      app/</span>
+<span class="file">        page.tsx</span>                         <span class="comment">// Landing Page (Arcline-style)</span>
+<span class="file">        layout.tsx</span>                       <span class="comment">// Root layout with providers</span>
+<span class="dir">        dashboard/</span>
+<span class="file">          page.tsx</span>                      <span class="comment">// Dashboard overview</span>
+<span class="dir">          cases/</span>                        <span class="comment">// Case management</span>
+<span class="dir">          chat/</span>                         <span class="comment">// AI Legal Assistant</span>
+<span class="dir">          search/</span>                       <span class="comment">// Legal search</span>
+<span class="dir">          compliance/</span>                   <span class="comment">// Compliance tracking</span>
+<span class="dir">          forms/</span>                        <span class="comment">// Legal forms + [templateId]</span>
+<span class="dir">          review/</span>                       <span class="comment">// Smart review</span>
+<span class="dir">          settings/</span>                     <span class="comment">// User settings</span>
+<span class="dir">          support/</span>                      <span class="comment">// Support tickets</span>
+<span class="dir">          team/</span>                         <span class="comment">// Team management</span>
+<span class="dir">          integrations/</span>                 <span class="comment">// Third-party integrations</span>
+<span class="dir">          vault/</span>                        <span class="comment">// Document vault</span>
+<span class="dir">          analyzer/</span>                     <span class="comment">// Contract analyzer</span>
+<span class="dir">          calendar/</span>                     <span class="comment">// Compliance calendar</span>
+<span class="dir">          calculator/</span>                   <span class="comment">// Legal calculator (6 types)</span>
+<span class="dir">          rti/</span>                          <span class="comment">// RTI assistant</span>
+<span class="dir">          news/</span>                         <span class="comment">// Legal news feed</span>
+<span class="dir">        agreements/</span>                     <span class="comment">// Founder agreements</span>
+<span class="dir">      components/</span>
+<span class="file">        sidebar.tsx</span>                     <span class="comment">// Navigation sidebar</span>
+<span class="dir">        ui/</span>                             <span class="comment">// shadcn/ui components</span>
+<span class="dir">      lib/</span>
+<span class="file">        api.ts</span>                          <span class="comment">// API client utilities</span>
+<span class="file">    package.json</span>
+<span class="file">    tailwind.config.ts</span>
+<span class="file">    tsconfig.json</span>
+<span class="file">    next.config.ts</span>
+<span class="dir">  backend/</span>
+<span class="dir">    app/</span>
+<span class="file">      main.py</span>                          <span class="comment">// FastAPI entry point</span>
+<span class="file">      config.py</span>                        <span class="comment">// Configuration &amp; env vars</span>
+<span class="dir">      routes/</span>                          <span class="comment">// 18 route files</span>
+<span class="file">        legal.py</span>                       <span class="comment">// Legal data routes</span>
+<span class="file">        chat.py</span>                        <span class="comment">// Chat routes</span>
+<span class="file">        companies.py</span>                   <span class="comment">// Company routes</span>
+<span class="file">        matters.py</span>                     <span class="comment">// Legal matter routes</span>
+<span class="file">        documents.py</span>                   <span class="comment">// Document routes</span>
+<span class="file">        admin.py</span>                       <span class="comment">// Admin review routes</span>
+<span class="file">        compliance.py</span>                  <span class="comment">// Compliance routes</span>
+<span class="file">        templates.py</span>                   <span class="comment">// Template routes</span>
+<span class="file">        reviews.py</span>                     <span class="comment">// Smart review routes</span>
+<span class="file">        settings.py</span>                    <span class="comment">// Settings routes</span>
+<span class="file">        support.py</span>                     <span class="comment">// Support routes</span>
+<span class="file">        team.py</span>                        <span class="comment">// Team routes</span>
+<span class="file">        integrations.py</span>                <span class="comment">// Integration routes</span>
+<span class="file">        vault.py</span>                       <span class="comment">// Vault routes</span>
+<span class="file">        analyzer.py</span>                    <span class="comment">// Analyzer routes</span>
+<span class="file">        calculator.py</span>                  <span class="comment">// Calculator routes</span>
+<span class="file">        rti.py</span>                         <span class="comment">// RTI routes</span>
+<span class="file">        news.py</span>                        <span class="comment">// News routes</span>
+<span class="dir">      services/</span>                        <span class="comment">// Business logic services</span>
+<span class="file">    requirements.txt</span>
+<span class="dir">  data/</span>
+<span class="dir">    datasets/</span>
+<span class="dir">      samples/</span>
+<span class="file">        compliance_deadlines.json</span>       <span class="comment">// 25 Indian compliance deadlines</span>
+<span class="file">        legal_news.json</span>                <span class="comment">// 25 legal news articles</span>
+<span class="file">        case_summaries.json</span>             <span class="comment">// Supreme Court case summaries</span>
+<span class="file">        companies_act_sections.json</span>     <span class="comment">// Companies Act 2013 sections</span>
+<span class="file">    vault_documents.json</span>               <span class="comment">// Vault metadata</span>
+<span class="file">    analyzer_results.json</span>              <span class="comment">// Contract analysis results</span>
+<span class="file">    rti_applications.json</span>              <span class="comment">// RTI application records</span></div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 7: ROADMAP
+         ============================================================ -->
+    <section id="roadmap" class="section page-break">
+      <span class="section-number">Section 07</span>
+      <h2 class="section-title">Future Development Roadmap (Phase 3+)</h2>
+      <hr class="section-rule">
+
+      <h3>Phase 3: Advanced Features</h3>
+
+      <div class="roadmap-item">
+        <div class="roadmap-number">1</div>
+        <div class="roadmap-content">
+          <strong>Case Tracker</strong>
+          <p>Track ongoing court cases with CNR number, next hearing dates, and timeline view.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-number">2</div>
+        <div class="roadmap-content">
+          <strong>Lawyer Directory</strong>
+          <p>Browse verified lawyers by specialization, city, and language; submit consultation requests.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-number">3</div>
+        <div class="roadmap-content">
+          <strong>Enhanced RAG Search</strong>
+          <p>Semantic search with ChromaDB vector store, similar case matching, and AI-generated summaries.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-number">4</div>
+        <div class="roadmap-content">
+          <strong>AI Dashboard Insights</strong>
+          <p>Dynamic compliance health score, actionable cards, and real data-driven charts.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-number">5</div>
+        <div class="roadmap-content">
+          <strong>Authentication &amp; Authorization</strong>
+          <p>Supabase Auth integration with role-based access control and multi-tenant support.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-number">6</div>
+        <div class="roadmap-content">
+          <strong>Payment Integration</strong>
+          <p>Razorpay integration for pricing tiers: Naagrik, Udyami, Vyapar, and Nigam plans.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-number">7</div>
+        <div class="roadmap-content">
+          <strong>Email Notifications</strong>
+          <p>Resend-powered email alerts for compliance deadline reminders and ticket updates.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-number">8</div>
+        <div class="roadmap-content">
+          <strong>Document Generation with AI</strong>
+          <p>Real GPT-4o-powered legal template generation (currently mock data).</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-number">9</div>
+        <div class="roadmap-content">
+          <strong>Real Contract Analysis</strong>
+          <p>AI-powered clause extraction and risk scoring using GPT-4o (currently mock data).</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-number">10</div>
+        <div class="roadmap-content">
+          <strong>Mobile App</strong>
+          <p>React Native or Flutter companion app for on-the-go legal access.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-number">11</div>
+        <div class="roadmap-content">
+          <strong>Multi-Language Support</strong>
+          <p>Hindi, Tamil, Bengali, Marathi, Telugu, and Kannada language options.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-number">12</div>
+        <div class="roadmap-content">
+          <strong>API Rate Limiting &amp; Security</strong>
+          <p>JWT authentication, rate limiting, and comprehensive input sanitization.</p>
+        </div>
+      </div>
+
+      <h3>Data Storage Migration Plan</h3>
+
+      <div class="migration-grid">
+        <div class="migration-card">
+          <div class="label"><span class="arrow">Current</span></div>
+          <ul>
+            <li>JSON file-based storage</li>
+            <li>Local filesystem uploads</li>
+            <li>In-memory caching</li>
+            <li>ChromaDB for search</li>
+          </ul>
+        </div>
+        <div class="migration-card">
+          <div class="label"><span class="arrow">Target</span></div>
+          <ul>
+            <li>Supabase PostgreSQL tables</li>
+            <li>Supabase Storage or AWS S3</li>
+            <li>Redis caching layer</li>
+            <li>Elasticsearch full-text search</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 8: HOW TO RUN LOCALLY
+         ============================================================ -->
+    <section id="run-locally" class="section page-break">
+      <span class="section-number">Section 08</span>
+      <h2 class="section-title">How to Run Locally</h2>
+      <hr class="section-rule">
+
+      <h3>Prerequisites</h3>
+      <ul>
+        <li>Node.js 18+ and npm</li>
+        <li>Python 3.10+</li>
+        <li>Supabase account with project credentials</li>
+        <li>OpenAI API key</li>
+      </ul>
+
+      <h3>Backend Setup</h3>
+<pre><code><span style="color:#94a3b8;"># Navigate to the backend directory</span>
+cd backend
+
+<span style="color:#94a3b8;"># Create and activate a virtual environment</span>
+python -m venv venv
+source venv/bin/activate          <span style="color:#94a3b8;"># macOS/Linux</span>
+venv\Scripts\activate             <span style="color:#94a3b8;"># Windows</span>
+
+<span style="color:#94a3b8;"># Install dependencies</span>
+pip install -r requirements.txt
+
+<span style="color:#94a3b8;"># Configure environment variables</span>
+cp .env.example .env
+<span style="color:#94a3b8;"># Edit .env with your Supabase &amp; OpenAI keys</span>
+
+<span style="color:#94a3b8;"># Start the development server</span>
+uvicorn app.main:app --reload
+
+<span style="color:#94a3b8;"># API available at http://localhost:8000</span>
+<span style="color:#94a3b8;"># Swagger docs at http://localhost:8000/docs</span></code></pre>
+
+      <h3>Frontend Setup</h3>
+<pre><code><span style="color:#94a3b8;"># Navigate to the frontend directory</span>
+cd frontend
+
+<span style="color:#94a3b8;"># Install dependencies</span>
+npm install
+
+<span style="color:#94a3b8;"># Configure environment variables</span>
+cp .env.example .env.local
+<span style="color:#94a3b8;"># Edit .env.local with your backend URL</span>
+
+<span style="color:#94a3b8;"># Start the development server</span>
+npm run dev
+
+<span style="color:#94a3b8;"># Visit http://localhost:3000</span></code></pre>
+
+      <h3>Environment Variables</h3>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Variable</th>
+              <th>Service</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>SUPABASE_URL</code></td>
+              <td>Backend</td>
+              <td>Supabase project URL</td>
+            </tr>
+            <tr>
+              <td><code>SUPABASE_KEY</code></td>
+              <td>Backend</td>
+              <td>Supabase anon/service key</td>
+            </tr>
+            <tr>
+              <td><code>OPENAI_API_KEY</code></td>
+              <td>Backend</td>
+              <td>OpenAI API key for GPT-4o</td>
+            </tr>
+            <tr>
+              <td><code>NEXT_PUBLIC_API_URL</code></td>
+              <td>Frontend</td>
+              <td>Backend API URL (default: http://localhost:8000)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SECTION 9: PRICING MODEL
+         ============================================================ -->
+    <section id="pricing" class="section page-break">
+      <span class="section-number">Section 09</span>
+      <h2 class="section-title">Pricing Model</h2>
+      <hr class="section-rule">
+
+      <p>JurisGPT offers four tiers designed for the full spectrum of Indian businesses,
+         from individual citizens to large enterprises.</p>
+
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="plan-name">Naagrik</div>
+          <div class="plan-price">Free</div>
+          <ul>
+            <li>1 legal matter</li>
+            <li>Basic AI chat</li>
+            <li>Limited legal search</li>
+            <li>Basic compliance view</li>
+          </ul>
+        </div>
+
+        <div class="pricing-card featured">
+          <div class="plan-name">Udyami</div>
+          <div class="plan-price">&#8377;999/mo</div>
+          <ul>
+            <li>10 legal matters</li>
+            <li>All 7 templates</li>
+            <li>Compliance tracking</li>
+            <li>Legal calculator</li>
+            <li>RTI assistant</li>
+          </ul>
+        </div>
+
+        <div class="pricing-card">
+          <div class="plan-name">Vyapar</div>
+          <div class="plan-price">&#8377;4,999/mo</div>
+          <ul>
+            <li>Unlimited matters</li>
+            <li>Contract analyzer</li>
+            <li>Priority support</li>
+            <li>Team management</li>
+            <li>Document vault</li>
+          </ul>
+        </div>
+
+        <div class="pricing-card">
+          <div class="plan-name">Nigam</div>
+          <div class="plan-price">Custom</div>
+          <ul>
+            <li>Enterprise features</li>
+            <li>Dedicated lawyer</li>
+            <li>SLA guarantee</li>
+            <li>Custom integrations</li>
+            <li>White-label option</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="footer">
+    <div class="container">
+      <p><strong>JurisGPT</strong> &mdash; AI-Powered Legal Services for Indian Startups &amp; MSMEs</p>
+      <p>Document generated on <strong>February 6, 2026</strong>. This document is confidential and intended for internal use.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

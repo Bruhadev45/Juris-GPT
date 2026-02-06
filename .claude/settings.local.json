@@ -45,7 +45,10 @@
       "Bash(/Users/bruuu/Desktop/JurisGPT/backend/venv/bin/pip list:*)",
       "Bash(python:*)",
       "Bash(ls:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(git push:*)",
+      "Bash(git fetch:*)",
+      "WebFetch(domain:www.arcline-ai.com)"
     ]
   }
 }

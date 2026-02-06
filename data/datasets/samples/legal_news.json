@@ -1,0 +1,252 @@
+[
+  {
+    "id": "news-001",
+    "title": "Supreme Court Upholds Validity of Section 6A of the Citizenship Act",
+    "summary": "A Constitution Bench of the Supreme Court upheld the constitutional validity of Section 6A of the Citizenship Act, 1955, which grants citizenship to immigrants who entered Assam before March 25, 1971. The court ruled that the provision serves a humanitarian purpose and does not violate Article 14.",
+    "category": "Supreme Court",
+    "source": "Bar & Bench",
+    "published_at": "2026-01-28T09:30:00Z",
+    "url": "https://example.com/sc-section-6a-citizenship",
+    "tags": ["citizenship", "fundamental rights", "Assam", "constitution"]
+  },
+  {
+    "id": "news-002",
+    "title": "Delhi High Court Issues Guidelines on Enforcement of Foreign Arbitral Awards",
+    "summary": "The Delhi High Court issued comprehensive guidelines for enforcement of foreign arbitral awards under the New York Convention, streamlining the process and reducing delays. The court clarified the scope of public policy objections under Section 48 of the Arbitration Act.",
+    "category": "High Courts",
+    "source": "LiveLaw",
+    "published_at": "2026-01-27T14:15:00Z",
+    "url": "https://example.com/delhi-hc-foreign-arbitration",
+    "tags": ["arbitration", "foreign awards", "enforcement", "Delhi HC"]
+  },
+  {
+    "id": "news-003",
+    "title": "SEBI Introduces New Framework for ESG Rating Providers",
+    "summary": "SEBI has notified a comprehensive regulatory framework for Environmental, Social, and Governance (ESG) rating providers. The framework mandates registration, transparency in methodology, management of conflicts of interest, and periodic disclosures by ESG rating agencies.",
+    "category": "SEBI",
+    "source": "Economic Times",
+    "published_at": "2026-01-26T11:00:00Z",
+    "url": "https://example.com/sebi-esg-framework",
+    "tags": ["SEBI", "ESG", "rating agencies", "capital markets"]
+  },
+  {
+    "id": "news-004",
+    "title": "RBI Circular on Digital Lending: Key Compliance Requirements",
+    "summary": "The Reserve Bank of India issued updated guidelines on digital lending, mandating that all loan disbursements and repayments occur directly between the borrower and the regulated entity's bank account. Third-party platforms are prohibited from handling loan funds.",
+    "category": "RBI",
+    "source": "Moneycontrol",
+    "published_at": "2026-01-25T16:45:00Z",
+    "url": "https://example.com/rbi-digital-lending",
+    "tags": ["RBI", "digital lending", "fintech", "compliance"]
+  },
+  {
+    "id": "news-005",
+    "title": "Parliament Passes Digital Personal Data Protection (Amendment) Bill, 2026",
+    "summary": "Parliament passed the Digital Personal Data Protection (Amendment) Bill, introducing stricter penalties for data breaches and expanding the Data Protection Board's powers. The amendment mandates that data fiduciaries appoint a Data Protection Officer within 90 days.",
+    "category": "DPDPA/Data Privacy",
+    "source": "The Hindu",
+    "published_at": "2026-01-24T10:00:00Z",
+    "url": "https://example.com/dpdpa-amendment-2026",
+    "tags": ["DPDPA", "data privacy", "parliament", "data protection"]
+  },
+  {
+    "id": "news-006",
+    "title": "MCA Notifies Rules for Fast-Track Cross-Border Mergers",
+    "summary": "The Ministry of Corporate Affairs has notified new rules enabling fast-track cross-border mergers for companies with turnover below Rs 500 crore. The rules aim to simplify the process under the Companies Act, 2013 and reduce NCLT approval timelines.",
+    "category": "MCA",
+    "source": "Business Standard",
+    "published_at": "2026-01-23T08:30:00Z",
+    "url": "https://example.com/mca-cross-border-mergers",
+    "tags": ["MCA", "mergers", "Companies Act", "cross-border"]
+  },
+  {
+    "id": "news-007",
+    "title": "Supreme Court Clarifies Scope of Arbitration Clause in Unstamped Agreements",
+    "summary": "The Supreme Court in a landmark 7-judge bench decision clarified that an arbitration clause in an unstamped agreement is not void but unenforceable until proper stamp duty is paid. The court overruled the earlier N.N. Global decision.",
+    "category": "Supreme Court",
+    "source": "SCC Online",
+    "published_at": "2026-01-22T13:00:00Z",
+    "url": "https://example.com/sc-arbitration-unstamped",
+    "tags": ["arbitration", "stamp duty", "Supreme Court", "contract law"]
+  },
+  {
+    "id": "news-008",
+    "title": "CBDT Issues Clarification on Angel Tax Provisions for Startups",
+    "summary": "The Central Board of Direct Taxes issued a clarification stating that DPIIT-recognized startups with aggregate paid-up share capital not exceeding Rs 25 crore will be exempt from angel tax provisions under Section 56(2)(viib) of the Income Tax Act.",
+    "category": "Tax",
+    "source": "Financial Express",
+    "published_at": "2026-01-21T09:00:00Z",
+    "url": "https://example.com/cbdt-angel-tax-startups",
+    "tags": ["tax", "startups", "angel tax", "CBDT", "Section 56"]
+  },
+  {
+    "id": "news-009",
+    "title": "Bombay High Court Strikes Down Retrospective GST Notification",
+    "summary": "The Bombay High Court struck down a retrospective GST notification that sought to levy tax on services provided by clubs and associations to their members. The court held that retrospective taxation violates Article 19(1)(g) of the Constitution.",
+    "category": "High Courts",
+    "source": "Taxmann",
+    "published_at": "2026-01-20T15:30:00Z",
+    "url": "https://example.com/bombay-hc-gst-retrospective",
+    "tags": ["GST", "Bombay HC", "retrospective taxation", "clubs"]
+  },
+  {
+    "id": "news-010",
+    "title": "SEBI Tightens Insider Trading Norms for Connected Persons",
+    "summary": "SEBI has amended the Prohibition of Insider Trading Regulations to expand the definition of 'connected persons' and mandate structured digital databases for tracking access to unpublished price-sensitive information (UPSI).",
+    "category": "SEBI",
+    "source": "Mint",
+    "published_at": "2026-01-19T12:00:00Z",
+    "url": "https://example.com/sebi-insider-trading-norms",
+    "tags": ["SEBI", "insider trading", "UPSI", "capital markets"]
+  },
+  {
+    "id": "news-011",
+    "title": "New Labour Codes: Government Sets April 2026 Implementation Date",
+    "summary": "The Ministry of Labour confirmed that the four new Labour Codes on Wages, Industrial Relations, Social Security, and Occupational Safety will be implemented from April 1, 2026, requiring all establishments to update employment contracts and HR policies.",
+    "category": "Legislative Updates",
+    "source": "India Today",
+    "published_at": "2026-01-18T10:30:00Z",
+    "url": "https://example.com/labour-codes-april-2026",
+    "tags": ["labour law", "Labour Codes", "employment", "wages"]
+  },
+  {
+    "id": "news-012",
+    "title": "RBI Increases UPI Transaction Limit for Tax Payments to Rs 5 Lakh",
+    "summary": "The Reserve Bank of India has enhanced the per-transaction limit for UPI payments towards tax payments from Rs 1 lakh to Rs 5 lakh. The move aims to facilitate easier digital tax compliance for individuals and businesses.",
+    "category": "RBI",
+    "source": "NDTV Profit",
+    "published_at": "2026-01-17T14:00:00Z",
+    "url": "https://example.com/rbi-upi-tax-limit",
+    "tags": ["RBI", "UPI", "tax payments", "digital payments"]
+  },
+  {
+    "id": "news-013",
+    "title": "Supreme Court Orders Mandatory Mediation Before Filing of Commercial Disputes",
+    "summary": "In a significant ruling, the Supreme Court directed that all commercial disputes above Rs 1 crore must undergo mandatory pre-litigation mediation under the Commercial Courts Act before being filed in court, to reduce pendency.",
+    "category": "Supreme Court",
+    "source": "Bar & Bench",
+    "published_at": "2026-01-16T11:00:00Z",
+    "url": "https://example.com/sc-mandatory-mediation",
+    "tags": ["mediation", "commercial disputes", "Supreme Court", "ADR"]
+  },
+  {
+    "id": "news-014",
+    "title": "MCA Simplifies LLP Annual Filing Process with New Form 11A",
+    "summary": "The Ministry of Corporate Affairs has introduced a simplified annual filing form (Form 11A) for LLPs with turnover below Rs 5 crore. The new form consolidates multiple compliance requirements into a single filing.",
+    "category": "MCA",
+    "source": "Company Law Journal",
+    "published_at": "2026-01-15T09:00:00Z",
+    "url": "https://example.com/mca-llp-form-11a",
+    "tags": ["MCA", "LLP", "annual filing", "compliance"]
+  },
+  {
+    "id": "news-015",
+    "title": "GST Council Recommends 18% Rate on Online Gaming; 28% on Casinos",
+    "summary": "The 56th GST Council meeting recommended maintaining 18% GST on online skill-based gaming and 28% on casinos and betting. The Council also approved the inclusion of Extra Neutral Alcohol under GST with a 5% rate.",
+    "category": "Tax",
+    "source": "Business Today",
+    "published_at": "2026-01-14T16:00:00Z",
+    "url": "https://example.com/gst-council-gaming-rates",
+    "tags": ["GST", "online gaming", "GST Council", "casinos"]
+  },
+  {
+    "id": "news-016",
+    "title": "Karnataka High Court Declares IT Sector Layoffs Without Notice as Unfair Labour Practice",
+    "summary": "The Karnataka High Court ruled that mass layoffs in the IT sector without adequate notice or compensation constitute unfair labour practice under the Industrial Disputes Act. The ruling impacts several large IT companies in Bengaluru.",
+    "category": "High Courts",
+    "source": "LiveLaw",
+    "published_at": "2026-01-13T13:45:00Z",
+    "url": "https://example.com/karnataka-hc-it-layoffs",
+    "tags": ["labour law", "IT sector", "layoffs", "Karnataka HC"]
+  },
+  {
+    "id": "news-017",
+    "title": "DPDPA Rules Notified: Data Localization Requirements for Critical Personal Data",
+    "summary": "The government has notified rules under the Digital Personal Data Protection Act requiring that critical personal data (financial, health, biometric) be stored and processed within India. Companies have 180 days to comply.",
+    "category": "DPDPA/Data Privacy",
+    "source": "Medianama",
+    "published_at": "2026-01-12T10:00:00Z",
+    "url": "https://example.com/dpdpa-data-localization",
+    "tags": ["DPDPA", "data localization", "privacy", "compliance"]
+  },
+  {
+    "id": "news-018",
+    "title": "SEBI Mandates T+0 Settlement for Top 500 Stocks from March 2026",
+    "summary": "SEBI has issued a circular mandating same-day (T+0) settlement for the top 500 stocks by market capitalization from March 31, 2026. The move follows the successful implementation of T+1 settlement and aims to enhance market efficiency.",
+    "category": "SEBI",
+    "source": "Economic Times",
+    "published_at": "2026-01-11T11:30:00Z",
+    "url": "https://example.com/sebi-t0-settlement",
+    "tags": ["SEBI", "settlement", "stock market", "T+0"]
+  },
+  {
+    "id": "news-019",
+    "title": "Government Introduces Bharatiya Sakshya (Amendment) Bill for Digital Evidence",
+    "summary": "The government introduced the Bharatiya Sakshya (Amendment) Bill to strengthen provisions for admissibility of digital evidence, including blockchain records, IoT device data, and AI-generated documents in court proceedings.",
+    "category": "Legislative Updates",
+    "source": "The Hindu",
+    "published_at": "2026-01-10T09:30:00Z",
+    "url": "https://example.com/bsa-amendment-digital-evidence",
+    "tags": ["Bharatiya Sakshya", "digital evidence", "legislation", "blockchain"]
+  },
+  {
+    "id": "news-020",
+    "title": "Supreme Court Directs States to Establish Commercial Courts in Every District",
+    "summary": "The Supreme Court directed all state governments to establish dedicated Commercial Courts in every district within 6 months, citing the need to expedite resolution of commercial disputes and improve India's ease of doing business ranking.",
+    "category": "Supreme Court",
+    "source": "Deccan Herald",
+    "published_at": "2026-01-09T14:00:00Z",
+    "url": "https://example.com/sc-commercial-courts-districts",
+    "tags": ["commercial courts", "Supreme Court", "ease of business", "judiciary"]
+  },
+  {
+    "id": "news-021",
+    "title": "RBI Issues Master Direction on IT Governance for Regulated Entities",
+    "summary": "The RBI issued comprehensive Master Directions on IT Governance and Cybersecurity for all regulated entities, mandating CISO appointment, annual IT audits, and incident reporting within 6 hours of a cyber incident.",
+    "category": "RBI",
+    "source": "Financial Express",
+    "published_at": "2026-01-08T12:00:00Z",
+    "url": "https://example.com/rbi-it-governance",
+    "tags": ["RBI", "cybersecurity", "IT governance", "compliance"]
+  },
+  {
+    "id": "news-022",
+    "title": "Income Tax Department Launches New Faceless Assessment Portal 2.0",
+    "summary": "The Income Tax Department launched the upgraded Faceless Assessment Portal 2.0 with AI-driven case selection, video conferencing for hearings, and real-time status tracking. The portal aims to reduce assessment completion time to 90 days.",
+    "category": "Tax",
+    "source": "Taxmann",
+    "published_at": "2026-01-07T10:00:00Z",
+    "url": "https://example.com/it-faceless-assessment-2",
+    "tags": ["income tax", "faceless assessment", "tax technology", "compliance"]
+  },
+  {
+    "id": "news-023",
+    "title": "Madras High Court Upholds Validity of Pre-Packaged Insolvency for MSMEs",
+    "summary": "The Madras High Court upheld the constitutional validity of the pre-packaged insolvency resolution process for MSMEs under the IBC, rejecting challenges that it discriminated against operational creditors.",
+    "category": "High Courts",
+    "source": "SCC Online",
+    "published_at": "2026-01-06T15:00:00Z",
+    "url": "https://example.com/madras-hc-prepack-ibc",
+    "tags": ["IBC", "insolvency", "MSME", "Madras HC"]
+  },
+  {
+    "id": "news-024",
+    "title": "MCA Proposes Mandatory CSR Spending Audit for Companies Above Rs 100 Crore Turnover",
+    "summary": "The Ministry of Corporate Affairs has issued a draft notification proposing mandatory third-party audit of CSR spending for companies with turnover exceeding Rs 100 crore, aiming to ensure genuine compliance with Section 135 of the Companies Act.",
+    "category": "MCA",
+    "source": "Business Standard",
+    "published_at": "2026-01-05T08:00:00Z",
+    "url": "https://example.com/mca-csr-audit-proposal",
+    "tags": ["MCA", "CSR", "Companies Act", "audit"]
+  },
+  {
+    "id": "news-025",
+    "title": "Data Protection Board Issues First Penalty Under DPDPA for Healthcare Data Breach",
+    "summary": "The Data Protection Board of India imposed its first penalty of Rs 50 crore on a leading healthcare platform for a data breach affecting 5 million users. The Board found violations of data minimization and security safeguard obligations.",
+    "category": "DPDPA/Data Privacy",
+    "source": "Medianama",
+    "published_at": "2026-01-04T11:00:00Z",
+    "url": "https://example.com/dpb-first-penalty",
+    "tags": ["DPDPA", "data breach", "penalty", "healthcare"]
+  }
+]

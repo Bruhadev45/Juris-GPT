@@ -17,6 +17,12 @@ import {
   LogOut,
   ChevronLeft,
   MessageSquare,
+  CalendarDays,
+  Calculator,
+  FileEdit,
+  Newspaper,
+  Archive,
+  FileScan,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -33,20 +39,26 @@ const mainNav: NavItem[] = [
   { icon: Search, label: "Legal Search", href: "/dashboard/search" },
   { icon: FileText, label: "Smart Review", href: "/dashboard/review" },
   { icon: MessageSquare, label: "Chat", href: "/dashboard/chat" },
+  { icon: FileEdit, label: "RTI Assistant", href: "/dashboard/rti" },
 ];
 
 const analyticsNav: NavItem[] = [
   { icon: BarChart3, label: "Compliance View", href: "/dashboard/compliance" },
+  { icon: CalendarDays, label: "Compliance Calendar", href: "/dashboard/calendar" },
   { icon: ClipboardList, label: "Legal Forms", href: "/dashboard/forms" },
   { icon: FileText, label: "Agreements", href: "/agreements/new" },
+  { icon: FileScan, label: "Contract Analyzer", href: "/dashboard/analyzer" },
+  { icon: Calculator, label: "Legal Calculator", href: "/dashboard/calculator" },
 ];
 
 const managementNav: NavItem[] = [
+  { icon: Archive, label: "Document Vault", href: "/dashboard/vault" },
   { icon: Users, label: "Team", href: "/dashboard/team" },
   { icon: Puzzle, label: "Integrations", href: "/dashboard/integrations" },
 ];
 
 const otherNav: NavItem[] = [
+  { icon: Newspaper, label: "Legal News", href: "/dashboard/news" },
   { icon: Settings, label: "Settings", href: "/dashboard/settings" },
   { icon: HelpCircle, label: "Support Center", href: "/dashboard/support" },
 ];
@@ -103,12 +115,12 @@ export function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
       <div className="flex items-center justify-between px-4 py-5 border-b border-border">
         {!collapsed && (
           <Link href="/dashboard" className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-primary">Legalwork</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-primary">JurisGPT</h1>
           </Link>
         )}
         {collapsed && (
           <Link href="/dashboard" className="w-8 h-8 bg-primary rounded flex items-center justify-center mx-auto">
-            <span className="text-white font-bold text-xs">L</span>
+            <span className="text-white font-bold text-xs">J</span>
           </Link>
         )}
         {!collapsed && (
