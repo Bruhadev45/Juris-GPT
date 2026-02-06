@@ -40,11 +40,11 @@ export function LeftSidebar({ collapsed = false, onToggle }: LeftSidebarProps) {
   const chat = useChatOptional();
 
   const sortedConversations = useMemo(() => {
-    if (!chat) return [];
+    if (!chat || !chat.hydrated) return [];
     return [...chat.conversations].sort(
       (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     );
-  }, [chat?.conversations]);
+  }, [chat, chat?.hydrated, chat?.conversations]);
 
   const handleNewChat = () => {
     chat?.createNewConversation();

@@ -19,10 +19,9 @@ function generateTitle(firstMessage: string): string {
   return cleaned.substring(0, 47) + "...";
 }
 
+const EMPTY_STATE: ChatState = { conversations: [], activeConversationId: null };
+
 function loadState(): ChatState {
-  if (typeof window === "undefined") {
-    return { conversations: [], activeConversationId: null };
-  }
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
@@ -31,7 +30,7 @@ function loadState(): ChatState {
   } catch {
     // ignore
   }
-  return { conversations: [], activeConversationId: null };
+  return EMPTY_STATE;
 }
 
 function saveState(state: ChatState) {
@@ -46,6 +45,7 @@ interface ChatContextValue {
   conversations: Conversation[];
   activeConversationId: string | null;
   activeConversation: Conversation | null;
+  hydrated: boolean;
   createNewConversation: () => void;
   switchConversation: (id: string) => void;
   addMessage: (message: ChatMessage) => void;
@@ -55,11 +55,18 @@ interface ChatContextValue {
 const ChatContext = createContext<ChatContextValue | null>(null);
 
 export function ChatProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<ChatState>(loadState);
+  const [state, setState] = useState<ChatState>(EMPTY_STATE);
+  const [hydrated, setHydrated] = useState(false);
+
+  // Load from localStorage after hydration
+  useEffect(() => {
+    setState(loadState());
+    setHydrated(true);
+  }, []);
 
   useEffect(() => {
-    saveState(state);
-  }, [state]);
+    if (hydrated) saveState(state);
+  }, [state, hydrated]);
 
   const activeConversation = useMemo(() => {
     if (!state.activeConversationId) return null;
@@ -134,6 +141,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       conversations: state.conversations,
       activeConversationId: state.activeConversationId,
       activeConversation,
+      hydrated,
       createNewConversation,
       switchConversation,
       addMessage,
@@ -143,6 +151,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       state.conversations,
       state.activeConversationId,
       activeConversation,
+      hydrated,
       createNewConversation,
       switchConversation,
       addMessage,

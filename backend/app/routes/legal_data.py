@@ -21,13 +21,38 @@ class LawSection(BaseModel):
     description: str
 
 
+class RelatedPdf(BaseModel):
+    title: str
+    url: str
+
+
 class CaseSummary(BaseModel):
+    id: Optional[int] = None
     case_name: str
     citation: str
     court: str
     principle: str
     summary: str
     relevance: str
+    date: Optional[str] = None
+    judges: Optional[List[str]] = None
+    status: Optional[str] = None
+    description: Optional[str] = None
+    key_points: Optional[List[str]] = None
+    related_pdfs: Optional[List[RelatedPdf]] = None
+    related_sections: Optional[List[str]] = None
+
+
+class CaseListItem(BaseModel):
+    id: Optional[int] = None
+    case_name: str
+    citation: str
+    court: str
+    principle: str
+    summary: str
+    relevance: str
+    date: Optional[str] = None
+    status: Optional[str] = None
 
 
 class CreateCaseRequest(BaseModel):
@@ -37,6 +62,13 @@ class CreateCaseRequest(BaseModel):
     principle: str
     summary: str
     relevance: str
+    date: Optional[str] = None
+    judges: Optional[List[str]] = None
+    status: Optional[str] = None
+    description: Optional[str] = None
+    key_points: Optional[List[str]] = None
+    related_pdfs: Optional[List[RelatedPdf]] = None
+    related_sections: Optional[List[str]] = None
 
 
 class CompaniesActSection(BaseModel):
@@ -109,38 +141,47 @@ async def list_available_laws():
     return ["cpc", "ipc", "crpc", "hma", "ida", "iea", "mva", "nia"]
 
 
-@router.get("/cases", response_model=List[CaseSummary])
+def _load_cases():
+    """Load cases from JSON file"""
+    cases_file = DATA_DIR / "samples" / "case_summaries.json"
+    if not cases_file.exists():
+        raise HTTPException(status_code=404, detail="Case summaries file not found")
+    try:
+        with open(cases_file, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error reading cases file: {str(e)}")
+
+
+@router.get("/cases", response_model=List[CaseListItem])
 async def get_case_summaries(
     limit: int = Query(50, ge=1, le=500),
     offset: int = Query(0, ge=0),
     search: Optional[str] = Query(None, description="Search in case name, principle, or summary"),
 ):
-    """Get case summaries"""
-    cases_file = DATA_DIR / "samples" / "case_summaries.json"
-    
-    if not cases_file.exists():
-        raise HTTPException(status_code=404, detail="Case summaries file not found")
-    
-    try:
-        with open(cases_file, "r", encoding="utf-8") as f:
-            cases = json.load(f)
-        
-        # Search filter
-        if search:
-            search_lower = search.lower()
-            cases = [
-                c for c in cases
-                if search_lower in c.get("case_name", "").lower()
-                or search_lower in c.get("principle", "").lower()
-                or search_lower in c.get("summary", "").lower()
-            ]
-        
-        # Pagination
-        paginated_cases = cases[offset:offset + limit]
-        
-        return paginated_cases
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error reading cases file: {str(e)}")
+    """Get case summaries (list view — lightweight fields only)"""
+    cases = _load_cases()
+
+    if search:
+        search_lower = search.lower()
+        cases = [
+            c for c in cases
+            if search_lower in c.get("case_name", "").lower()
+            or search_lower in c.get("principle", "").lower()
+            or search_lower in c.get("summary", "").lower()
+        ]
+
+    return cases[offset:offset + limit]
+
+
+@router.get("/cases/{case_id}", response_model=CaseSummary)
+async def get_case_detail(case_id: int):
+    """Get full case detail by id"""
+    cases = _load_cases()
+    for c in cases:
+        if c.get("id") == case_id:
+            return c
+    raise HTTPException(status_code=404, detail=f"Case with id {case_id} not found")
 
 
 @router.post("/cases", response_model=CaseSummary, status_code=201)
@@ -158,6 +199,8 @@ async def create_case(case: CreateCaseRequest):
             cases = []
 
     new_case = case.model_dump()
+    max_id = max((c.get("id", 0) for c in cases), default=0)
+    new_case["id"] = max_id + 1
     cases.append(new_case)
 
     # Ensure directory exists

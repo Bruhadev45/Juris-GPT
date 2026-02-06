@@ -18,6 +18,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useChat } from "./chat-context";
 import type { ChatMessage } from "@/types/chat";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 interface ActionCard {
   icon: React.ElementType;
   title: string;
@@ -78,7 +80,7 @@ export default function ChatPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8000/api/chat/message", {
+      const response = await fetch(`${API_BASE}/api/chat/message`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

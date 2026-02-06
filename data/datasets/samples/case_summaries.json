@@ -1,122 +1,394 @@
 [
   {
+    "id": 1,
     "case_name": "Salomon v. Salomon & Co. Ltd",
     "citation": "(1897) AC 22",
     "court": "House of Lords",
     "principle": "Separate Legal Entity",
     "summary": "A company is a separate legal entity distinct from its members. Even a one-man company has a separate existence from its sole shareholder.",
-    "relevance": "Foundation of company law"
+    "relevance": "Foundation of company law",
+    "date": "1897-11-16",
+    "judges": ["Lord Halsbury", "Lord Watson", "Lord Herschell", "Lord Macnaghten"],
+    "status": "Landmark",
+    "description": "Aron Salomon was a leather merchant and boot manufacturer who incorporated his business as a limited company, with himself and family members as shareholders. When the company went into liquidation, the question arose whether Salomon could be held personally liable for the company's debts. The House of Lords unanimously held that the company was a separate legal entity from Salomon, and he was not liable for its debts beyond his shareholding. This established the foundational principle that a company, once incorporated, is a separate person in law distinct from its members.",
+    "key_points": [
+      "A company is a legal person separate from its members",
+      "Limited liability protects shareholders from company debts",
+      "The corporate veil can only be lifted in exceptional circumstances",
+      "One-man companies are valid legal entities",
+      "Creditors of the company cannot sue shareholders personally"
+    ],
+    "related_pdfs": [
+      {"title": "Full Judgment - Salomon v Salomon", "url": "https://www.bailii.org/uk/cases/UKHL/1896/1.html"},
+      {"title": "Case Analysis - Corporate Personality", "url": "https://www.lawteacher.net/cases/salomon-v-salomon.php"}
+    ],
+    "related_sections": ["Companies Act 2013 - Section 2(20)", "Companies Act 2013 - Section 7"]
   },
   {
+    "id": 2,
     "case_name": "Tata Consultancy Services v. State of AP",
     "citation": "(2005) 1 SCC 308",
     "court": "Supreme Court of India",
     "principle": "Software as Goods",
     "summary": "Computer software on medium is goods liable to sales tax.",
-    "relevance": "Important for tech companies"
+    "relevance": "Important for tech companies",
+    "date": "2004-11-05",
+    "judges": ["Justice Ruma Pal", "Justice C.K. Thakker"],
+    "status": "Landmark",
+    "description": "The case examined whether software supplied on a medium (CD, floppy disk) constitutes 'goods' for the purpose of sales tax. TCS argued that software is intellectual property and not goods. The Supreme Court held that software, when put on a medium and sold, becomes tangible property and qualifies as 'goods' under the Sales Tax Act. The court distinguished between customized software (service) and canned/packaged software (goods).",
+    "key_points": [
+      "Canned/packaged software on a medium is considered 'goods'",
+      "Software has the attributes of movable property",
+      "Distinction between customized software (service) and canned software (goods)",
+      "Sales tax is applicable on sale of packaged software",
+      "Intellectual property can become goods when embodied in a physical medium"
+    ],
+    "related_pdfs": [
+      {"title": "Supreme Court Judgment", "url": "https://indiankanoon.org/doc/1823675/"},
+      {"title": "Analysis - Software Taxation in India", "url": "https://taxguru.in/goods-and-service-tax/gst-software-licensing.html"}
+    ],
+    "related_sections": ["IT Act 2000 - Section 2", "Sale of Goods Act 1930 - Section 2(7)"]
   },
   {
+    "id": 3,
     "case_name": "Kesavananda Bharati v. State of Kerala",
     "citation": "AIR 1973 SC 1461",
     "court": "Supreme Court of India",
     "principle": "Basic Structure Doctrine",
     "summary": "Parliament can amend the Constitution but cannot alter its basic structure. The basic structure includes supremacy of the Constitution, rule of law, separation of powers, and fundamental rights.",
-    "relevance": "Most important constitutional law case in India"
+    "relevance": "Most important constitutional law case in India",
+    "date": "1973-04-24",
+    "judges": ["Chief Justice S.M. Sikri", "Justice J.M. Shelat", "Justice K.S. Hegde", "Justice A.N. Grover", "Justice A.N. Ray", "Justice P. Jaganmohan Reddy", "Justice H.R. Khanna", "Justice K.K. Mathew", "Justice M.H. Beg", "Justice S.N. Dwivedi", "Justice Y.V. Chandrachud", "Justice A.K. Mukherjea", "Justice N.L. Untwalia"],
+    "status": "Landmark",
+    "description": "This is the most consequential constitutional case in Indian legal history. A 13-judge bench of the Supreme Court, in a 7-6 majority, held that while Parliament has the power to amend any provision of the Constitution under Article 368, it cannot alter or destroy the 'basic structure' or framework of the Constitution. This doctrine has since been the cornerstone of Indian constitutional law, preventing any government from fundamentally altering the democratic character of the Constitution through amendments.",
+    "key_points": [
+      "Parliament can amend the Constitution under Article 368 but cannot destroy its basic structure",
+      "Basic structure includes: supremacy of the Constitution, republican and democratic form of government, secular character, separation of powers, federal character",
+      "Fundamental rights form part of the basic structure",
+      "Judicial review is part of the basic structure",
+      "The doctrine was decided by a 7-6 majority of a 13-judge bench",
+      "Overruled the earlier Golaknath case partially"
+    ],
+    "related_pdfs": [
+      {"title": "Full Judgment - Indian Kanoon", "url": "https://indiankanoon.org/doc/257876/"},
+      {"title": "Basic Structure Doctrine - SCC Online", "url": "https://www.scconline.com/blog/post/tag/basic-structure-doctrine/"},
+      {"title": "Constitutional Analysis", "url": "https://www.livelaw.in/tags/kesavananda-bharati"}
+    ],
+    "related_sections": ["Constitution of India - Article 368", "Constitution of India - Article 13", "Constitution of India - Part III (Fundamental Rights)"]
   },
   {
+    "id": 4,
     "case_name": "Maneka Gandhi v. Union of India",
     "citation": "AIR 1978 SC 597",
     "court": "Supreme Court of India",
     "principle": "Right to Life and Personal Liberty",
     "summary": "Article 21 does not merely guarantee the right against deprivation of life or personal liberty but also the right to live with dignity. Any procedure depriving a person of life or liberty must be just, fair, and reasonable.",
-    "relevance": "Expanded scope of Article 21 significantly"
+    "relevance": "Expanded scope of Article 21 significantly",
+    "date": "1978-01-25",
+    "judges": ["Chief Justice M.H. Beg", "Justice Y.V. Chandrachud", "Justice P.N. Bhagwati", "Justice V.R. Krishna Iyer", "Justice N.L. Untwalia", "Justice S. Murtaza Fazal Ali", "Justice P.S. Kailasam"],
+    "status": "Landmark",
+    "description": "Maneka Gandhi's passport was impounded by the government without giving her any reason or opportunity of being heard. The Supreme Court held that the right to 'life' in Article 21 is not merely confined to animal existence but includes the right to live with human dignity. The procedure established by law must be right, just, and fair, and not arbitrary, fanciful, or oppressive. This case transformed Article 21 into the most significant fundamental right, from which many other rights have been derived.",
+    "key_points": [
+      "Right to life under Article 21 includes right to live with dignity",
+      "Procedure established by law must be just, fair, and reasonable (not arbitrary)",
+      "Articles 14, 19, and 21 are interconnected — a law must satisfy all three",
+      "Right to travel abroad is part of personal liberty under Article 21",
+      "Principles of natural justice are implicit in Article 21",
+      "Overruled the narrow interpretation from A.K. Gopalan case"
+    ],
+    "related_pdfs": [
+      {"title": "Full Judgment - Indian Kanoon", "url": "https://indiankanoon.org/doc/1766147/"},
+      {"title": "Article 21 Jurisprudence", "url": "https://www.livelaw.in/tags/article-21"}
+    ],
+    "related_sections": ["Constitution of India - Article 21", "Constitution of India - Article 14", "Constitution of India - Article 19", "Passports Act 1967 - Section 10(3)(c)"]
   },
   {
+    "id": 5,
     "case_name": "Vishaka v. State of Rajasthan",
     "citation": "AIR 1997 SC 3011",
     "court": "Supreme Court of India",
     "principle": "Sexual Harassment at Workplace",
     "summary": "The Supreme Court laid down guidelines to prevent sexual harassment of women at the workplace. These guidelines were binding until the enactment of the Sexual Harassment of Women at Workplace Act, 2013.",
-    "relevance": "Led to POSH Act 2013"
+    "relevance": "Led to POSH Act 2013",
+    "date": "1997-08-13",
+    "judges": ["Chief Justice J.S. Verma", "Justice Sujata V. Manohar", "Justice B.N. Kirpal"],
+    "status": "Landmark",
+    "description": "This PIL was filed by women's rights groups after the brutal gang rape of Bhanwari Devi, a social worker in Rajasthan who tried to prevent child marriage. In the absence of any legislation addressing sexual harassment at the workplace, the Supreme Court framed the 'Vishaka Guidelines' which defined sexual harassment, placed obligations on employers, and mandated the creation of complaints committees. These guidelines had the force of law until Parliament enacted the Sexual Harassment of Women at Workplace (Prevention, Prohibition and Redressal) Act, 2013.",
+    "key_points": [
+      "Defined sexual harassment at workplace comprehensively for the first time",
+      "Made it the duty of employers to prevent sexual harassment",
+      "Mandated creation of Complaints Committees in every workplace",
+      "Guidelines were binding as law until POSH Act 2013 was enacted",
+      "Used international conventions (CEDAW) to fill legislative gaps",
+      "Extended protection to both public and private sector"
+    ],
+    "related_pdfs": [
+      {"title": "Full Judgment - Indian Kanoon", "url": "https://indiankanoon.org/doc/1031794/"},
+      {"title": "POSH Act 2013 - Full Text", "url": "https://legislative.gov.in/sites/default/files/A2013-14.pdf"},
+      {"title": "Vishaka Guidelines Analysis", "url": "https://www.scobserver.in/cases/vishaka-v-state-of-rajasthan/"}
+    ],
+    "related_sections": ["Constitution of India - Article 14", "Constitution of India - Article 15", "Constitution of India - Article 21", "POSH Act 2013"]
   },
   {
+    "id": 6,
     "case_name": "Navtej Singh Johar v. Union of India",
     "citation": "(2018) 10 SCC 1",
     "court": "Supreme Court of India",
     "principle": "Decriminalization of Homosexuality",
     "summary": "Section 377 of IPC was struck down to the extent it criminalized consensual sexual conduct between adults. The court held it violated Articles 14, 15, 19, and 21 of the Constitution.",
-    "relevance": "Landmark LGBTQ rights case"
+    "relevance": "Landmark LGBTQ rights case",
+    "date": "2018-09-06",
+    "judges": ["Chief Justice Dipak Misra", "Justice R.F. Nariman", "Justice A.M. Khanwilkar", "Justice D.Y. Chandrachud", "Justice Indu Malhotra"],
+    "status": "Landmark",
+    "description": "A five-judge Constitution Bench unanimously struck down the colonial-era Section 377 of the Indian Penal Code insofar as it criminalized consensual sexual acts between adults in private. The court overruled the 2013 Suresh Kumar Koushal judgment that had reinstated Section 377. Each judge wrote a separate but concurring opinion, emphasizing that sexual orientation is an intrinsic part of identity and that the LGBTQ community is entitled to equal citizenship and protection of fundamental rights.",
+    "key_points": [
+      "Section 377 IPC partially struck down (consensual adult sexual conduct decriminalized)",
+      "Sexual orientation is an intrinsic part of identity protected under Article 21",
+      "LGBTQ persons are entitled to full constitutional protection",
+      "Overruled Suresh Kumar Koushal v. NAZ Foundation (2013)",
+      "Discrimination based on sexual orientation violates Article 15",
+      "Constitutional morality prevails over social morality"
+    ],
+    "related_pdfs": [
+      {"title": "Full Judgment - Indian Kanoon", "url": "https://indiankanoon.org/doc/168671544/"},
+      {"title": "SC Observer Case Page", "url": "https://www.scobserver.in/cases/navtej-johar-v-union-of-india/"}
+    ],
+    "related_sections": ["IPC - Section 377", "Constitution of India - Article 14", "Constitution of India - Article 15", "Constitution of India - Article 19", "Constitution of India - Article 21"]
   },
   {
+    "id": 7,
     "case_name": "K.S. Puttaswamy v. Union of India",
     "citation": "(2017) 10 SCC 1",
     "court": "Supreme Court of India",
     "principle": "Right to Privacy",
     "summary": "Right to privacy is a fundamental right under Article 21 of the Constitution. It includes informational privacy, bodily autonomy, and the privacy of personal choices.",
-    "relevance": "Foundation for data protection law in India"
+    "relevance": "Foundation for data protection law in India",
+    "date": "2017-08-24",
+    "judges": ["Chief Justice J.S. Khehar", "Justice J. Chelameswar", "Justice S.A. Bobde", "Justice R.K. Agrawal", "Justice R.F. Nariman", "Justice A.M. Sapre", "Justice D.Y. Chandrachud", "Justice S.K. Kaul", "Justice S. Abdul Nazeer"],
+    "status": "Landmark",
+    "description": "A nine-judge Constitution Bench unanimously held that the right to privacy is a constitutionally protected fundamental right under Articles 14, 19, and 21. The judgment arose in the context of challenges to the Aadhaar scheme. The court overruled the earlier M.P. Sharma (1954) and Kharak Singh (1962) judgments that had denied privacy as a fundamental right. Justice Chandrachud's opinion emphasized that privacy is essential to human dignity and personal autonomy.",
+    "key_points": [
+      "Right to privacy is a fundamental right under Article 21",
+      "Privacy includes informational privacy, bodily autonomy, decisional autonomy, and privacy of personal choices",
+      "Overruled M.P. Sharma (1954) and Kharak Singh (1962) on this point",
+      "Any restriction on privacy must satisfy the threefold test: legality, legitimate aim, proportionality",
+      "Privacy is not an absolute right and can be subject to reasonable restrictions",
+      "Foundation for India's data protection legislation"
+    ],
+    "related_pdfs": [
+      {"title": "Full Judgment (Right to Privacy)", "url": "https://indiankanoon.org/doc/127517806/"},
+      {"title": "Aadhaar Judgment (2018)", "url": "https://indiankanoon.org/doc/127517806/"},
+      {"title": "Digital Personal Data Protection Act 2023", "url": "https://www.meity.gov.in/writereaddata/files/Digital%20Personal%20Data%20Protection%20Act%202023.pdf"}
+    ],
+    "related_sections": ["Constitution of India - Article 21", "Constitution of India - Article 14", "Constitution of India - Article 19", "Digital Personal Data Protection Act 2023"]
   },
   {
+    "id": 8,
     "case_name": "Shreya Singhal v. Union of India",
     "citation": "AIR 2015 SC 1523",
     "court": "Supreme Court of India",
     "principle": "Freedom of Speech Online",
     "summary": "Section 66A of the IT Act was struck down as unconstitutional for being vague and overbroad, violating the right to freedom of speech and expression under Article 19(1)(a).",
-    "relevance": "Key internet freedom and free speech case"
+    "relevance": "Key internet freedom and free speech case",
+    "date": "2015-03-24",
+    "judges": ["Justice J. Chelameswar", "Justice R.F. Nariman"],
+    "status": "Landmark",
+    "description": "Section 66A of the Information Technology Act, 2000 made it a criminal offence to send 'offensive' messages through a computer or communication device. The Supreme Court struck down this provision, holding that terms like 'annoying', 'inconvenience', and 'grossly offensive' were vague and undefined, leading to a chilling effect on free speech. The court also read down Section 79 (intermediary liability) to require a court order before content could be taken down.",
+    "key_points": [
+      "Section 66A IT Act struck down as unconstitutional for vagueness",
+      "The provision had a chilling effect on free speech under Article 19(1)(a)",
+      "Terms like 'annoying' and 'grossly offensive' are too vague for criminal law",
+      "Section 79 (intermediary liability) read down to require court orders for takedowns",
+      "Distinguished between discussion, advocacy, and incitement",
+      "Online speech enjoys the same constitutional protection as offline speech"
+    ],
+    "related_pdfs": [
+      {"title": "Full Judgment - Indian Kanoon", "url": "https://indiankanoon.org/doc/110813550/"},
+      {"title": "IT Act 2000 - Full Text", "url": "https://www.meity.gov.in/content/information-technology-act"}
+    ],
+    "related_sections": ["IT Act 2000 - Section 66A (struck down)", "IT Act 2000 - Section 79", "Constitution of India - Article 19(1)(a)", "Constitution of India - Article 19(2)"]
   },
   {
+    "id": 9,
     "case_name": "M.C. Mehta v. Union of India",
     "citation": "AIR 1987 SC 1086",
     "court": "Supreme Court of India",
     "principle": "Absolute Liability",
     "summary": "An enterprise engaged in a hazardous or inherently dangerous activity owes an absolute duty to the community to ensure no harm. No exceptions or defences are available — stricter than the Rylands v. Fletcher rule.",
-    "relevance": "Foundation of environmental law in India"
+    "relevance": "Foundation of environmental law in India",
+    "date": "1987-02-17",
+    "judges": ["Chief Justice P.N. Bhagwati", "Justice R.S. Pathak", "Justice D.P. Madon", "Justice G.L. Oza", "Justice M.M. Dutt"],
+    "status": "Landmark",
+    "description": "Following the Oleum gas leak from Shriram Industries in Delhi, M.C. Mehta filed a PIL seeking closure of the factory and compensation for victims. The Supreme Court evolved the principle of 'absolute liability', going beyond the English rule of strict liability from Rylands v. Fletcher. Under this doctrine, an enterprise carrying on a hazardous or inherently dangerous activity is absolutely liable for any harm caused, regardless of whether it exercised due diligence. No exceptions like act of God, act of a stranger, or consent of the plaintiff are available.",
+    "key_points": [
+      "Doctrine of absolute liability — no defences or exceptions available",
+      "Stricter than strict liability under Rylands v. Fletcher",
+      "Applies to enterprises engaged in hazardous or inherently dangerous activities",
+      "Compensation must be proportional to the magnitude and capacity of the enterprise",
+      "Polluter pays principle recognized",
+      "Foundation of Indian environmental jurisprudence"
+    ],
+    "related_pdfs": [
+      {"title": "Full Judgment - Indian Kanoon", "url": "https://indiankanoon.org/doc/1486949/"},
+      {"title": "Environmental Law in India", "url": "https://www.livelaw.in/tags/environmental-law"}
+    ],
+    "related_sections": ["Constitution of India - Article 21", "Constitution of India - Article 48A", "Environment Protection Act 1986", "National Green Tribunal Act 2010"]
   },
   {
+    "id": 10,
     "case_name": "S.R. Bommai v. Union of India",
     "citation": "AIR 1994 SC 1918",
     "court": "Supreme Court of India",
     "principle": "President's Rule and Federalism",
     "summary": "The imposition of President's Rule under Article 356 is subject to judicial review. Secularism is a basic feature of the Constitution. The court restricted misuse of Article 356 by the central government.",
-    "relevance": "Landmark federalism and secularism case"
+    "relevance": "Landmark federalism and secularism case",
+    "date": "1994-03-11",
+    "judges": ["Chief Justice M.H. Kania", "Justice L.M. Sharma", "Justice S.R. Pandian", "Justice A.M. Ahmadi", "Justice J.S. Verma", "Justice S.P. Bharucha", "Justice P.B. Sawant", "Justice S.C. Agarwal", "Justice B.P. Jeevan Reddy"],
+    "status": "Landmark",
+    "description": "Multiple state governments were dismissed by the Centre using Article 356, leading to this challenge. A nine-judge bench held that the proclamation of President's Rule is subject to judicial review and cannot be used for political purposes. The court held that secularism is a basic feature of the Constitution and a state government pursuing anti-secular policies can be legitimately dismissed. The judgment established important safeguards against the arbitrary use of Article 356.",
+    "key_points": [
+      "President's Rule under Article 356 is subject to judicial review",
+      "Article 356 cannot be used for political purposes by the Centre",
+      "Secularism is a basic feature of the Constitution",
+      "The material relied upon by the President must be made available to the court",
+      "If the proclamation is found unconstitutional, the court can restore the dissolved government",
+      "Federal structure is part of the basic structure of the Constitution"
+    ],
+    "related_pdfs": [
+      {"title": "Full Judgment - Indian Kanoon", "url": "https://indiankanoon.org/doc/60799/"},
+      {"title": "Article 356 Analysis", "url": "https://www.scobserver.in/cases/s-r-bommai-v-union-of-india/"}
+    ],
+    "related_sections": ["Constitution of India - Article 356", "Constitution of India - Article 355", "Constitution of India - Article 365"]
   },
   {
+    "id": 11,
     "case_name": "Olga Tellis v. Bombay Municipal Corporation",
     "citation": "AIR 1986 SC 180",
     "court": "Supreme Court of India",
     "principle": "Right to Livelihood",
     "summary": "The right to livelihood is included in the right to life under Article 21. Pavement dwellers cannot be evicted without following due process of law and providing them a hearing.",
-    "relevance": "Expanded Article 21 to include right to livelihood"
+    "relevance": "Expanded Article 21 to include right to livelihood",
+    "date": "1985-07-10",
+    "judges": ["Chief Justice Y.V. Chandrachud", "Justice S. Murtaza Fazal Ali", "Justice V.D. Tulzapurkar", "Justice O. Chinnappa Reddy", "Justice A. Varadarajan"],
+    "status": "Landmark",
+    "description": "Pavement and slum dwellers in Bombay challenged their eviction orders. The Supreme Court held that the right to livelihood is an integral part of the right to life under Article 21, since no person can live without the means of living. While the court recognized that the dwellers were occupying public property illegally, it held that they could not be evicted without being given a hearing and reasonable notice. The government was directed to provide alternative sites or transit accommodation.",
+    "key_points": [
+      "Right to livelihood is part of right to life under Article 21",
+      "Eviction of pavement dwellers without due process is unconstitutional",
+      "No person can live without the means of living — livelihood is essential",
+      "Government must provide reasonable notice before eviction",
+      "Alternative accommodation should be provided where possible",
+      "Even illegal occupants are entitled to procedural fairness"
+    ],
+    "related_pdfs": [
+      {"title": "Full Judgment - Indian Kanoon", "url": "https://indiankanoon.org/doc/709776/"},
+      {"title": "Right to Shelter Jurisprudence", "url": "https://www.livelaw.in/tags/right-to-shelter"}
+    ],
+    "related_sections": ["Constitution of India - Article 21", "Constitution of India - Article 19(1)(e)", "Bombay Municipal Corporation Act"]
   },
   {
+    "id": 12,
     "case_name": "Indian Young Lawyers Association v. State of Kerala",
     "citation": "(2019) 11 SCC 1",
     "court": "Supreme Court of India",
     "principle": "Sabarimala Temple Entry",
     "summary": "The ban on entry of women aged 10-50 into Sabarimala temple was held to be violative of their fundamental rights under Articles 14, 15, 25, and 26 of the Constitution.",
-    "relevance": "Religious rights vs gender equality"
+    "relevance": "Religious rights vs gender equality",
+    "date": "2018-09-28",
+    "judges": ["Chief Justice Dipak Misra", "Justice R.F. Nariman", "Justice A.M. Khanwilkar", "Justice D.Y. Chandrachud", "Justice Indu Malhotra"],
+    "status": "Under Review",
+    "description": "The Indian Young Lawyers Association challenged Rule 3(b) of the Kerala Hindu Places of Public Worship (Authorization of Entry) Rules, 1965, which prohibited women between the ages of 10 and 50 from entering the Sabarimala temple. In a 4:1 majority, the Supreme Court struck down the rule, holding that the exclusion of women based on a biological factor (menstruation) amounted to discrimination. Justice Indu Malhotra dissented, arguing that courts should not interfere with essential religious practices. The case was later referred to a larger bench for reconsideration.",
+    "key_points": [
+      "Ban on women (10-50) entering Sabarimala struck down by 4:1 majority",
+      "Exclusion based on menstruation is discriminatory under Article 15",
+      "Women have equal right to worship under Article 25",
+      "Devotees of Lord Ayyappa do not constitute a separate religious denomination under Article 26",
+      "Justice Indu Malhotra's dissent — courts should not interfere with religious practices",
+      "Case referred to larger 7-judge bench for reconsideration"
+    ],
+    "related_pdfs": [
+      {"title": "Full Judgment - Indian Kanoon", "url": "https://indiankanoon.org/doc/163639357/"},
+      {"title": "SC Observer Analysis", "url": "https://www.scobserver.in/cases/indian-young-lawyers-association-v-state-of-kerala/"}
+    ],
+    "related_sections": ["Constitution of India - Article 14", "Constitution of India - Article 15", "Constitution of India - Article 25", "Constitution of India - Article 26"]
   },
   {
+    "id": 13,
     "case_name": "Arnesh Kumar v. State of Bihar",
     "citation": "(2014) 8 SCC 273",
     "court": "Supreme Court of India",
     "principle": "Guidelines on Arrest",
     "summary": "Police must not automatically arrest the accused in cases under Section 498A IPC. Magistrates must not mechanically authorize detention. Laid down specific guidelines to prevent misuse of arrest powers.",
-    "relevance": "Prevents misuse of arrest provisions"
+    "relevance": "Prevents misuse of arrest provisions",
+    "date": "2014-07-02",
+    "judges": ["Justice C.K. Prasad", "Justice P.C. Ghose"],
+    "status": "Active",
+    "description": "The case arose from the rampant misuse of Section 498A IPC (cruelty by husband or his relatives), where arrests were being made mechanically without proper investigation. The Supreme Court laid down mandatory guidelines requiring police officers to satisfy themselves about the necessity of arrest based on specific parameters under Section 41 CrPC. Magistrates were directed not to authorize detention casually. Non-compliance was made a ground for departmental action against the police officer and contempt of court proceedings.",
+    "key_points": [
+      "Arrest under Section 498A IPC should not be automatic or routine",
+      "Police must follow checklist under Section 41(1)(b)(ii) CrPC before arrest",
+      "Magistrate must record reasons for authorizing detention",
+      "Non-compliance results in departmental action and contempt proceedings",
+      "Applies to all cases where punishment is up to 7 years imprisonment",
+      "Aimed at preventing misuse of anti-dowry laws"
+    ],
+    "related_pdfs": [
+      {"title": "Full Judgment - Indian Kanoon", "url": "https://indiankanoon.org/doc/2849931/"},
+      {"title": "Section 498A Guidelines", "url": "https://www.livelaw.in/tags/section-498a"}
+    ],
+    "related_sections": ["IPC - Section 498A", "CrPC - Section 41", "CrPC - Section 41A", "CrPC - Section 154"]
   },
   {
+    "id": 14,
     "case_name": "Lalita Kumari v. Government of UP",
     "citation": "(2014) 2 SCC 1",
     "court": "Supreme Court of India",
     "principle": "Mandatory FIR Registration",
     "summary": "Registration of FIR under Section 154 CrPC is mandatory if the information discloses commission of a cognizable offence. Police cannot refuse to register an FIR.",
-    "relevance": "Ensures access to criminal justice system"
+    "relevance": "Ensures access to criminal justice system",
+    "date": "2013-11-12",
+    "judges": ["Chief Justice P. Sathasivam", "Justice B.S. Chauhan", "Justice Ranjana Prakash Desai", "Justice Ranjan Gogoi", "Justice S.A. Bobde"],
+    "status": "Active",
+    "description": "Lalita Kumari's minor daughter was abducted, and the police refused to register an FIR. A five-judge Constitution Bench held that registration of FIR under Section 154 CrPC is mandatory when information received by the police discloses the commission of a cognizable offence. The police officer cannot conduct a preliminary inquiry before registering the FIR in cases involving cognizable offences. However, in cases where the information does not clearly disclose a cognizable offence, a preliminary inquiry may be conducted within 7 days.",
+    "key_points": [
+      "FIR registration is mandatory upon receiving information about a cognizable offence",
+      "Police cannot refuse to register an FIR — it is a statutory duty",
+      "Preliminary inquiry allowed only in exceptional cases (within 7 days)",
+      "Non-registration of FIR is punishable under Section 166A IPC",
+      "A copy of the FIR must be given to the informant free of cost",
+      "All FIRs must be uploaded on a police website within 24 hours"
+    ],
+    "related_pdfs": [
+      {"title": "Full Judgment - Indian Kanoon", "url": "https://indiankanoon.org/doc/90837735/"},
+      {"title": "FIR Registration Guidelines", "url": "https://www.livelaw.in/tags/fir-registration"}
+    ],
+    "related_sections": ["CrPC - Section 154", "CrPC - Section 155", "IPC - Section 166A"]
   },
   {
+    "id": 15,
     "case_name": "Shayara Bano v. Union of India",
     "citation": "(2017) 9 SCC 1",
     "court": "Supreme Court of India",
     "principle": "Triple Talaq",
     "summary": "The practice of instant triple talaq (talaq-e-biddat) was declared unconstitutional. It violated the fundamental rights of Muslim women under Articles 14, 15, and 21.",
-    "relevance": "Led to Muslim Women (Protection of Rights on Marriage) Act, 2019"
+    "relevance": "Led to Muslim Women (Protection of Rights on Marriage) Act, 2019",
+    "date": "2017-08-22",
+    "judges": ["Chief Justice J.S. Khehar", "Justice Kurian Joseph", "Justice R.F. Nariman", "Justice U.U. Lalit", "Justice S. Abdul Nazeer"],
+    "status": "Landmark",
+    "description": "Shayara Bano challenged the practice of instant triple talaq (talaq-e-biddat) after her husband divorced her by uttering talaq three times. A five-judge Constitution Bench, in a 3:2 majority, struck down the practice. The majority held that triple talaq is not an essential religious practice protected under Article 25 and is manifestly arbitrary, violating Article 14. This judgment led to the enactment of the Muslim Women (Protection of Rights on Marriage) Act, 2019, which criminalized instant triple talaq.",
+    "key_points": [
+      "Instant triple talaq (talaq-e-biddat) declared unconstitutional by 3:2 majority",
+      "Triple talaq is not an essential religious practice under Article 25",
+      "The practice is manifestly arbitrary and violates Article 14",
+      "Muslim women have equal right to dignity and non-discrimination",
+      "Led to the Muslim Women (Protection of Rights on Marriage) Act, 2019",
+      "Parliament was directed to legislate on the matter within 6 months"
+    ],
+    "related_pdfs": [
+      {"title": "Full Judgment - Indian Kanoon", "url": "https://indiankanoon.org/doc/115701246/"},
+      {"title": "Muslim Women Act 2019", "url": "https://www.livelaw.in/tags/triple-talaq-law"},
+      {"title": "SC Observer Analysis", "url": "https://www.scobserver.in/cases/shayara-bano-v-union-of-india/"}
+    ],
+    "related_sections": ["Constitution of India - Article 14", "Constitution of India - Article 15", "Constitution of India - Article 21", "Constitution of India - Article 25", "Muslim Women (Protection of Rights on Marriage) Act 2019"]
   }
 ]

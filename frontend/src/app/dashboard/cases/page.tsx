@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { Search, Plus, FileText, Calendar, User, Tag, Scale, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,12 +22,15 @@ import {
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 interface CaseSummary {
+  id?: number;
   case_name: string;
   citation: string;
   court: string;
   principle: string;
   summary: string;
   relevance: string;
+  date?: string;
+  status?: string;
 }
 
 const emptyForm: CaseSummary = {
@@ -227,58 +231,75 @@ export default function CasesPage() {
               </div>
             )}
 
-            {/* Cases List */}
-            {!loading && (
-              <div className="grid gap-4">
-                {cases.map((c, i) => (
-                  <Card key={i} className="shadow-sm border-border hover:shadow-md transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-3 mb-2">
-                            <Scale className="h-5 w-5 text-primary shrink-0" />
-                            <h3 className="text-lg font-semibold text-foreground truncate">
-                              {c.case_name}
-                            </h3>
-                          </div>
-                          {c.summary && (
-                            <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                              {c.summary}
-                            </p>
-                          )}
-                          <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                            {c.citation && (
-                              <div className="flex items-center gap-2">
-                                <FileText className="h-4 w-4" />
-                                <span>{c.citation}</span>
+              {/* Cases List */}
+              {!loading && (
+                <div className="grid gap-4">
+                  {cases.map((c, i) => (
+                    <Link key={c.id ?? i} href={`/dashboard/cases/${c.id}`}>
+                      <Card className="shadow-sm border-border hover:shadow-md transition-shadow cursor-pointer">
+                        <CardContent className="p-6">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-3 mb-2">
+                                <Scale className="h-5 w-5 text-primary shrink-0" />
+                                <h3 className="text-lg font-semibold text-foreground truncate">
+                                  {c.case_name}
+                                </h3>
                               </div>
-                            )}
-                            {c.court && (
-                              <div className="flex items-center gap-2">
-                                <Tag className="h-4 w-4" />
-                                <span>{c.court}</span>
+                              {c.summary && (
+                                <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                                  {c.summary}
+                                </p>
+                              )}
+                              <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                                {c.citation && (
+                                  <div className="flex items-center gap-2">
+                                    <FileText className="h-4 w-4" />
+                                    <span>{c.citation}</span>
+                                  </div>
+                                )}
+                                {c.court && (
+                                  <div className="flex items-center gap-2">
+                                    <Tag className="h-4 w-4" />
+                                    <span>{c.court}</span>
+                                  </div>
+                                )}
+                                {c.date && (
+                                  <div className="flex items-center gap-2">
+                                    <Calendar className="h-4 w-4" />
+                                    <span>{new Date(c.date).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" })}</span>
+                                  </div>
+                                )}
                               </div>
-                            )}
+                            </div>
+                            <div className="flex flex-col items-end gap-2 shrink-0">
+                              {c.status && (
+                                <Badge variant="outline" className={
+                                  c.status === "Landmark" ? "bg-amber-50 text-amber-700 border-amber-200" :
+                                  c.status === "Active" ? "bg-green-50 text-green-700 border-green-200" :
+                                  "bg-gray-50 text-gray-700 border-gray-200"
+                                }>
+                                  {c.status}
+                                </Badge>
+                              )}
+                              {c.principle && (
+                                <Badge className="bg-blue-100 text-blue-800 border-blue-200">
+                                  {c.principle}
+                                </Badge>
+                              )}
+                              {c.relevance && (
+                                <Badge variant="outline" className="text-xs">
+                                  {c.relevance}
+                                </Badge>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                        <div className="flex flex-col items-end gap-2 shrink-0">
-                          {c.principle && (
-                            <Badge className="bg-blue-100 text-blue-800 border-blue-200">
-                              {c.principle}
-                            </Badge>
-                          )}
-                          {c.relevance && (
-                            <Badge variant="outline" className="text-xs">
-                              {c.relevance}
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
+              )}
 
             {/* Empty state */}
             {!loading && cases.length === 0 && (
