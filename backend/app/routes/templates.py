@@ -1,6 +1,11 @@
+"""
+Legal Document Templates — AI-powered document generation using GPT-4o.
+Generates complete legal documents from template fields.
+"""
+
 from fastapi import APIRouter, HTTPException
 from typing import Optional
-import json
+from app.services.ai_analyzer import generate_template_document
 
 router = APIRouter()
 
@@ -161,7 +166,7 @@ async def get_template(template_id: str):
 
 @router.post("/api/templates/{template_id}/generate")
 async def generate_from_template(template_id: str, data: dict):
-    """Generate a document from a template. Returns placeholder for now - will integrate with AI generator."""
+    """Generate a complete legal document from a template using AI."""
     template = next((t for t in TEMPLATES if t["id"] == template_id), None)
     if not template:
         raise HTTPException(status_code=404, detail="Template not found")
@@ -174,11 +179,28 @@ async def generate_from_template(template_id: str, data: dict):
                 detail=f"Required field missing: {field['label']}",
             )
 
-    # For now, return a confirmation. Will integrate with AI generator later.
-    return {
-        "success": True,
-        "message": f"{template['name']} generation started",
-        "template_id": template_id,
-        "data": data,
-        "status": "generating",
-    }
+    # Generate document using AI
+    result = generate_template_document(
+        template_name=template["name"],
+        template_id=template["id"],
+        fields=data,
+        field_schema=template["fields"],
+    )
+
+    if result["success"]:
+        return {
+            "success": True,
+            "message": f"{template['name']} generated successfully",
+            "template_id": template_id,
+            "data": data,
+            "status": "completed",
+            "document_content": result["document_content"],
+        }
+    else:
+        return {
+            "success": False,
+            "message": f"Document generation failed: {result.get('error', 'Unknown error')}",
+            "template_id": template_id,
+            "data": data,
+            "status": "failed",
+        }

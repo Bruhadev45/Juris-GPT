@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   Search,
@@ -53,14 +54,15 @@ export function LeftSidebar({ collapsed = false, onToggle }: LeftSidebarProps) {
   return (
     <div
       className={cn(
-        "flex h-full flex-col border-r border-border bg-[#f8f7fc] transition-all duration-300",
+        "flex h-full flex-col border-r border-border bg-background transition-all duration-300",
         collapsed ? "w-0 overflow-hidden" : "w-60"
       )}
     >
       {/* Logo and collapse toggle */}
       <div className="flex items-center justify-between px-4 py-5">
-        <Link href="/dashboard" className="text-2xl font-bold tracking-tight text-primary">
-          Legalwork
+        <Link href="/dashboard" className="flex items-center gap-2">
+          <Image src="/logo.png" alt="JurisGPT" width={28} height={28} />
+          <span className="text-2xl font-bold tracking-tight text-primary">JurisGPT</span>
         </Link>
         <button
           onClick={onToggle}

@@ -25,7 +25,12 @@ import {
   IndianRupee,
   FileText,
   Download,
+  Copy,
+  Printer,
+  Eye,
+  Edit3,
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { templatesApi, type TemplateDetail } from "@/lib/api";
 
 export default function TemplateFormPage({
@@ -41,6 +46,8 @@ export default function TemplateFormPage({
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [generateResult, setGenerateResult] = useState<Record<string, unknown> | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [showPreview, setShowPreview] = useState(true);
 
   useEffect(() => {
     async function fetchTemplate() {
@@ -89,6 +96,58 @@ export default function TemplateFormPage({
       setError(err instanceof Error ? err.message : "Failed to generate document");
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function handleCopy() {
+    const content = String(generateResult?.document_content || "");
+    if (content) {
+      await navigator.clipboard.writeText(content);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  }
+
+  function handleDownloadText() {
+    const content = String(generateResult?.document_content || "");
+    if (!content) return;
+    const blob = new Blob([content], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${template?.name?.replace(/\s+/g, "_") || "document"}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function handlePrint() {
+    const content = String(generateResult?.document_content || "");
+    if (!content) return;
+    const printWindow = window.open("", "_blank");
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>${template?.name || "Document"}</title>
+            <style>
+              body { font-family: 'Georgia', serif; line-height: 1.8; padding: 40px; max-width: 800px; margin: 0 auto; color: #1a1a1a; }
+              h1 { font-size: 24px; text-align: center; margin-bottom: 30px; }
+              h2 { font-size: 18px; margin-top: 24px; border-bottom: 1px solid #ccc; padding-bottom: 6px; }
+              h3 { font-size: 15px; margin-top: 18px; }
+              p { margin: 8px 0; text-align: justify; }
+              ul, ol { margin: 8px 0 8px 20px; }
+              li { margin: 4px 0; }
+              strong { font-weight: 600; }
+              hr { border: none; border-top: 1px solid #ccc; margin: 20px 0; }
+            </style>
+          </head>
+          <body>${content.replace(/\n/g, "<br>")}</body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.print();
     }
   }
 
@@ -245,61 +304,139 @@ export default function TemplateFormPage({
 
   if (!template) return null;
 
-  if (success) {
+  // Success state — show generated document
+  if (success && generateResult) {
+    const documentContent = String(generateResult.document_content || "");
+    const hasContent = documentContent.length > 0;
+
     return (
       <div className="flex h-screen bg-background">
         <div className="flex-1 flex flex-col">
           <header className="bg-card border-b border-border px-6 py-4">
-            <div className="flex items-center gap-3">
-              <Link href="/dashboard/forms">
-                <Button variant="ghost" size="sm">
-                  <ArrowLeft className="h-4 w-4 mr-1" />
-                  Back
-                </Button>
-              </Link>
-              <h1 className="text-xl font-semibold text-foreground">{template.name}</h1>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Link href="/dashboard/forms">
+                  <Button variant="ghost" size="sm">
+                    <ArrowLeft className="h-4 w-4 mr-1" />
+                    Back
+                  </Button>
+                </Link>
+                <div>
+                  <h1 className="text-xl font-semibold text-foreground">{template.name}</h1>
+                  <p className="text-sm text-muted-foreground">Document generated successfully</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {hasContent && (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowPreview(!showPreview)}
+                    >
+                      {showPreview ? (
+                        <><Edit3 className="h-4 w-4 mr-1" /> Raw</>
+                      ) : (
+                        <><Eye className="h-4 w-4 mr-1" /> Preview</>
+                      )}
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={handleCopy}>
+                      <Copy className="h-4 w-4 mr-1" />
+                      {copied ? "Copied!" : "Copy"}
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={handlePrint}>
+                      <Printer className="h-4 w-4 mr-1" />
+                      Print
+                    </Button>
+                    <Button size="sm" onClick={handleDownloadText}>
+                      <Download className="h-4 w-4 mr-1" />
+                      Download
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
           </header>
-          <div className="flex-1 flex items-center justify-center p-6">
-            <Card className="shadow-sm border-border max-w-lg w-full">
-              <CardContent className="p-8 text-center">
-                <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-4" />
-                <h2 className="text-2xl font-bold text-foreground mb-2">Document Generated</h2>
-                <p className="text-muted-foreground mb-6">
-                  Your {template.name} has been successfully generated and is ready for download.
-                </p>
-                {generateResult && (generateResult as Record<string, unknown>).document_id && (
-                  <p className="text-xs text-muted-foreground mb-4">
-                    Document ID: {String((generateResult as Record<string, unknown>).document_id)}
-                  </p>
-                )}
-                <div className="flex flex-col gap-3">
-                  {generateResult && (generateResult as Record<string, unknown>).download_url && (
-                    <Button className="w-full gap-2" asChild>
-                      <a href={String((generateResult as Record<string, unknown>).download_url)} download>
-                        <Download className="h-4 w-4" />
-                        Download Document
-                      </a>
-                    </Button>
-                  )}
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => {
-                      setSuccess(false);
-                      setGenerateResult(null);
-                    }}
-                  >
-                    Generate Another
-                  </Button>
-                  <Link href="/dashboard/forms" className="w-full">
-                    <Button variant="ghost" className="w-full">
-                      Back to Forms
-                    </Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
+
+          <div className="flex-1 overflow-y-auto p-6 bg-background">
+            <div className="max-w-4xl mx-auto space-y-6">
+              {/* Success Banner */}
+              <Card className="border-green-200 bg-green-50 dark:bg-green-900/10 dark:border-green-800">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="h-6 w-6 text-green-600 flex-shrink-0" />
+                    <div>
+                      <p className="font-semibold text-green-800 dark:text-green-400">
+                        Document Generated Successfully
+                      </p>
+                      <p className="text-sm text-green-700 dark:text-green-500">
+                        Your {template.name} has been generated using AI. Review the content below before downloading.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Document Content */}
+              {hasContent ? (
+                <Card className="shadow-sm border-border">
+                  <CardHeader className="border-b border-border">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <FileText className="h-4 w-4" />
+                        Generated Document
+                      </CardTitle>
+                      <Badge variant="outline">AI-Generated</Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    {showPreview ? (
+                      <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-li:text-muted-foreground">
+                        <ReactMarkdown>{documentContent}</ReactMarkdown>
+                      </div>
+                    ) : (
+                      <pre className="text-sm text-muted-foreground whitespace-pre-wrap font-mono bg-muted/30 p-4 rounded-lg overflow-x-auto">
+                        {documentContent}
+                      </pre>
+                    )}
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card className="shadow-sm border-border">
+                  <CardContent className="p-8 text-center">
+                    <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-4" />
+                    <h2 className="text-2xl font-bold text-foreground mb-2">Document Generated</h2>
+                    <p className="text-muted-foreground mb-6">
+                      Your {template.name} has been generated.
+                    </p>
+                    {generateResult.download_url && (
+                      <Button className="w-full max-w-xs gap-2" asChild>
+                        <a href={String(generateResult.download_url)} download>
+                          <Download className="h-4 w-4" />
+                          Download Document
+                        </a>
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Actions */}
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSuccess(false);
+                    setGenerateResult(null);
+                  }}
+                >
+                  Generate Another
+                </Button>
+                <Link href="/dashboard/forms">
+                  <Button variant="ghost">Back to Forms</Button>
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -355,7 +492,7 @@ export default function TemplateFormPage({
               <CardHeader>
                 <CardTitle>Fill in the Details</CardTitle>
                 <CardDescription>
-                  Complete all required fields to generate your document. Fields marked with * are required.
+                  Complete all required fields to generate your document using AI. Fields marked with * are required.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -386,7 +523,7 @@ export default function TemplateFormPage({
                       {submitting ? (
                         <>
                           <Loader2 className="h-4 w-4 animate-spin" />
-                          Generating...
+                          Generating with AI...
                         </>
                       ) : (
                         <>

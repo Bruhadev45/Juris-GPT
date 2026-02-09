@@ -32,6 +32,24 @@ export interface LegalDataStats {
   companies_act_sections: number;
 }
 
+// Unified Search types
+export interface SearchResult {
+  type: "case" | "statute" | "companies_act";
+  title: string;
+  subtitle: string;
+  content: string;
+  relevance_score: number;
+  source: string;
+  metadata: Record<string, unknown>;
+}
+
+export interface UnifiedSearchResponse {
+  results: SearchResult[];
+  total: number;
+  query: string;
+  suggestions: string[];
+}
+
 class ApiClient {
   private baseUrl: string;
 
@@ -106,6 +124,20 @@ class ApiClient {
 
   async getLegalDataStats(): Promise<LegalDataStats> {
     return this.fetch<LegalDataStats>("/api/legal/stats");
+  }
+
+  async unifiedSearch(options: {
+    query: string;
+    types?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<UnifiedSearchResponse> {
+    const params = new URLSearchParams();
+    params.append("q", options.query);
+    if (options.types) params.append("types", options.types);
+    if (options.limit) params.append("limit", options.limit.toString());
+    if (options.offset) params.append("offset", options.offset.toString());
+    return this.fetch<UnifiedSearchResponse>(`/api/legal/search?${params.toString()}`);
   }
 }
 

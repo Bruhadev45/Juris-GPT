@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JurisGPT - User Guide</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #1e293b;
+      background: #ffffff;
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 0 32px; }
+
+    /* ── Print ── */
+    @page { size: A4; margin: 20mm 18mm; }
+    @media print {
+      body { font-size: 12px; }
+      .page-break { page-break-before: always; }
+      .cover { page-break-after: always; }
+      .no-print { display: none !important; }
+      .step-card, .feature-section { break-inside: avoid; }
+    }
+
+    /* ── Cover ── */
+    .cover {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+      color: #fff;
+      padding: 60px 32px;
+    }
+    .cover-badge {
+      display: inline-block;
+      padding: 6px 20px;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      font-size: 13px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+    }
+    .cover h1 { font-size: 52px; font-weight: 800; margin-bottom: 16px; }
+    .cover h2 { font-size: 24px; font-weight: 400; opacity: 0.85; margin-bottom: 40px; }
+    .cover-meta { font-size: 14px; opacity: 0.6; }
+
+    /* ── TOC ── */
+    .toc { padding: 48px 0; }
+    .toc h2 { font-size: 28px; font-weight: 700; margin-bottom: 24px; color: #0f172a; }
+    .toc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .toc-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; border-radius: 8px; background: #f8fafc;
+      text-decoration: none; color: #1e293b; transition: background 0.2s;
+    }
+    .toc-item:hover { background: #e2e8f0; }
+    .toc-num {
+      width: 28px; height: 28px; border-radius: 50%; background: #1e3a5f; color: #fff;
+      display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0;
+    }
+    .toc-label { font-size: 14px; font-weight: 500; }
+    .toc-section-label {
+      grid-column: 1 / -1; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px; color: #64748b;
+      margin-top: 12px; padding-left: 4px;
+    }
+
+    /* ── Section ── */
+    .section { padding: 48px 0; }
+    .section-number { font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #3b82f6; }
+    .section-title { font-size: 28px; font-weight: 700; color: #0f172a; margin: 8px 0 4px; }
+    .section-subtitle { font-size: 15px; color: #64748b; margin-bottom: 24px; }
+    .section-rule { border: none; border-top: 2px solid #e2e8f0; margin-bottom: 28px; }
+
+    /* ── Feature Section ── */
+    .feature-section {
+      background: #f8fafc; border-radius: 12px; padding: 28px;
+      margin-bottom: 24px; border: 1px solid #e2e8f0;
+    }
+    .feature-section h3 {
+      font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 6px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .feature-section .path {
+      font-size: 13px; color: #64748b; font-family: "SF Mono", Monaco, Consolas, monospace;
+      margin-bottom: 16px;
+    }
+    .feature-section p { margin-bottom: 12px; }
+
+    /* ── Step Cards ── */
+    .steps { margin: 16px 0; }
+    .step-card {
+      display: flex; gap: 16px; padding: 14px 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .step-card:last-child { border-bottom: none; }
+    .step-num {
+      width: 32px; height: 32px; border-radius: 50%; background: #1e3a5f; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; flex-shrink: 0; margin-top: 2px;
+    }
+    .step-content h4 { font-size: 15px; font-weight: 600; color: #0f172a; margin-bottom: 4px; }
+    .step-content p { font-size: 14px; color: #475569; margin: 0; }
+
+    /* ── Tip / Note ── */
+    .tip {
+      background: #eff6ff; border-left: 4px solid #3b82f6; padding: 12px 16px;
+      border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 14px;
+    }
+    .tip strong { color: #1d4ed8; }
+    .warning {
+      background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px;
+      border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 14px;
+    }
+    .warning strong { color: #b45309; }
+
+    /* ── Feature List ── */
+    .feature-list { list-style: none; margin: 12px 0; }
+    .feature-list li {
+      padding: 6px 0 6px 24px; position: relative; font-size: 14px; color: #334155;
+    }
+    .feature-list li::before {
+      content: "\2713"; position: absolute; left: 0; color: #22c55e; font-weight: 700;
+    }
+
+    /* ── Table ── */
+    .info-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+    .info-table th {
+      text-align: left; padding: 10px 12px; background: #1e3a5f; color: #fff;
+      font-weight: 600; font-size: 13px;
+    }
+    .info-table td { padding: 10px 12px; border-bottom: 1px solid #e2e8f0; }
+    .info-table tr:hover td { background: #f1f5f9; }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-block; padding: 2px 10px; border-radius: 12px;
+      font-size: 12px; font-weight: 600;
+    }
+    .badge-blue { background: #dbeafe; color: #1d4ed8; }
+    .badge-green { background: #dcfce7; color: #16a34a; }
+    .badge-red { background: #fee2e2; color: #dc2626; }
+    .badge-yellow { background: #fef3c7; color: #b45309; }
+    .badge-purple { background: #f3e8ff; color: #7c3aed; }
+
+    /* ── Footer ── */
+    .footer {
+      background: #0f172a; color: #94a3b8; padding: 32px 0; text-align: center; font-size: 13px;
+    }
+    .footer strong { color: #fff; }
+
+    /* ── Keyboard shortcut ── */
+    kbd {
+      display: inline-block; padding: 2px 8px; background: #f1f5f9; border: 1px solid #cbd5e1;
+      border-radius: 4px; font-family: "SF Mono", Monaco, Consolas, monospace; font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════ COVER ═══════ -->
+  <div class="cover">
+    <div class="cover-badge">User Guide</div>
+    <h1>JurisGPT</h1>
+    <h2>How to Use Every Feature</h2>
+    <p class="cover-meta">A step-by-step guide to all 19 features in the JurisGPT platform<br>Version 1.0 &mdash; February 2026</p>
+  </div>
+
+  <main class="container">
+
+    <!-- ═══════ TABLE OF CONTENTS ═══════ -->
+    <div class="toc page-break">
+      <h2>Table of Contents</h2>
+      <div class="toc-grid">
+        <div class="toc-section-label">Main</div>
+        <a class="toc-item" href="#dashboard"><span class="toc-num">1</span><span class="toc-label">Dashboard</span></a>
+        <a class="toc-item" href="#cases"><span class="toc-num">2</span><span class="toc-label">Cases</span></a>
+        <a class="toc-item" href="#search"><span class="toc-num">3</span><span class="toc-label">Legal Search</span></a>
+        <a class="toc-item" href="#review"><span class="toc-num">4</span><span class="toc-label">Smart Review</span></a>
+        <a class="toc-item" href="#chat"><span class="toc-num">5</span><span class="toc-label">Chat</span></a>
+        <a class="toc-item" href="#rti"><span class="toc-num">6</span><span class="toc-label">RTI Assistant</span></a>
+
+        <div class="toc-section-label">Analytics</div>
+        <a class="toc-item" href="#compliance"><span class="toc-num">7</span><span class="toc-label">Compliance View</span></a>
+        <a class="toc-item" href="#calendar"><span class="toc-num">8</span><span class="toc-label">Compliance Calendar</span></a>
+        <a class="toc-item" href="#forms"><span class="toc-num">9</span><span class="toc-label">Legal Forms</span></a>
+        <a class="toc-item" href="#agreements"><span class="toc-num">10</span><span class="toc-label">Agreements</span></a>
+        <a class="toc-item" href="#analyzer"><span class="toc-num">11</span><span class="toc-label">Contract Analyzer</span></a>
+        <a class="toc-item" href="#calculator"><span class="toc-num">12</span><span class="toc-label">Legal Calculator</span></a>
+
+        <div class="toc-section-label">Management</div>
+        <a class="toc-item" href="#vault"><span class="toc-num">13</span><span class="toc-label">Document Vault</span></a>
+        <a class="toc-item" href="#team"><span class="toc-num">14</span><span class="toc-label">Team</span></a>
+        <a class="toc-item" href="#integrations"><span class="toc-num">15</span><span class="toc-label">Integrations</span></a>
+
+        <div class="toc-section-label">Other</div>
+        <a class="toc-item" href="#news"><span class="toc-num">16</span><span class="toc-label">Legal News</span></a>
+        <a class="toc-item" href="#settings"><span class="toc-num">17</span><span class="toc-label">Settings</span></a>
+        <a class="toc-item" href="#support"><span class="toc-num">18</span><span class="toc-label">Support Center</span></a>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 1: DASHBOARD
+         ═══════════════════════════════════════ -->
+    <section id="dashboard" class="section page-break">
+      <span class="section-number">Feature 01</span>
+      <h2 class="section-title">Dashboard</h2>
+      <p class="section-subtitle">Your command center &mdash; see everything at a glance</p>
+      <hr class="section-rule">
+
+      <div class="feature-section">
+        <h3>What You See</h3>
+        <div class="path">Sidebar &rarr; Dashboard</div>
+        <p>The Dashboard is the first screen you land on after logging in. It gives you an overview of your legal workspace with live data from the backend.</p>
+
+        <ul class="feature-list">
+          <li><strong>Document Status Card</strong> &mdash; Shows the latest document being reviewed, its AI analysis progress (%), and current review stage</li>
+          <li><strong>AI Summary &amp; Risk</strong> &mdash; Highlights the highest-risk clause found by AI, with risk zone score and clause type</li>
+          <li><strong>AI Recommendation</strong> &mdash; Actionable suggestion from the AI with a "See Suggested Rewrite" button</li>
+          <li><strong>Documents List</strong> &mdash; Quick access to your recent documents with view and download buttons</li>
+          <li><strong>Key Metrics</strong> &mdash; Four stat cards: Legal Cases indexed, Companies Act sections, Indian Laws, and Total Sections</li>
+          <li><strong>Companies Act Sections</strong> &mdash; Shows top 5 relevant sections from the Companies Act 2013</li>
+          <li><strong>Relevant Cases</strong> &mdash; Table of relevant case law with case name, court, year, principle, and relevance score</li>
+        </ul>
+      </div>
+
+      <div class="feature-section">
+        <h3>How to Use It</h3>
+        <div class="steps">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h4>Check Your Document Status</h4>
+              <p>Look at the top-left card to see which document is currently being analyzed and its progress percentage.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h4>Review AI Insights</h4>
+              <p>The AI Summary card shows risk zones. Click "See Suggested Rewrite" on the Recommendation card to see AI-proposed changes.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <h4>Quick Actions</h4>
+              <p>Use the top-right buttons: "Legal Chat" opens the AI assistant, "New Agreement" starts a Founder Agreement.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <h4>Browse Legal Data</h4>
+              <p>Scroll down to see Companies Act sections and relevant cases. Click any case row for details.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 2: CASES
+         ═══════════════════════════════════════ -->
+    <section id="cases" class="section page-break">
+      <span class="section-number">Feature 02</span>
+      <h2 class="section-title">Cases</h2>
+      <p class="section-subtitle">Manage and search your legal case database</p>
+      <hr class="section-rule">
+
+      <div class="feature-section">
+        <h3>What You See</h3>
+        <div class="path">Sidebar &rarr; Cases</div>
+        <p>A searchable list of legal cases with details including court, citation, legal principle, and summary.</p>
+      </div>
+
+      <div class="feature-section">
+        <h3>How to Use It</h3>
+        <div class="steps">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h4>Search Existing Cases</h4>
+              <p>Type in the search bar at the top. It searches across case names, principles, and summaries with a 300ms debounce.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h4>Add a New Case</h4>
+              <p>Click <strong>"New Case"</strong> in the header. Fill in: Case Name (required), Citation (e.g., "(1973) 4 SCC 225"), Court (required), Legal Principle, Summary, and Relevance. Click "Add Case".</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <h4>View Case Details</h4>
+              <p>Click any case card to navigate to its detail page. Each card shows the case name, summary (first 2 lines), citation, court, and relevant badges.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 3: LEGAL SEARCH
+         ═══════════════════════════════════════ -->
+    <section id="search" class="section page-break">
+      <span class="section-number">Feature 03</span>
+      <h2 class="section-title">Legal Search</h2>
+      <p class="section-subtitle">Search across 16M+ Indian judgments, statutes, and regulations</p>
+      <hr class="section-rule">
+
+      <div class="feature-section">
+        <h3>What You See</h3>
+        <div class="path">Sidebar &rarr; Legal Search</div>
+        <p>A powerful search engine that queries across three Indian legal databases simultaneously: Case Law, Companies Act 2013, and various Statutes (IPC, CPC, CrPC, etc.).</p>
+      </div>
+
+      <div class="feature-section">
+        <h3>How to Use It</h3>
+        <div class="steps">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h4>Enter Your Search Query</h4>
+              <p>Type at least 2 characters in the search bar. Search starts automatically after 400ms. Try suggested queries like "Contract breach" or "Specific performance".</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h4>Filter by Type</h4>
+              <p>Click one of the four filter buttons: <span class="badge badge-blue">All</span> <span class="badge badge-blue">Case Law</span> <span class="badge badge-purple">Statutes</span> <span class="badge badge-green">Companies Act</span>. Each filter narrows results to that category only.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <h4>Select a Statute (Optional)</h4>
+              <p>When "All" or "Statutes" filter is active, a dropdown appears. Select a specific law (IPC, CPC, CrPC, etc.) to browse its sections.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <h4>Browse Results</h4>
+              <p>Results are color-coded: <span class="badge badge-blue">Case Law</span> (blue), <span class="badge badge-green">Companies Act</span> (green), <span class="badge badge-purple">Statute</span> (purple). Each result shows the title, court/section, and summary.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">5</div>
+            <div class="step-content">
+              <h4>Navigate Pages</h4>
+              <p>Use the Previous/Next buttons at the top-right of results. 10 results per page.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip">
+        <strong>Tip:</strong> Click any suggested search term (e.g., "Director duties", "Arbitration clause") on the empty state to instantly search for it.
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 4: SMART REVIEW
+         ═══════════════════════════════════════ -->
+    <section id="review" class="section page-break">
+      <span class="section-number">Feature 04</span>
+      <h2 class="section-title">Smart Review</h2>
+      <p class="section-subtitle">Upload documents and get AI-powered legal analysis</p>
+      <hr class="section-rule">
+
+      <div class="feature-section">
+        <h3>What You See</h3>
+        <div class="path">Sidebar &rarr; Smart Review</div>
+        <p>A two-panel interface: the left panel for uploading documents and managing your document list, the right panel for viewing detailed AI analysis results.</p>
+      </div>
+
+      <div class="feature-section">
+        <h3>How to Use It</h3>
+        <div class="steps">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h4>Upload a Document</h4>
+              <p>Drag and drop a file onto the upload zone in the left panel, or click it to browse. Accepted formats: PDF, DOC, DOCX. Max size: 10MB.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h4>Trigger AI Analysis</h4>
+              <p>After upload, the document appears in the list with status <span class="badge badge-yellow">Pending</span>. Click the <strong>"Analyze"</strong> button on the document card to start AI analysis.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <h4>View Analysis Results</h4>
+              <p>Once analysis completes (status changes to <span class="badge badge-green">Completed</span>), click the document to see results in the right panel.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-section">
+        <h3>Understanding the Analysis</h3>
+        <p>The right panel shows four sections when a document is analyzed:</p>
+        <table class="info-table">
+          <thead><tr><th>Section</th><th>What It Shows</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Summary</strong></td><td>AI-generated plain-English summary of the document</td></tr>
+            <tr><td><strong>Risk Score</strong></td><td>Overall risk (0-100) with color coding: green (&le;30), yellow (31-60), red (&gt;60)</td></tr>
+            <tr><td><strong>Clause Analysis</strong></td><td>Grid showing which standard clauses are present or missing (e.g., Indemnity, Termination, IP)</td></tr>
+            <tr><td><strong>AI Suggestions</strong></td><td>Numbered list of recommended improvements to the document</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 5: CHAT
+         ═══════════════════════════════════════ -->
+    <section id="chat" class="section page-break">
+      <span class="section-number">Feature 05</span>
+      <h2 class="section-title">Chat (AI Legal Assistant)</h2>
+      <p class="section-subtitle">Ask legal questions and get AI-powered answers</p>
+      <hr class="section-rule">
+
+      <div class="feature-section">
+        <h3>What You See</h3>
+        <div class="path">Sidebar &rarr; Chat</div>
+        <p>A conversational AI interface similar to ChatGPT, specialized for Indian legal queries. The AI uses your legal database (case law, statutes) to provide informed answers.</p>
+      </div>
+
+      <div class="feature-section">
+        <h3>How to Use It</h3>
+        <div class="steps">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h4>Start with a Quick Action or Free Text</h4>
+              <p>On the empty screen, you see three action cards: <strong>Research Case Law</strong>, <strong>Draft Document</strong>, and <strong>Analyze Document</strong>. Click one, or type your question directly in the input box.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h4>Send Your Message</h4>
+              <p>Type your legal question and press <kbd>Enter</kbd> to send. Use <kbd>Shift</kbd> + <kbd>Enter</kbd> for a new line without sending.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <h4>Read AI Responses</h4>
+              <p>The AI responds with formatted Markdown including headings, bullet points, bold text, and legal citations. Your messages appear on the right (blue), AI responses on the left.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <h4>Continue the Conversation</h4>
+              <p>Ask follow-up questions. The AI maintains context throughout the conversation.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip">
+        <strong>Example questions:</strong> "What are the legal requirements for terminating an employee in India?", "Explain Section 138 of the Negotiable Instruments Act", "Draft a notice for breach of contract"
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 6: RTI ASSISTANT
+         ═══════════════════════════════════════ -->
+    <section id="rti" class="section page-break">
+      <span class="section-number">Feature 06</span>
+      <h2 class="section-title">RTI Assistant</h2>
+      <p class="section-subtitle">Generate Right to Information applications in 4 easy steps</p>
+      <hr class="section-rule">
+
+      <div class="feature-section">
+        <h3>What You See</h3>
+        <div class="path">Sidebar &rarr; RTI Assistant</div>
+        <p>A step-by-step wizard that guides you through creating a formal RTI (Right to Information Act, 2005) application addressed to any Indian government department.</p>
+      </div>
+
+      <div class="feature-section">
+        <h3>How to Use It</h3>
+        <div class="steps">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h4>Step 1: Select Department</h4>
+              <p>Choose from 16 government departments displayed as cards (e.g., Finance, Health, Education, Railways, Home Affairs, Law &amp; Justice). Click a card to select it, then click "Next".</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h4>Step 2: Provide Details</h4>
+              <p>Enter the <strong>Subject</strong> of your RTI (required), describe the <strong>Information Requested</strong> (required), and optionally state the <strong>Purpose/Reason</strong>. Click "Next".</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <h4>Step 3: Applicant Information</h4>
+              <p>Fill in your <strong>Full Name</strong> (required), <strong>Address</strong> (required), <strong>Phone</strong> (optional), <strong>Email</strong> (optional). The PIO address is auto-filled based on the department you selected but can be edited.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <h4>Step 4: Review &amp; Generate</h4>
+              <p>Review all details in a summary view. Click <strong>"Generate RTI Application"</strong>. The AI generates a formally worded RTI application following the proper legal format.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">5</div>
+            <div class="step-content">
+              <h4>Download the Application</h4>
+              <p>After generation, you'll see a preview of the application text. Click <strong>"Download Application"</strong> to save it as a .txt file. Click "Create New Application" to start over.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip">
+        <strong>Tip:</strong> The generated application includes all required sections: date, addressee, subject, information sought, fee details, applicant info, and a formal declaration &mdash; ready to submit.
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 7: COMPLIANCE VIEW
+         ═══════════════════════════════════════ -->
+    <section id="compliance" class="section page-break">
+      <span class="section-number">Feature 07</span>
+      <h2 class="section-title">Compliance View</h2>
+      <p class="section-subtitle">Track all Indian regulatory deadlines &mdash; GST, ROC, TDS, PF/ESI, Income Tax, Board Meetings</p>
+      <hr class="section-rule">
+
+      <div class="feature-section">
+        <h3>What You See</h3>
+        <div class="path">Sidebar &rarr; Compliance View</div>
+        <p>A dashboard showing all upcoming Indian compliance deadlines with urgency levels, categories, and status tracking.</p>
+      </div>
+
+      <div class="feature-section">
+        <h3>How to Use It</h3>
+        <div class="steps">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h4>Check Summary Cards</h4>
+              <p>At the top, three cards show: <strong>Total Deadlines</strong> (with % on track), <strong>Overdue</strong> (red, need immediate attention), and <strong>Due This Week</strong> (yellow).</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h4>Filter by Category</h4>
+              <p>Click category tabs to filter: <strong>All</strong>, <strong>GST</strong> (GSTR-1, GSTR-3B, GSTR-9), <strong>ROC</strong> (AOC-4, MGT-7, DIR-3 KYC), <strong>TDS</strong> (quarterly), <strong>PF/ESI</strong> (monthly), <strong>Income Tax</strong> (advance tax, ITR), <strong>Board Meetings</strong>. Each tab shows its count.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <h4>Read Deadline Cards</h4>
+              <p>Each card has a colored left border indicating urgency:
+                <span class="badge badge-red">Critical</span> red,
+                <span class="badge badge-yellow">High</span> orange,
+                <span class="badge badge-yellow">Medium</span> yellow,
+                <span class="badge badge-green">Low</span> green.
+                You'll see the due date, days remaining, recurrence info, and penalty warning.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="warning">
+        <strong>Important:</strong> Deadlines marked <span class="badge badge-red">Overdue</span> require immediate attention. These have negative days remaining and may carry penalties.
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 8: COMPLIANCE CALENDAR
+         ═══════════════════════════════════════ -->
+    <section id="calendar" class="section page-break">
+      <span class="section-number">Feature 08</span>
+      <h2 class="section-title">Compliance Calendar</h2>
+      <p class="section-subtitle">Visual month-view calendar of all compliance deadlines</p>
+      <hr class="section-rule">
+
+      <div class="feature-section">
+        <h3>What You See</h3>
+        <div class="path">Sidebar &rarr; Compliance Calendar</div>
+        <p>A full month grid calendar with colored dots showing deadline urgency on each day. Same data as Compliance View but in a visual calendar format.</p>
+      </div>
+
+      <div class="feature-section">
+        <h3>How to Use It</h3>
+        <div class="steps">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h4>Navigate Months</h4>
+              <p>Use the <strong>&larr;</strong> and <strong>&rarr;</strong> arrows next to the month name to go to previous/next months. Click <strong>"Today"</strong> to jump back to the current month.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h4>Read the Color Dots</h4>
+              <p>Each day cell shows small dots. Colors match urgency: <span style="color:#ef4444;">&bull;</span> Critical, <span style="color:#f97316;">&bull;</span> High, <span style="color:#eab308;">&bull;</span> Medium, <span style="color:#22c55e;">&bull;</span> Low. A "+N" appears if there are more than 4 deadlines on a day.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <h4>Click a Day</h4>
+              <p>Click any day with deadlines to open a detail panel below the calendar. It lists all deadlines for that day with full details: title, description, urgency, status, category, and penalty info.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <h4>Check "Upcoming This Week"</h4>
+              <p>Below the calendar, the "Upcoming This Week" panel shows all deadlines due in the next 7 days, sorted by date, with relative time indicators (Today, Tomorrow, 3d, etc.).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 9: LEGAL FORMS
+         ═══════════════════════════════════════ -->
+    <section id="forms" class="section page-break">
+      <span class="section-number">Feature 09</span>
+      <h2 class="section-title">Legal Forms</h2>
+      <p class="section-subtitle">Generate legal documents from 7 ready-made Indian law templates</p>
+      <hr class="section-rule">
+
+      <div class="feature-section">
+        <h3>What You See</h3>
+        <div class="path">Sidebar &rarr; Legal Forms</div>
+        <p>A library of 7 legal document templates organized by category. Each template has a dynamic form that generates a legal document when completed.</p>
+      </div>
+
+      <div class="feature-section">
+        <h3>Available Templates</h3>
+        <table class="info-table">
+          <thead><tr><th>Template</th><th>Category</th><th>Fields</th><th>Price</th></tr></thead>
+          <tbody>
+            <tr><td>Non-Disclosure Agreement (NDA)</td><td>Corporate</td><td>~8 fields</td><td>&#8377;499</td></tr>
+            <tr><td>Employment Contract</td><td>Employment</td><td>~10 fields</td><td>&#8377;999</td></tr>
+            <tr><td>Master Service Agreement (MSA)</td><td>Corporate</td><td>~10 fields</td><td>&#8377;1,499</td></tr>
+            <tr><td>Freelancer Agreement</td><td>Employment</td><td>~8 fields</td><td>&#8377;799</td></tr>
+            <tr><td>Memorandum of Understanding (MoU)</td><td>Legal</td><td>~8 fields</td><td>&#8377;699</td></tr>
+            <tr><td>Rental / Lease Agreement</td><td>Legal</td><td>~10 fields</td><td>&#8377;599</td></tr>
+            <tr><td>Power of Attorney</td><td>Legal</td><td>~8 fields</td><td>&#8377;899</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="feature-section">
+        <h3>How to Use It</h3>
+        <div class="steps">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h4>Browse Templates</h4>
+              <p>Templates are grouped by category (Corporate, Employment, Legal). Each card shows the template name, description, estimated time, price in &#8377;, and number of fields.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h4>Click "Create"</h4>
+              <p>Click the <strong>"Create"</strong> button on any template card. This opens the dynamic form page for that template.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <h4>Fill in the Form</h4>
+              <p>Each template generates a custom form with fields specific to that document type (text inputs, dates, dropdowns, toggles). Required fields are marked with a red asterisk <span style="color:red;">*</span>.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <h4>Generate &amp; Download</h4>
+              <p>Click <strong>"Generate Document"</strong>. After generation, you'll see a success screen with a <strong>"Download Document"</strong> button (if available) and an option to generate another.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 10: AGREEMENTS
+         ═══════════════════════════════════════ -->
+    <section id="agreements" class="section page-break">
+      <span class="section-number">Feature 10</span>
+      <h2 class="section-title">Agreements (Founder Agreement)</h2>
+      <p class="section-subtitle">Create a comprehensive Founder Agreement with a 3-step wizard</p>
+      <hr class="section-rule">
+
+      <div class="feature-section">
+        <h3>What You See</h3>
+        <div class="path">Sidebar &rarr; Legal Forms &rarr; Founder Agreement "Create" button<br>
+        Or: Dashboard &rarr; "New Agreement" button</div>
+        <p>A 3-step form wizard that collects company details, founder information, and legal preferences to generate a complete Founder Agreement document.</p>
+      </div>
+
+      <div class="feature-section">
+        <h3>How to Use It</h3>
+        <div class="steps">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h4>Step 1: Company Information</h4>
+              <p>Enter: <strong>Company Name</strong> (required), <strong>Description</strong>, <strong>State</strong> (required), and <strong>Authorized Capital</strong> in &#8377; (required). Click "Next: Add Founders".</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h4>Step 2: Founder Details</h4>
+              <p>Add 2&ndash;4 founders. For each founder, enter: Name, Email, Role, Equity %, Vesting Period (months, default 48), and Cliff Period (months, default 12). Total equity must equal exactly 100%. Click "Add Founder" to add more (max 4).</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <h4>Step 3: Legal Preferences</h4>
+              <p>Choose: <strong>Non-Compete clause</strong> (checkbox, with period if enabled), <strong>Dispute Resolution</strong> method (Arbitration / Court / Mediation), and <strong>Additional Terms</strong> (optional free text). Click "Create Agreement".</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <h4>View Your Agreement</h4>
+              <p>After creation, you are redirected to the agreement detail page at <code>/agreements/[id]</code> where you can view the generated document, download it, and track its review status.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="warning">
+        <strong>Validation:</strong> All founder equity percentages must add up to exactly 100%. The form will not proceed if this requirement is not met.
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 11: CONTRACT ANALYZER
+         ═══════════════════════════════════════ -->
+    <section id="analyzer" class="section page-break">
+      <span class="section-number">Feature 11</span>
+      <h2 class="section-title">Contract Analyzer</h2>
+      <p class="section-subtitle">Deep clause-by-clause analysis with risk scoring</p>
+      <hr class="section-rule">
+
+      <div class="feature-section">
+        <h3>What You See</h3>
+        <div class="path">Sidebar &rarr; Contract Analyzer</div>
+        <p>An advanced document analysis tool that extracts and evaluates 8 types of legal clauses from uploaded contracts, providing risk scores and actionable suggestions.</p>
+      </div>
+
+      <div class="feature-section">
+        <h3>How to Use It</h3>
+        <div class="steps">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h4>Upload a Contract</h4>
+              <p>Drag and drop a file onto the upload area, or click to browse. Accepted: PDF, DOC, DOCX.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h4>Wait for Analysis</h4>
+              <p>The system uploads the file, then automatically starts analysis. You'll see progress bars for both uploading and analyzing stages.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <h4>Review Results</h4>
+              <p>The analysis screen shows five sections (see table below). Click <strong>"Analyze Another"</strong> in the header to start over with a new contract.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-section">
+        <h3>Understanding the Analysis</h3>
+        <table class="info-table">
+          <thead><tr><th>Section</th><th>Details</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Risk Score</strong></td><td>Score out of 10 with color circle: green (&lt;4 = Low), yellow (4-6 = Medium), red (&gt;6 = High)</td></tr>
+            <tr><td><strong>Summary</strong></td><td>AI-generated overview of the contract's purpose and key terms</td></tr>
+            <tr><td><strong>Clause Table</strong></td><td>8 clauses analyzed: Indemnity, Termination, Non-Compete, IP, Force Majeure, Confidentiality, Limitation of Liability, Governing Law. Each shows: Present/Missing/Risky status, risk level</td></tr>
+            <tr><td><strong>Risk Breakdown</strong></td><td>Horizontal bar chart showing risk level per clause with color-coded bars</td></tr>
+            <tr><td><strong>AI Suggestions</strong></td><td>Numbered list of specific improvements (e.g., "Add a mutual indemnification clause")</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tip">
+        <strong>Tip:</strong> Contract Analyzer provides deeper analysis than Smart Review. Use Smart Review for quick checks and Contract Analyzer for thorough clause-by-clause evaluation.
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 12: LEGAL CALCULATOR
+         ═══════════════════════════════════════ -->
+    <section id="calculator" class="section page-break">
+      <span class="section-number">Feature 12</span>
+      <h2 class="section-title">Legal Calculator</h2>
+      <p class="section-subtitle">Calculate stamp duty, court fees, GST, TDS, gratuity, and EMI instantly</p>
+      <hr class="section-rule">
+
+      <div class="feature-section">
+        <h3>What You See</h3>
+        <div class="path">Sidebar &rarr; Legal Calculator</div>
+        <p>Six specialized calculators in a tabbed interface. All calculations happen instantly on-screen (no API call needed).</p>
+      </div>
+
+      <div class="feature-section">
+        <h3>Available Calculators</h3>
+        <table class="info-table">
+          <thead><tr><th>Calculator</th><th>Inputs</th><th>Outputs</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Stamp Duty</strong></td>
+              <td>State (10 states), Document Type (6 types), Property Value</td>
+              <td>Stamp Duty amount, Registration Fee, Total Payable</td>
+            </tr>
+            <tr>
+              <td><strong>Court Fees</strong></td>
+              <td>Court Type (4 courts), Case Type (4 types), Claim Amount</td>
+              <td>Court Fee, Advocate Fee (estimated), Total Cost</td>
+            </tr>
+            <tr>
+              <td><strong>GST</strong></td>
+              <td>Amount, GST Rate (5%, 12%, 18%, 28%)</td>
+              <td>CGST, SGST, Total GST, Grand Total</td>
+            </tr>
+            <tr>
+              <td><strong>TDS</strong></td>
+              <td>Section (194A/194C/194H/194I/194J), Amount</td>
+              <td>TDS Rate, TDS Amount, Net Payable</td>
+            </tr>
+            <tr>
+              <td><strong>Gratuity</strong></td>
+              <td>Last Drawn Basic Salary + DA, Years of Service</td>
+              <td>Gratuity Amount (capped at &#8377;25,00,000)</td>
+            </tr>
+            <tr>
+              <td><strong>EMI</strong></td>
+              <td>Loan Amount, Interest Rate (% p.a.), Tenure (months)</td>
+              <td>Monthly EMI, Total Interest, Total Payable</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="feature-section">
+        <h3>How to Use It</h3>
+        <div class="steps">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h4>Select a Calculator Tab</h4>
+              <p>Click one of the 6 tabs at the top: Stamp Duty, Court Fees, GST, TDS, Gratuity, or EMI.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h4>Fill in the Inputs</h4>
+              <p>Enter the required values using dropdowns and number inputs. All amounts are in Indian Rupees (&#8377;).</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <h4>Click "Calculate"</h4>
+              <p>Press the calculate button. Results appear instantly below in color-coded cards with amounts formatted in Indian number style (e.g., &#8377;12,34,567).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 13: DOCUMENT VAULT
+         ═══════════════════════════════════════ -->
+    <section id="vault" class="section page-break">
+      <span class="section-number">Feature 13</span>
+      <h2 class="section-title">Document Vault</h2>
+      <p class="section-subtitle">Securely store, organize, and retrieve all your legal documents</p>
+      <hr class="section-rule">
+
+      <div class="feature-section">
+        <h3>What You See</h3>
+        <div class="path">Sidebar &rarr; Document Vault</div>
+        <p>A file management system with category organization, tagging, and grid/list views. Think of it as a dedicated "Google Drive" for your legal documents.</p>
+      </div>
+
+      <div class="feature-section">
+        <h3>How to Use It</h3>
+        <div class="steps">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h4>Upload a Document</h4>
+              <p>Click <strong>"Upload Document"</strong> in the header. In the dialog: select a file, choose a <strong>Category</strong> (Agreements, Contracts, Compliance, Tax, Employment, Corporate, Court Documents), add an optional description, and enter comma-separated tags.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h4>Filter by Category</h4>
+              <p>Click the category tabs (All, Agreements, Contracts, etc.) to filter documents. Only documents in that category will be shown.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <h4>Switch View</h4>
+              <p>Toggle between <strong>Grid View</strong> (cards in 3 columns) and <strong>List View</strong> (compact rows) using the toggle buttons next to the category tabs.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <h4>Download or Delete</h4>
+              <p>Each document card has a <strong>"Download"</strong> button and a red trash icon to <strong>delete</strong>. Deleting asks for confirmation first.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 14: TEAM
+         ═══════════════════════════════════════ -->
+    <section id="team" class="section page-break">
+      <span class="section-number">Feature 14</span>
+      <h2 class="section-title">Team</h2>
+      <p class="section-subtitle">Manage team members and roles</p>
+      <hr class="section-rule">
+
+      <div class="feature-section">
+        <h3>What You See</h3>
+        <div class="path">Sidebar &rarr; Team</div>
+        <p>A team management page with stat cards, member cards showing avatars and details, and the ability to add/remove members.</p>
+      </div>
+
+      <div class="feature-section">
+        <h3>How to Use It</h3>
+        <div class="steps">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h4>View Team Stats</h4>
+              <p>Three cards at the top show: Total Members, Active Members (green), and number of Departments (blue).</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h4>Add a Member</h4>
+              <p>Click <strong>"Add Member"</strong> in the header. An inline form appears with fields for Name (required), Email (required), Role, and Department. Click "Add Member" to save.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <h4>View Member Cards</h4>
+              <p>Each member card shows: avatar with initials, name, role, status badge (<span class="badge badge-green">Active</span> / <span class="badge badge-yellow">Invited</span>), email, department, and join date.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <h4>Remove a Member</h4>
+              <p>Click the red <strong>"Remove"</strong> button on a member card. A confirmation dialog will appear before deletion.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 15: INTEGRATIONS
+         ═══════════════════════════════════════ -->
+    <section id="integrations" class="section page-break">
+      <span class="section-number">Feature 15</span>
+      <h2 class="section-title">Integrations</h2>
+      <p class="section-subtitle">Connect third-party services to JurisGPT</p>
+      <hr class="section-rule">
+
+      <div class="feature-section">
+        <h3>What You See</h3>
+        <div class="path">Sidebar &rarr; Integrations</div>
+        <p>A list of available integrations (Supabase, OpenAI, Resend, Google Drive, etc.) showing their real-time connection status.</p>
+      </div>
+
+      <div class="feature-section">
+        <h3>How to Use It</h3>
+        <div class="steps">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h4>Check Connection Status</h4>
+              <p>The header badge shows "X of Y connected". Each integration card shows a status badge: <span class="badge badge-green">Connected</span> (green), <span class="badge badge-blue">Available</span> (blue), or <span style="background:#e2e8f0; padding:2px 8px; border-radius:12px; font-size:12px;">Disconnected</span> (gray).</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h4>Configure or Connect</h4>
+              <p>Connected integrations show a <strong>"Configure"</strong> button and last sync time. Available/Disconnected integrations show a <strong>"Connect"</strong> button.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 16: LEGAL NEWS
+         ═══════════════════════════════════════ -->
+    <section id="news" class="section page-break">
+      <span class="section-number">Feature 16</span>
+      <h2 class="section-title">Legal News</h2>
+      <p class="section-subtitle">Latest updates from Indian courts and regulators</p>
+      <hr class="section-rule">
+
+      <div class="feature-section">
+        <h3>What You See</h3>
+        <div class="path">Sidebar &rarr; Legal News</div>
+        <p>A news feed with category-filtered articles covering Supreme Court judgments, legislative updates, SEBI, RBI, MCA, and tax news.</p>
+      </div>
+
+      <div class="feature-section">
+        <h3>How to Use It</h3>
+        <div class="steps">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h4>Filter by Category</h4>
+              <p>Click one of 9 category buttons: <strong>All</strong>, Supreme Court, High Courts, Legislative Updates, SEBI, RBI, MCA, Tax, Data Privacy. Each is color-coded.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h4>Read Articles</h4>
+              <p>Each article card shows: category badge (colored), time stamp (e.g., "2h ago"), title, summary (3 lines), source name with external link icon, and tags.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <h4>Load More</h4>
+              <p>10 articles load at a time. Click <strong>"Load More"</strong> at the bottom to fetch the next batch.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 17: SETTINGS
+         ═══════════════════════════════════════ -->
+    <section id="settings" class="section page-break">
+      <span class="section-number">Feature 17</span>
+      <h2 class="section-title">Settings</h2>
+      <p class="section-subtitle">Manage your profile, notifications, security, and appearance</p>
+      <hr class="section-rule">
+
+      <div class="feature-section">
+        <h3>What You See</h3>
+        <div class="path">Sidebar &rarr; Settings</div>
+        <p>A settings page with 4 tabs for managing different aspects of your account.</p>
+      </div>
+
+      <div class="feature-section">
+        <h3>Settings Tabs</h3>
+        <table class="info-table">
+          <thead><tr><th>Tab</th><th>What You Can Do</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Profile</strong></td>
+              <td>Update your Full Name, Email, Company, and Role. Click "Save Changes" &mdash; you'll see a brief "Saved" confirmation.</td>
+            </tr>
+            <tr>
+              <td><strong>Notifications</strong></td>
+              <td>Toggle 4 switches: Email Notifications, Compliance Alerts, Document Updates, Weekly Digest. Click "Save Preferences".</td>
+            </tr>
+            <tr>
+              <td><strong>Security</strong></td>
+              <td>Change your password by entering Current Password, New Password, and Confirm Password. Click "Update Password".</td>
+            </tr>
+            <tr>
+              <td><strong>Appearance</strong></td>
+              <td>Choose Theme (Light/Dark/System), Language (English, Hindi, Marathi, Tamil, Telugu), and Timezone. Click "Save Appearance".</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tip">
+        <strong>Tip:</strong> After clicking any "Save" button, watch for the green checkmark confirmation. It briefly shows "Saved" before resetting.
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         SECTION 18: SUPPORT CENTER
+         ═══════════════════════════════════════ -->
+    <section id="support" class="section page-break">
+      <span class="section-number">Feature 18</span>
+      <h2 class="section-title">Support Center</h2>
+      <p class="section-subtitle">Get help, read FAQs, and submit support tickets</p>
+      <hr class="section-rule">
+
+      <div class="feature-section">
+        <h3>What You See</h3>
+        <div class="path">Sidebar &rarr; Support Center</div>
+        <p>A help center with three sections: Help Categories, FAQ Accordion, Contact Form + Ticket History.</p>
+      </div>
+
+      <div class="feature-section">
+        <h3>How to Use It</h3>
+        <div class="steps">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h4>Browse Help Categories</h4>
+              <p>Three cards at the top: <strong>Getting Started</strong> (12 articles), <strong>Document Management</strong> (8 articles), <strong>Account &amp; Billing</strong> (5 articles).</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h4>Read FAQs</h4>
+              <p>Click any FAQ question to expand the answer. Questions cover: creating agreements, review timelines, editing documents, supported file formats, AI analysis, and data security.</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <h4>Submit a Support Ticket</h4>
+              <p>Fill in the Contact Support form: <strong>Name</strong>, <strong>Email</strong>, <strong>Subject</strong>, <strong>Category</strong> (General, Technical, Billing, Feature Request, Bug Report), and <strong>Message</strong>. Click "Submit Ticket".</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <h4>Track Your Tickets</h4>
+              <p>Below the form, the "My Tickets" section shows your submitted tickets with status: <span class="badge badge-green">Resolved</span>, <span class="badge badge-blue">In Progress</span>, or <span class="badge badge-yellow">Open</span>.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════
+         QUICK REFERENCE
+         ═══════════════════════════════════════ -->
+    <section class="section page-break">
+      <span class="section-number">Quick Reference</span>
+      <h2 class="section-title">Sidebar Navigation Map</h2>
+      <hr class="section-rule">
+
+      <table class="info-table">
+        <thead><tr><th>Section</th><th>Feature</th><th>What It Does</th><th>Key Action</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="6"><strong>MAIN</strong></td><td>Dashboard</td><td>Overview of your workspace</td><td>View metrics &amp; AI insights</td></tr>
+          <tr><td>Cases</td><td>Manage legal cases</td><td>Search, add, view cases</td></tr>
+          <tr><td>Legal Search</td><td>Search 16M+ legal documents</td><td>Type query &rarr; get results</td></tr>
+          <tr><td>Smart Review</td><td>Upload &amp; analyze documents</td><td>Upload &rarr; Analyze &rarr; View risks</td></tr>
+          <tr><td>Chat</td><td>AI legal assistant</td><td>Ask questions, get answers</td></tr>
+          <tr><td>RTI Assistant</td><td>Generate RTI applications</td><td>4-step wizard &rarr; Download</td></tr>
+
+          <tr><td rowspan="6"><strong>ANALYTICS</strong></td><td>Compliance View</td><td>Track regulatory deadlines</td><td>Filter by category, check urgency</td></tr>
+          <tr><td>Compliance Calendar</td><td>Calendar view of deadlines</td><td>Click day &rarr; see deadlines</td></tr>
+          <tr><td>Legal Forms</td><td>7 document templates</td><td>Pick template &rarr; Fill form &rarr; Generate</td></tr>
+          <tr><td>Agreements</td><td>Founder Agreement wizard</td><td>3 steps &rarr; Generate agreement</td></tr>
+          <tr><td>Contract Analyzer</td><td>Deep clause analysis</td><td>Upload &rarr; View 8-clause analysis</td></tr>
+          <tr><td>Legal Calculator</td><td>6 legal calculators</td><td>Enter values &rarr; Get instant results</td></tr>
+
+          <tr><td rowspan="3"><strong>MANAGEMENT</strong></td><td>Document Vault</td><td>Store &amp; organize documents</td><td>Upload, categorize, download</td></tr>
+          <tr><td>Team</td><td>Manage team members</td><td>Add, view, remove members</td></tr>
+          <tr><td>Integrations</td><td>Third-party connections</td><td>Check status, configure</td></tr>
+
+          <tr><td rowspan="3"><strong>OTHER</strong></td><td>Legal News</td><td>Indian legal news feed</td><td>Filter by category, read articles</td></tr>
+          <tr><td>Settings</td><td>Account preferences</td><td>Profile, notifications, theme</td></tr>
+          <tr><td>Support Center</td><td>Help &amp; ticket system</td><td>Read FAQs, submit tickets</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+
+  <!-- ═══════ FOOTER ═══════ -->
+  <footer class="footer">
+    <div class="container">
+      <p><strong>JurisGPT</strong> &mdash; AI-Powered Legal Services for Indian Startups &amp; MSMEs</p>
+      <p>User Guide generated on <strong>February 6, 2026</strong>.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

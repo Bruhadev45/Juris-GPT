@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     environment: str = "development"
     
     # CORS settings
-    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:3001"]
+    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002"]
     
     class Config:
         env_file = ".env"

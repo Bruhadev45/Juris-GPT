@@ -1,8 +1,11 @@
+"""
+Compliance Deadlines API — with AI-powered risk assessment.
+"""
+
 from fastapi import APIRouter, HTTPException, Query
 from typing import Optional
 import json
-import os
-from datetime import datetime, date, timedelta
+from datetime import date, timedelta
 from pathlib import Path
 
 router = APIRouter()
@@ -35,7 +38,6 @@ def generate_upcoming_deadlines(templates, months_ahead=3):
                 try:
                     due = date(year, month, template["due_day"])
                 except ValueError:
-                    # Handle months with fewer days
                     import calendar
                     last_day = calendar.monthrange(year, month)[1]
                     due = date(year, month, min(template["due_day"], last_day))
@@ -53,7 +55,6 @@ def generate_upcoming_deadlines(templates, months_ahead=3):
             due_day = template.get("due_day", 1)
 
             if template["recurring"] == "annual":
-                # Check this year and next year
                 for year in [today.year, today.year + 1]:
                     try:
                         due = date(year, due_month, due_day)
@@ -96,7 +97,7 @@ def generate_upcoming_deadlines(templates, months_ahead=3):
 async def get_deadlines(
     category: Optional[str] = Query(None, description="Filter by category (GST, ROC, TDS, etc.)"),
     status: Optional[str] = Query(None, description="Filter by status (pending, upcoming, overdue)"),
-    limit: int = Query(50, ge=1, le=200),
+    limit: int = Query(50, ge=1, le=1000),
     offset: int = Query(0, ge=0),
 ):
     """Get all compliance deadlines with generated dates."""
@@ -135,3 +136,39 @@ async def get_categories():
             categories[cat] = 0
         categories[cat] += 1
     return {"categories": [{"name": k, "count": v} for k, v in categories.items()]}
+
+
+@router.get("/api/compliance/risk-assessment/{deadline_id}")
+async def get_risk_assessment(deadline_id: str):
+    """Get AI-powered risk assessment for a specific compliance deadline."""
+    templates = load_compliance_templates()
+    deadlines = generate_upcoming_deadlines(templates)
+
+    deadline = next((d for d in deadlines if d.get("id") == deadline_id), None)
+    if not deadline:
+        raise HTTPException(status_code=404, detail="Deadline not found")
+
+    try:
+        from app.services.ai_analyzer import assess_compliance_risk
+        assessment = assess_compliance_risk(
+            deadline.get("title", ""),
+            deadline.get("category", ""),
+            deadline.get("days_remaining", 0),
+        )
+        return {
+            "deadline_id": deadline_id,
+            "title": deadline.get("title", ""),
+            "category": deadline.get("category", ""),
+            "days_remaining": deadline.get("days_remaining", 0),
+            "assessment": assessment,
+        }
+    except Exception as e:
+        return {
+            "deadline_id": deadline_id,
+            "title": deadline.get("title", ""),
+            "assessment": {
+                "risk_note": "AI assessment unavailable",
+                "penalty_info": deadline.get("penalty", "Contact a compliance expert"),
+                "action_items": ["Review deadline requirements", "Prepare required documents"],
+            },
+        }

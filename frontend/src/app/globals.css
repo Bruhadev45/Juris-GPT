@@ -49,74 +49,84 @@
 
 :root {
   --radius: 0.5rem;
-  /* Charcoal & Amber Theme - Elegant & Sophisticated */
-  --background: #F9FAFB;
-  --foreground: #111827;
-  --card: #ffffff;
-  --card-foreground: #111827;
-  --popover: #ffffff;
-  --popover-foreground: #111827;
-  /* Primary: Charcoal */
-  --primary: #1F2937;
-  --primary-foreground: #ffffff;
-  /* Secondary: Light Gray */
-  --secondary: #F3F4F6;
-  --secondary-foreground: #111827;
-  --muted: #F3F4F6;
-  --muted-foreground: #6B7280;
-  /* Accent: Amber */
-  --accent: #F59E0B;
-  --accent-foreground: #111827;
-  --destructive: #ef4444;
-  --border: #E5E7EB;
-  --input: #F9FAFB;
-  --ring: #1F2937;
-  /* Sidebar - Charcoal with amber accents */
-  --sidebar: #F9FAFB;
-  --sidebar-foreground: #4B5563;
-  --sidebar-primary: #1F2937;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #FEF3C7;
-  --sidebar-accent-foreground: #F59E0B;
-  --sidebar-border: #E5E7EB;
-  --sidebar-ring: #1F2937;
+  /* Deep Teal & Mist Gray Theme - Cool & Professional */
+  --background: #F5F7F9;
+  --foreground: #0A2A36;
+  --card: #FFFFFF;
+  --card-foreground: #0A2A36;
+  --popover: #FFFFFF;
+  --popover-foreground: #0A2A36;
+  /* Primary: Deep Teal */
+  --primary: #004E64;
+  --primary-foreground: #FFFFFF;
+  /* Secondary: Mist Gray */
+  --secondary: #E0E5E9;
+  --secondary-foreground: #0A2A36;
+  --muted: #E0E5E9;
+  --muted-foreground: #4A6E7D;
+  /* Accent: Light Teal */
+  --accent: #E0E5E9;
+  --accent-foreground: #004E64;
+  --destructive: #C62828;
+  --border: #C8D1D9;
+  --input: #F5F7F9;
+  --ring: #004E64;
+  /* Charts */
+  --chart-1: #004E64;
+  --chart-2: #1A6B82;
+  --chart-3: #3D8A9E;
+  --chart-4: #6AABB9;
+  --chart-5: #A8CDD6;
+  /* Sidebar - Teal tones */
+  --sidebar: #F5F7F9;
+  --sidebar-foreground: #3D6B7A;
+  --sidebar-primary: #004E64;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #E0E5E9;
+  --sidebar-accent-foreground: #004E64;
+  --sidebar-border: #C8D1D9;
+  --sidebar-ring: #004E64;
+  /* Legacy purple aliases */
+  --purple: #004E64;
+  --purple-light: #1A6B82;
+  --purple-bg: #F5F7F9;
 }
 
 .dark {
-  --background: #111827;
-  --foreground: #F9FAFB;
-  --card: #1F2937;
-  --card-foreground: #F9FAFB;
-  --popover: #1F2937;
-  --popover-foreground: #F9FAFB;
-  --primary: #F59E0B;
-  --primary-foreground: #111827;
-  --secondary: #374151;
-  --secondary-foreground: #F9FAFB;
-  --muted: #374151;
-  --muted-foreground: #9CA3AF;
-  --accent: #F59E0B;
-  --accent-foreground: #111827;
-  --destructive: #f87171;
-  --border: #374151;
-  --input: #374151;
-  --ring: #F59E0B;
-  --chart-1: #F59E0B;
-  --chart-2: #FBBF24;
-  --chart-3: #FCD34D;
-  --chart-4: #FDE68A;
-  --chart-5: #FEF3C7;
-  --sidebar: #1F2937;
-  --sidebar-foreground: #F9FAFB;
-  --sidebar-primary: #F59E0B;
-  --sidebar-primary-foreground: #111827;
-  --sidebar-accent: #374151;
-  --sidebar-accent-foreground: #F59E0B;
-  --sidebar-border: #374151;
-  --sidebar-ring: #F59E0B;
-  --purple: #F59E0B;
-  --purple-light: #FBBF24;
-  --purple-bg: #111827;
+  --background: #071E26;
+  --foreground: #E0E5E9;
+  --card: #0A2A36;
+  --card-foreground: #E0E5E9;
+  --popover: #0A2A36;
+  --popover-foreground: #E0E5E9;
+  --primary: #A8CDD6;
+  --primary-foreground: #071E26;
+  --secondary: #0F3644;
+  --secondary-foreground: #E0E5E9;
+  --muted: #0F3644;
+  --muted-foreground: #7BAAB8;
+  --accent: #A8CDD6;
+  --accent-foreground: #071E26;
+  --destructive: #EF5350;
+  --border: #1A4A5A;
+  --input: #0F3644;
+  --ring: #A8CDD6;
+  --chart-1: #A8CDD6;
+  --chart-2: #6AABB9;
+  --chart-3: #3D8A9E;
+  --chart-4: #1A6B82;
+  --chart-5: #004E64;
+  --sidebar: #071E26;
+  --sidebar-foreground: #E0E5E9;
+  --sidebar-primary: #A8CDD6;
+  --sidebar-primary-foreground: #071E26;
+  --sidebar-accent: #0F3644;
+  --sidebar-accent-foreground: #A8CDD6;
+  --sidebar-border: #1A4A5A;
+  --sidebar-ring: #A8CDD6;
+  --purple: #A8CDD6;
+  --purple-light: #6AABB9;
+  --purple-bg: #071E26;
 }
 
 @layer base {
@@ -195,10 +205,10 @@
   /* Pulse glow effect */
   @keyframes pulse-glow {
     0%, 100% {
-      box-shadow: 0 0 20px rgba(31, 41, 55, 0.3);
+      box-shadow: 0 0 20px rgba(0, 78, 100, 0.3);
     }
     50% {
-      box-shadow: 0 0 40px rgba(31, 41, 55, 0.6);
+      box-shadow: 0 0 40px rgba(0, 78, 100, 0.6);
     }
   }
 

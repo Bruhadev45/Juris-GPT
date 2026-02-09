@@ -36,12 +36,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
-        <body
-          className={`${inter.variable} antialiased font-sans`}
-          style={{ fontFamily: "var(--font-inter), system-ui, -apple-system, sans-serif" }}
-          suppressHydrationWarning
-        >
+    <html lang="en" data-scroll-behavior="smooth">
+      <body
+        className={`${inter.variable} antialiased font-sans`}
+        style={{ fontFamily: "var(--font-inter), system-ui, -apple-system, sans-serif" }}
+      >
         {children}
       </body>
     </html>

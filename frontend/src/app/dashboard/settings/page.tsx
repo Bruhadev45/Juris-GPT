@@ -29,7 +29,7 @@ interface NotificationData {
 }
 
 interface AppearanceData {
-  theme: "light" | "dark" | "system";
+  theme: "light";
   language: string;
   timezone: string;
 }
@@ -57,7 +57,7 @@ export default function SettingsPage() {
   });
 
   const [appearance, setAppearance] = useState<AppearanceData>({
-    theme: "system",
+    theme: "light",
     language: "en",
     timezone: "Asia/Kolkata",
   });
@@ -384,25 +384,6 @@ export default function SettingsPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    {/* Theme Selector */}
-                    <div className="space-y-3">
-                      <Label>Theme</Label>
-                      <div className="flex gap-3">
-                        {(["light", "dark", "system"] as const).map((t) => (
-                          <Button
-                            key={t}
-                            variant={appearance.theme === t ? "default" : "outline"}
-                            className="flex-1 capitalize"
-                            onClick={() =>
-                              setAppearance({ ...appearance, theme: t })
-                            }
-                          >
-                            {t}
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-
                     {/* Language Dropdown */}
                     <div className="space-y-2">
                       <Label htmlFor="language">Language</Label>

@@ -1,3 +1,7 @@
+"""
+Legal News API — with optional AI-generated summaries.
+"""
+
 from fastapi import APIRouter, HTTPException, Query
 from typing import Optional
 import json
@@ -32,18 +36,29 @@ async def get_news(
     category: Optional[str] = Query(None, description="Filter by category"),
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
+    search: Optional[str] = Query(None, description="Search in title or content"),
 ):
-    """Get legal news feed with optional category filtering."""
+    """Get legal news feed with optional category filtering and search."""
     news = _load_news()
 
     if category:
         news = [n for n in news if n.get("category", "").lower() == category.lower()]
 
+    # Search filter
+    if search:
+        search_lower = search.lower()
+        news = [
+            n for n in news
+            if search_lower in n.get("title", "").lower()
+            or search_lower in n.get("content", "").lower()
+            or search_lower in n.get("summary", "").lower()
+        ]
+
     # Sort by published_at descending (newest first)
     news.sort(key=lambda x: x.get("published_at", ""), reverse=True)
 
     total = len(news)
-    news = news[offset : offset + limit]
+    news = news[offset:offset + limit]
 
     return {"data": news, "total": total}
 
@@ -61,3 +76,26 @@ async def get_categories():
     return {
         "categories": [{"name": k, "count": v} for k, v in counts.items()],
     }
+
+
+@router.get("/{article_id}/summary")
+async def get_article_summary(article_id: str):
+    """Get an AI-generated summary for a specific news article."""
+    news = _load_news()
+    article = next((n for n in news if n.get("id") == article_id), None)
+    if not article:
+        raise HTTPException(status_code=404, detail="Article not found")
+
+    # Check if summary already exists
+    if article.get("ai_summary"):
+        return {"summary": article["ai_summary"]}
+
+    try:
+        from app.services.ai_analyzer import summarize_news_article
+        summary = summarize_news_article(
+            article.get("title", ""),
+            article.get("content", article.get("summary", "")),
+        )
+        return {"summary": summary if summary else article.get("summary", "No summary available.")}
+    except Exception:
+        return {"summary": article.get("summary", "No summary available.")}

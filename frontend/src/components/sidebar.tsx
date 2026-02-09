@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -107,7 +108,7 @@ export function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
   return (
     <div
       className={cn(
-        "flex h-screen flex-col bg-[#f8f7fc] border-r border-border transition-all duration-300",
+        "flex h-screen flex-col bg-background border-r border-border transition-all duration-300",
         collapsed ? "w-16" : "w-64"
       )}
     >
@@ -115,12 +116,13 @@ export function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
       <div className="flex items-center justify-between px-4 py-5 border-b border-border">
         {!collapsed && (
           <Link href="/dashboard" className="flex items-center gap-2">
+            <Image src="/logo.png" alt="JurisGPT" width={28} height={28} />
             <h1 className="text-2xl font-bold tracking-tight text-primary">JurisGPT</h1>
           </Link>
         )}
         {collapsed && (
-          <Link href="/dashboard" className="w-8 h-8 bg-primary rounded flex items-center justify-center mx-auto">
-            <span className="text-white font-bold text-xs">J</span>
+          <Link href="/dashboard" className="flex items-center justify-center mx-auto">
+            <Image src="/logo.png" alt="JurisGPT" width={28} height={28} />
           </Link>
         )}
         {!collapsed && (

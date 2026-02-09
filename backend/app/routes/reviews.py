@@ -1,4 +1,9 @@
-from fastapi import APIRouter, HTTPException, UploadFile, File, Form
+"""
+Smart Document Review — AI-powered document review using GPT-4o.
+Uploads documents, extracts text, and performs real legal analysis.
+"""
+
+from fastapi import APIRouter, HTTPException, UploadFile, File
 from typing import Optional
 import uuid
 import json
@@ -6,9 +11,12 @@ import os
 from datetime import datetime
 from pathlib import Path
 
+from app.services.ai_analyzer import extract_text_from_file, review_document_with_ai
+
 router = APIRouter()
 
 REVIEWS_FILE = Path(__file__).parent.parent.parent / "data" / "reviews.json"
+UPLOAD_DIR = Path(__file__).parent.parent.parent / "data" / "uploads"
 
 
 def load_reviews():
@@ -41,10 +49,9 @@ async def upload_document(file: UploadFile = File(...)):
     review_id = str(uuid.uuid4())
     content = await file.read()
 
-    # Save file locally for now
-    upload_dir = Path(__file__).parent.parent.parent / "data" / "uploads"
-    upload_dir.mkdir(parents=True, exist_ok=True)
-    file_path = upload_dir / f"{review_id}{ext}"
+    # Save file locally
+    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    file_path = UPLOAD_DIR / f"{review_id}{ext}"
     with open(file_path, "wb") as f:
         f.write(content)
 
@@ -85,51 +92,47 @@ async def get_review(review_id: str):
 
 @router.post("/{review_id}/analyze")
 async def analyze_document(review_id: str):
-    """Trigger AI analysis on an uploaded document. Placeholder for GPT-4o integration."""
+    """Trigger real AI analysis on an uploaded document using GPT-4o."""
     reviews = load_reviews()
     review = next((r for r in reviews if r["id"] == review_id), None)
     if not review:
         raise HTTPException(status_code=404, detail="Review not found")
 
-    # Placeholder analysis - will be replaced with actual AI analysis
-    review["status"] = "completed"
-    review["analysis"] = {
-        "overall_risk_score": 6.5,
-        "summary": "Document reviewed. AI analysis will be available when OpenAI integration is configured.",
-        "clauses": [
-            {"name": "Indemnity", "status": "present", "risk": "medium"},
-            {"name": "Limitation of Liability", "status": "present", "risk": "low"},
-            {"name": "Termination", "status": "present", "risk": "low"},
-            {"name": "Force Majeure", "status": "missing", "risk": "high"},
-            {"name": "Confidentiality", "status": "present", "risk": "low"},
-            {"name": "Dispute Resolution", "status": "present", "risk": "medium"},
-            {"name": "Governing Law", "status": "present", "risk": "low"},
-            {"name": "IP Assignment", "status": "missing", "risk": "high"},
-        ],
-        "risks": [
-            {
-                "title": "Missing Force Majeure Clause",
-                "severity": "high",
-                "description": "No force majeure clause found. Consider adding to protect against unforeseen events.",
-            },
-            {
-                "title": "Missing IP Assignment",
-                "severity": "high",
-                "description": "No intellectual property assignment clause. Work product ownership may be ambiguous.",
-            },
-            {
-                "title": "Broad Indemnity",
-                "severity": "medium",
-                "description": "Indemnity clause is broadly worded. Consider adding caps and carve-outs.",
-            },
-        ],
-        "suggestions": [
-            "Add a Force Majeure clause covering natural disasters, pandemics, and government actions",
-            "Include an IP assignment clause specifying ownership of work product",
-            "Add a cap on indemnity liability (e.g., total contract value)",
-            "Consider adding a dispute resolution escalation procedure before arbitration",
-        ],
-    }
+    # Update status to analyzing
+    review["status"] = "analyzing"
+    save_reviews(reviews)
+
+    try:
+        # Extract text from the uploaded file
+        file_path = review.get("file_path", "")
+        document_text = extract_text_from_file(file_path)
+
+        if not document_text or document_text.startswith("[Error") or document_text.startswith("[Unsupported"):
+            document_text = f"[Document: {review['file_name']}]\n{document_text or 'No text could be extracted.'}"
+
+        # Perform real AI analysis
+        analysis = review_document_with_ai(document_text, review["file_name"])
+
+        review["status"] = "completed"
+        review["analysis"] = analysis
+        review["analyzed_at"] = datetime.utcnow().isoformat()
+
+    except Exception as e:
+        review["status"] = "failed"
+        review["analysis"] = {
+            "overall_risk_score": 50,
+            "summary": f"Analysis failed: {str(e)}",
+            "clauses": [],
+            "risks": [
+                {
+                    "title": "Analysis Error",
+                    "severity": "high",
+                    "description": str(e),
+                }
+            ],
+            "suggestions": ["Please try again or check API configuration"],
+        }
+
     save_reviews(reviews)
 
     return {"success": True, "review": review}
