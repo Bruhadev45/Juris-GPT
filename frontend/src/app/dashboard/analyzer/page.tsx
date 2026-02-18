@@ -207,7 +207,7 @@ export default function AnalyzerPage() {
                 <h1 className="text-xl font-semibold text-foreground">Contract Analyzer</h1>
               </div>
               <p className="text-sm text-muted-foreground mt-1">
-                Deep clause-by-clause analysis
+                Deep clause-by-clause analysis — understand contract risks before signing or negotiating
               </p>
             </div>
             {pageState === "done" && (

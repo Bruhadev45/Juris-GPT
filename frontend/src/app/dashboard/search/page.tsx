@@ -219,11 +219,11 @@ export default function SearchPage() {
           <div className="flex items-center gap-2">
             <Search className="h-5 w-5 text-primary" />
             <h1 className="text-xl font-semibold text-foreground">
-              Legal Search
+              Legal Research
             </h1>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
-            AI-powered search across Indian judgments, statutes, and regulations with relevance ranking
+            Unified search across case law, statutes, and regulations — AI-powered summaries and relevance ranking
           </p>
         </header>
         <div className="flex-1 overflow-y-auto p-6 bg-background">
@@ -579,13 +579,13 @@ export default function SearchPage() {
                 <CardContent className="py-12 text-center">
                   <Search className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
                   <h3 className="text-lg font-semibold text-foreground mb-2">
-                    Search Indian Legal Database
+                    Legal Research
                   </h3>
                   <p className="text-sm text-muted-foreground mb-2">
-                    AI-powered search with fuzzy matching and relevance ranking
+                    Replace manual legal research with fast, structured discovery
                   </p>
                   <p className="text-sm text-muted-foreground mb-6">
-                    Search across Supreme Court judgments, Companies Act sections, IPC, CPC, CrPC, and more
+                    Search across case law with citations, courts and principles, Companies Act sections, IPC, CPC, CrPC, and more
                   </p>
                   <div className="flex flex-wrap gap-2 justify-center">
                     {[

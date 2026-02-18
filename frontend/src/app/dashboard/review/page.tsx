@@ -177,9 +177,14 @@ export default function ReviewPage() {
       <div className="flex-1 flex flex-col">
         <header className="bg-card border-b border-border px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-primary" />
-              <h1 className="text-xl font-semibold text-foreground">Smart Review</h1>
+            <div>
+              <div className="flex items-center gap-2">
+                <Shield className="h-5 w-5 text-primary" />
+                <h1 className="text-xl font-semibold text-foreground">Document Review</h1>
+              </div>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                Upload documents for AI review and risk assessment — submit for optional lawyer verification
+              </p>
             </div>
             <Badge variant="outline" className="text-muted-foreground">
               {reviews.length} document{reviews.length !== 1 ? "s" : ""}
@@ -322,8 +327,7 @@ export default function ReviewPage() {
                     Select a Document
                   </h3>
                   <p className="text-sm text-muted-foreground max-w-sm">
-                    Upload and select a document from the left panel to view its
-                    AI-powered analysis results.
+                    Upload a document for AI-powered clause analysis and risk scoring. Ensures legal accuracy while reducing lawyer dependency.
                   </p>
                 </div>
               </div>

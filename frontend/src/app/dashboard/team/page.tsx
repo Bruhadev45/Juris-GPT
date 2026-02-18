@@ -157,9 +157,12 @@ export default function TeamPage() {
       <div className="flex-1 flex flex-col">
         <header className="bg-card border-b border-border px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-primary" />
-              <h1 className="text-xl font-semibold text-foreground">Team</h1>
+            <div>
+              <div className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-primary" />
+                <h1 className="text-xl font-semibold text-foreground">Team</h1>
+              </div>
+              <p className="text-sm text-muted-foreground mt-0.5">Manage team members, assign roles and permissions, control access to documents and features</p>
             </div>
             <Button
               onClick={() => setShowAddForm(!showAddForm)}

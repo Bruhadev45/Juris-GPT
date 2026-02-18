@@ -1,0 +1,22 @@
+{
+  "name": "Indian Kanoon API",
+  "base_url": "https://api.indiankanoon.org",
+  "documentation": "https://api.indiankanoon.org/documentation/",
+  "endpoints": {
+    "search": "/search/?formInput={query}&pagenum={page}",
+    "document": "/doc/{doc_id}/",
+    "document_fragments": "/docfragment/{doc_id}/?formInput={query}"
+  },
+  "features": [
+    "Full-text legal search",
+    "Supreme Court judgments",
+    "High Court judgments",
+    "Tribunal decisions",
+    "Central and State Acts",
+    "Structural analysis of judgments",
+    "Citation analysis"
+  ],
+  "auth": "API key required - register at https://api.indiankanoon.org",
+  "pricing": "Contact Indian Kanoon for pricing",
+  "note": "Free tier may be available for research/educational use"
+}
