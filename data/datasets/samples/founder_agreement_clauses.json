@@ -2,16 +2,21 @@
   {
     "clause_type": "Vesting Schedule",
     "standard_terms": "4-year vesting with 1-year cliff",
-    "sample_text": "Each Founder equity shall vest over 48 months, with 12-month cliff. At cliff, 25% vests immediately, remaining 75% vests monthly over 36 months."
+    "sample_text": "Each Founder's equity shall vest over a period of forty-eight (48) months, with a twelve (12) month cliff. Upon the cliff date, 25% of the Founder's equity shall vest, with the remaining 75% vesting monthly over the subsequent 36 months."
   },
   {
     "clause_type": "Non-Compete",
     "standard_terms": "12-24 months post-employment",
-    "sample_text": "During this Agreement and for 12 months following termination, Founder shall not engage in competing business within India."
+    "sample_text": "During the term of this Agreement and for a period of [12/24] months following termination, the Founder shall not, directly or indirectly, engage in any business that competes with the Company's business within India."
   },
   {
     "clause_type": "IP Assignment",
     "standard_terms": "All work product belongs to company",
-    "sample_text": "Founder assigns to Company all right, title and interest in all Inventions and IP created during the term of this Agreement."
+    "sample_text": "The Founder hereby irrevocably assigns to the Company all right, title, and interest in and to any and all Inventions, including all Intellectual Property Rights therein, that the Founder may solely or jointly conceive, develop, or reduce to practice during the term of this Agreement."
+  },
+  {
+    "clause_type": "Dispute Resolution",
+    "standard_terms": "Arbitration in India",
+    "sample_text": "Any dispute arising out of or in connection with this Agreement shall be finally resolved by arbitration in accordance with the Arbitration and Conciliation Act, 1996. The seat of arbitration shall be [City], India. The arbitration shall be conducted in English."
   }
 ]

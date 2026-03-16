@@ -146,6 +146,7 @@ export default function SettingsPage() {
       <div className="flex-1 flex flex-col">
         <header className="bg-card border-b border-border px-6 py-4">
           <h1 className="text-xl font-semibold text-foreground">Settings</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Manage profile, preferences, notifications, security, and appearance</p>
         </header>
         <div className="flex-1 overflow-y-auto p-6 bg-background">
           <div className="max-w-4xl mx-auto">

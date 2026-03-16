@@ -200,7 +200,7 @@ export default function VaultPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <FolderOpen className="h-5 w-5 text-primary" />
-                <h1 className="text-xl font-semibold text-foreground">Document Vault</h1>
+                <h1 className="text-xl font-semibold text-foreground">Vault</h1>
               </div>
             </div>
           </header>
@@ -223,7 +223,7 @@ export default function VaultPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <FolderOpen className="h-5 w-5 text-primary" />
-                <h1 className="text-xl font-semibold text-foreground">Document Vault</h1>
+                <h1 className="text-xl font-semibold text-foreground">Vault</h1>
               </div>
             </div>
           </header>
@@ -247,9 +247,12 @@ export default function VaultPage() {
       <div className="flex-1 flex flex-col">
         <header className="bg-card border-b border-border px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <FolderOpen className="h-5 w-5 text-primary" />
-              <h1 className="text-xl font-semibold text-foreground">Document Vault</h1>
+            <div>
+              <div className="flex items-center gap-2">
+                <FolderOpen className="h-5 w-5 text-primary" />
+                <h1 className="text-xl font-semibold text-foreground">Vault</h1>
+              </div>
+              <p className="text-sm text-muted-foreground mt-0.5">Secure document storage — upload, tag, categorize, and manage your legal files</p>
             </div>
             <Button onClick={() => setUploadDialogOpen(true)}>
               <Upload className="h-4 w-4 mr-2" />

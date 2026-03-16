@@ -58,12 +58,11 @@ const InteractiveDots = dynamic(() => import("@/components/ui/interactive-dots")
 
 /* ─── Data ─── */
 const services = [
-  { icon: FileText, title: "Contracts", desc: "NDA, MSA, employment, freelancer agreements, MoU, rental and more" },
-  { icon: Shield, title: "Compliance", desc: "GST, ROC filings, TDS, PF/ESI, Shops Act and state-wise tracking" },
-  { icon: Building2, title: "Corporate", desc: "Incorporation, DPIIT registration, equity, ESOP pools, board resolutions" },
-  { icon: Users, title: "Employment", desc: "Offer letters, employment contracts, ESOP, contractor setup, policies" },
-  { icon: Search, title: "Legal Research", desc: "AI-powered search across 16M+ Indian judgments, statutes and case law" },
-  { icon: UserCheck, title: "Fractional GC", desc: "On-demand general counsel for your day-to-day legal needs" },
+  { icon: FileText, title: "Contracts", desc: "NDA, MSA, employment, freelancer agreements, MoU, rental and more", href: "/agreements/new" },
+  { icon: Shield, title: "Compliance", desc: "GST, ROC filings, TDS, PF/ESI, Shops Act and state-wise tracking", href: "/dashboard/compliance" },
+  { icon: Building2, title: "Corporate", desc: "Incorporation, DPIIT registration, equity, ESOP pools, board resolutions", href: "/dashboard/cases" },
+  { icon: Users, title: "Employment", desc: "Offer letters, employment contracts, ESOP, contractor setup, policies", href: "/dashboard/forms" },
+  { icon: Search, title: "Legal Research", desc: "AI-powered search across 16M+ Indian judgments, statutes and case law", href: "/dashboard/search" },
 ];
 
 const howItWorks = [
@@ -380,6 +379,73 @@ function RevealSection({ children, className = "" }: { children: React.ReactNode
   );
 }
 
+/* ─── Shining Border Card ─── */
+function ShiningBorderCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
+
+  return (
+    <motion.div
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className={`relative ${className}`}
+      style={{ padding: "2px", borderRadius: "0.75rem" }}
+    >
+      {/* Animated shining border layer */}
+      <div
+        className="absolute inset-0 rounded-xl transition-opacity duration-300"
+        style={{
+          opacity: isHovered ? 1 : 0,
+          background: `radial-gradient(500px circle at ${mousePos.x}px ${mousePos.y}px, rgba(255,255,255,0.95), rgba(220,225,232,0.7) 20%, rgba(180,190,200,0.45) 40%, rgba(140,150,165,0.2) 60%, transparent 80%)`,
+        }}
+      />
+      {/* Secondary shimmer ring */}
+      <div
+        className="absolute inset-0 rounded-xl transition-opacity duration-300 pointer-events-none"
+        style={{
+          opacity: isHovered ? 0.7 : 0,
+          background: `conic-gradient(from ${Math.atan2(mousePos.y - 100, mousePos.x - 150) * (180 / Math.PI)}deg at ${mousePos.x}px ${mousePos.y}px, transparent 0%, rgba(255,255,255,0.6) 10%, transparent 20%, rgba(200,210,220,0.3) 40%, transparent 50%)`,
+        }}
+      />
+      {/* Resting silver border */}
+      <div
+        className="absolute inset-0 rounded-xl transition-opacity duration-300"
+        style={{
+          opacity: isHovered ? 0.3 : 1,
+          background: "linear-gradient(135deg, rgba(200,205,215,0.35), rgba(170,178,190,0.15) 50%, rgba(200,205,215,0.35))",
+        }}
+      />
+      {/* Inner glow on hover */}
+      <div
+        className="absolute inset-[2px] rounded-[10px] transition-opacity duration-300 pointer-events-none"
+        style={{
+          opacity: isHovered ? 1 : 0,
+          background: `radial-gradient(350px circle at ${mousePos.x}px ${mousePos.y}px, rgba(255,255,255,0.1), rgba(200,210,220,0.04) 40%, transparent 60%)`,
+          boxShadow: isHovered
+            ? `inset 0 0 30px rgba(200,210,220,0.08), 0 0 15px rgba(200,210,220,0.05)`
+            : "none",
+        }}
+      />
+      {/* Content */}
+      <div className="relative rounded-[10px] bg-card h-full">
+        {children}
+      </div>
+    </motion.div>
+  );
+}
+
 /* ─── Stagger Container ─── */
 const stagger = {
   hidden: {},
@@ -388,7 +454,7 @@ const stagger = {
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const } },
 };
 
 /* ─── Main Component ─── */
@@ -457,15 +523,21 @@ export default function Home() {
             <span className="text-xl font-bold text-foreground">JurisGPT</span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-8">
-            {["solutions", "pricing", "faq"].map((section) => (
+          <div className="hidden md:flex items-center gap-6">
+            {[
+              { id: "solutions", label: "Solutions" },
+              { id: "how-it-works", label: "How it Works" },
+              { id: "pricing", label: "Pricing" },
+              { id: "testimonials", label: "Testimonials" },
+              { id: "faq", label: "Questions" },
+            ].map((item) => (
               <motion.button
-                key={section}
-                onClick={() => scrollToSection(section)}
+                key={item.id}
+                onClick={() => scrollToSection(item.id)}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors relative group"
                 whileHover={{ y: -1 }}
               >
-                {section.charAt(0).toUpperCase() + section.slice(1) === "Faq" ? "Questions" : section.charAt(0).toUpperCase() + section.slice(1)}
+                {item.label}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
               </motion.button>
             ))}
@@ -479,10 +551,10 @@ export default function Home() {
               Login
             </Link>
             <ShimmerButton
-              href="/agreements/new"
+              href="/dashboard"
               className="px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-lg hover:bg-primary/90 transition-all hover:shadow-lg hover:shadow-primary/20"
             >
-              Get Started
+              Dashboard
             </ShimmerButton>
             <button
               className="md:hidden p-2 text-muted-foreground"
@@ -503,7 +575,13 @@ export default function Home() {
               className="md:hidden border-t border-border/50 overflow-hidden"
             >
               <div className="px-4 py-4 space-y-3">
-                {[{ label: "Solutions", id: "solutions" }, { label: "Pricing", id: "pricing" }, { label: "Questions", id: "faq" }].map((item) => (
+                {[
+                  { label: "Solutions", id: "solutions" },
+                  { label: "How it Works", id: "how-it-works" },
+                  { label: "Pricing", id: "pricing" },
+                  { label: "Testimonials", id: "testimonials" },
+                  { label: "Questions", id: "faq" },
+                ].map((item) => (
                   <button
                     key={item.id}
                     onClick={() => scrollToSection(item.id)}
@@ -540,14 +618,14 @@ export default function Home() {
         {/* Hero law watermark */}
         <HeroScalesAnimation />
         <motion.div style={{ y: heroParallax, opacity: heroOpacity }} className="container mx-auto px-4">
-          <div className="max-w-7xl mx-auto flex flex-col-reverse lg:flex-row items-center gap-12 lg:gap-16">
+          <div className="max-w-7xl mx-auto flex flex-col-reverse lg:flex-row items-center gap-10 lg:gap-14">
 
             {/* ─── Left: Video ─── */}
             <motion.div
               initial={{ opacity: 0, x: -60 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
-              className="w-full lg:w-[45%] flex-shrink-0"
+              className="w-full max-w-sm mx-auto lg:mx-0 lg:w-[38%] flex-shrink-0"
             >
               <div className="relative group">
                 {/* Video glow effect */}
@@ -559,21 +637,18 @@ export default function Home() {
                   whileHover={{ scale: 1.01 }}
                   transition={{ type: "spring", stiffness: 200 }}
                 >
-                  {/* Video zoomed + cropped to hide watermark */}
-                  <div className="w-full aspect-[3/4] overflow-hidden relative">
-                    <video
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
-                      className="absolute inset-0 w-full h-[130%] object-cover object-top"
-                    >
-                      <source src="/hero-video.mp4" type="video/mp4" />
-                    </video>
-                  </div>
+                  <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-auto block rounded-2xl"
+                  >
+                    <source src="/hero-video1.mp4" type="video/mp4" />
+                  </video>
 
-                  {/* Gradient overlay to smooth out any remaining edges */}
-                  <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/25 to-transparent" />
+                  {/* Gradient overlay at bottom */}
+                  <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/20 to-transparent" />
                 </motion.div>
 
                 {/* Floating badge on video */}
@@ -679,32 +754,6 @@ export default function Home() {
                 </motion.div>
               </motion.div>
 
-              {/* Trust Badges */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.2, duration: 0.8 }}
-                className="mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-sm text-muted-foreground"
-              >
-                {[
-                  { icon: Shield, text: "Bar Council Verified" },
-                  { icon: Lock, text: "DPDPA Compliant" },
-                  { icon: Globe, text: "Indian Data Residency" },
-                ].map((badge, i) => {
-                  const Icon = badge.icon;
-                  return (
-                    <motion.div
-                      key={i}
-                      className="flex items-center gap-2"
-                      whileHover={{ scale: 1.05, color: "var(--primary)" }}
-                      transition={{ type: "spring", stiffness: 400 }}
-                    >
-                      <Icon className="h-4 w-4 text-primary" />
-                      <span>{badge.text}</span>
-                    </motion.div>
-                  );
-                })}
-              </motion.div>
             </div>
           </div>
         </motion.div>
@@ -766,44 +815,157 @@ export default function Home() {
               </p>
             </RevealSection>
 
+            {/* ─── Bento Grid ─── */}
             <motion.div
-              className="grid md:grid-cols-3 gap-6"
+              className="grid grid-cols-1 md:grid-cols-12 gap-4 auto-rows-auto"
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-50px" }}
               variants={stagger}
             >
-              {services.map((service, index) => {
-                const Icon = service.icon;
-                return (
-                  <motion.div key={index} variants={fadeUp}>
-                    <MagneticCard className="group p-6 bg-card rounded-xl border border-border hover:border-primary/30 transition-all duration-500 cursor-pointer h-full relative overflow-hidden">
-                      {/* Glow on hover */}
+              {/* ── Row 1: Two asymmetric cards (5 + 7) ── */}
+
+              {/* Contracts — left, 5 cols */}
+              <motion.div variants={fadeUp} className="md:col-span-5">
+                <Link href={services[0].href} className="block h-full">
+                  <ShiningBorderCard className="h-full">
+                    <div className="group p-7 md:p-8 h-full min-h-[260px] flex flex-col relative overflow-hidden">
                       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                      <div className="relative z-10">
+                      <div className="relative z-10 flex flex-col h-full">
                         <motion.div
-                          className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-primary/15 transition-all duration-300"
+                          className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-primary/15 transition-all duration-300"
                           whileHover={{ rotate: [0, -5, 5, 0], scale: 1.1 }}
                         >
-                          <Icon className="h-5 w-5 text-primary" />
+                          <FileText className="h-5 w-5 text-primary" />
                         </motion.div>
-                        <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors duration-300">
-                          {service.title}
+                        <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors duration-300">
+                          {services[0].title}
                         </h3>
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          {service.desc}
+                        <p className="text-sm text-muted-foreground leading-relaxed flex-1">
+                          {services[0].desc}
                         </p>
-                        <motion.div
-                          className="mt-4 flex items-center gap-1 text-sm text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                          initial={false}
-                        >
+                        <div className="mt-4 flex items-center gap-1.5 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                           Learn more <ArrowRight className="h-3.5 w-3.5" />
-                        </motion.div>
+                        </div>
                       </div>
-                    </MagneticCard>
-                  </motion.div>
-                );
-              })}
+                    </div>
+                  </ShiningBorderCard>
+                </Link>
+              </motion.div>
+
+              {/* Compliance — right, 7 cols */}
+              <motion.div variants={fadeUp} className="md:col-span-7">
+                <Link href={services[1].href} className="block h-full">
+                  <ShiningBorderCard className="h-full">
+                    <div className="group p-7 md:p-8 h-full min-h-[260px] flex flex-col relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <div className="relative z-10 flex flex-col h-full">
+                        <motion.div
+                          className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-primary/15 transition-all duration-300"
+                          whileHover={{ rotate: [0, -5, 5, 0], scale: 1.1 }}
+                        >
+                          <Shield className="h-5 w-5 text-primary" />
+                        </motion.div>
+                        <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors duration-300">
+                          {services[1].title}
+                        </h3>
+                        <p className="text-sm text-muted-foreground leading-relaxed flex-1">
+                          {services[1].desc}
+                        </p>
+                        <div className="mt-4 flex items-center gap-1.5 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          Learn more <ArrowRight className="h-3.5 w-3.5" />
+                        </div>
+                      </div>
+                    </div>
+                  </ShiningBorderCard>
+                </Link>
+              </motion.div>
+
+              {/* ── Row 2: Three equal cards (4 + 4 + 4) ── */}
+
+              {/* Corporate */}
+              <motion.div variants={fadeUp} className="md:col-span-4">
+                <Link href={services[2].href} className="block h-full">
+                  <ShiningBorderCard className="h-full">
+                    <div className="group p-7 md:p-8 h-full min-h-[240px] flex flex-col relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <div className="relative z-10 flex flex-col h-full">
+                        <motion.div
+                          className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-primary/15 transition-all duration-300"
+                          whileHover={{ rotate: [0, -5, 5, 0], scale: 1.1 }}
+                        >
+                          <Building2 className="h-5 w-5 text-primary" />
+                        </motion.div>
+                        <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors duration-300">
+                          {services[2].title}
+                        </h3>
+                        <p className="text-sm text-muted-foreground leading-relaxed flex-1">
+                          {services[2].desc}
+                        </p>
+                        <div className="mt-4 flex items-center gap-1.5 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          Learn more <ArrowRight className="h-3.5 w-3.5" />
+                        </div>
+                      </div>
+                    </div>
+                  </ShiningBorderCard>
+                </Link>
+              </motion.div>
+
+              {/* Employment */}
+              <motion.div variants={fadeUp} className="md:col-span-4">
+                <Link href={services[3].href} className="block h-full">
+                  <ShiningBorderCard className="h-full">
+                    <div className="group p-7 md:p-8 h-full min-h-[240px] flex flex-col relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <div className="relative z-10 flex flex-col h-full">
+                        <motion.div
+                          className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-primary/15 transition-all duration-300"
+                          whileHover={{ rotate: [0, -5, 5, 0], scale: 1.1 }}
+                        >
+                          <Users className="h-5 w-5 text-primary" />
+                        </motion.div>
+                        <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors duration-300">
+                          {services[3].title}
+                        </h3>
+                        <p className="text-sm text-muted-foreground leading-relaxed flex-1">
+                          {services[3].desc}
+                        </p>
+                        <div className="mt-4 flex items-center gap-1.5 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          Learn more <ArrowRight className="h-3.5 w-3.5" />
+                        </div>
+                      </div>
+                    </div>
+                  </ShiningBorderCard>
+                </Link>
+              </motion.div>
+
+              {/* Legal Research */}
+              <motion.div variants={fadeUp} className="md:col-span-4">
+                <Link href={services[4].href} className="block h-full">
+                  <ShiningBorderCard className="h-full">
+                    <div className="group p-7 md:p-8 h-full min-h-[240px] flex flex-col relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <div className="relative z-10 flex flex-col h-full">
+                        <motion.div
+                          className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-5 group-hover:bg-primary/15 transition-all duration-300"
+                          whileHover={{ rotate: [0, -5, 5, 0], scale: 1.1 }}
+                        >
+                          <Search className="h-5 w-5 text-primary" />
+                        </motion.div>
+                        <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors duration-300">
+                          {services[4].title}
+                        </h3>
+                        <p className="text-sm text-muted-foreground leading-relaxed flex-1">
+                          {services[4].desc}
+                        </p>
+                        <div className="mt-4 flex items-center gap-1.5 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          Learn more <ArrowRight className="h-3.5 w-3.5" />
+                        </div>
+                      </div>
+                    </div>
+                  </ShiningBorderCard>
+                </Link>
+              </motion.div>
             </motion.div>
 
             <RevealSection className="text-center mt-12">
@@ -820,7 +982,7 @@ export default function Home() {
       </section>
 
       {/* ======================== HOW IT WORKS ======================== */}
-      <section className="relative z-10 py-28 bg-secondary/20">
+      <section id="how-it-works" className="relative z-10 py-28 bg-secondary/20">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <RevealSection className="text-center mb-20">
@@ -1141,7 +1303,7 @@ export default function Home() {
       </section>
 
       {/* ======================== TESTIMONIALS ======================== */}
-      <section className="relative z-10 py-28 bg-secondary/20">
+      <section id="testimonials" className="relative z-10 py-28 bg-secondary/20">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <RevealSection className="text-center mb-16">
@@ -1400,19 +1562,26 @@ export default function Home() {
             </div>
           </div>
           <div className="border-t border-border pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <p className="text-xs text-muted-foreground">
+            <div className="flex flex-col items-center gap-4">
+              {/* Trust Badges */}
+              <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1.5">
+                  <Shield className="h-3.5 w-3.5 text-primary/70" />
+                  <span>Bar Council Verified</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Lock className="h-3.5 w-3.5 text-primary/70" />
+                  <span>DPDPA Compliant</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Globe className="h-3.5 w-3.5 text-primary/70" />
+                  <span>Indian Data Residency</span>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground text-center">
                 &copy; 2026 JurisGPT. All rights reserved. JurisGPT connects
                 users with independent attorneys and is not a law firm.
               </p>
-              <div className="flex gap-4">
-                <Link
-                  href="#"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  <Globe className="h-4 w-4" />
-                </Link>
-              </div>
             </div>
           </div>
         </div>

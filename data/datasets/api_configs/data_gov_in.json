@@ -1,0 +1,28 @@
+{
+  "name": "data.gov.in - Company Master Data",
+  "url": "https://www.data.gov.in/catalog/company-master-data",
+  "description": "Official MCA company registration data",
+  "fields": [
+    "CIN",
+    "Company Name",
+    "Status",
+    "Class",
+    "Category",
+    "Authorized Capital",
+    "Paid-up Capital",
+    "Registration Date",
+    "State",
+    "RoC",
+    "Business Activity",
+    "Address"
+  ],
+  "format": "CSV (ZIP compressed)",
+  "records": "17+ million companies",
+  "manual_download": true,
+  "instructions": [
+    "1. Visit https://www.data.gov.in/catalog/company-master-data",
+    "2. Click on the download link for the dataset",
+    "3. Save the ZIP file to data/raw/",
+    "4. Extract to data/datasets/company_master/"
+  ]
+}

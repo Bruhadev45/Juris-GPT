@@ -1,0 +1,24 @@
+{
+  "name": "eCourts Judgment Search Portal",
+  "url": "https://judgments.ecourts.gov.in",
+  "description": "Official repository for High Court judgments",
+  "search_options": [
+    "Bench",
+    "Case Type",
+    "Case Number",
+    "Year",
+    "Petitioner/Respondent Name",
+    "Judge Name",
+    "Act",
+    "Section",
+    "Full-text keywords"
+  ],
+  "coverage": "All High Courts of India",
+  "api_available": false,
+  "alternative": {
+    "name": "AWS Open Data - Indian High Court Judgments",
+    "url": "https://registry.opendata.aws/indian-high-court-judgments/",
+    "format": "JSON + Parquet",
+    "bulk_download": true
+  }
+}

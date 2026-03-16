@@ -162,11 +162,14 @@ export default function SupportPage() {
     <div className="flex h-screen bg-background">
       <div className="flex-1 flex flex-col">
         <header className="bg-card border-b border-border px-6 py-4">
-          <div className="flex items-center gap-2">
-            <HelpCircle className="h-5 w-5 text-primary" />
-            <h1 className="text-xl font-semibold text-foreground">
-              Support Center
-            </h1>
+          <div>
+            <div className="flex items-center gap-2">
+              <HelpCircle className="h-5 w-5 text-primary" />
+              <h1 className="text-xl font-semibold text-foreground">
+                Support
+              </h1>
+            </div>
+            <p className="text-sm text-muted-foreground mt-0.5">Create and track support tickets — get help with platform or legal workflow issues</p>
           </div>
         </header>
         <div className="flex-1 overflow-y-auto p-6 bg-background">

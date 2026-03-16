@@ -116,7 +116,8 @@ export default function CompliancePage() {
       <div className="flex h-screen bg-background">
         <div className="flex-1 flex flex-col">
           <header className="bg-card border-b border-border px-6 py-4">
-            <h1 className="text-xl font-semibold text-foreground">Compliance Tracker</h1>
+            <h1 className="text-xl font-semibold text-foreground">Compliance</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">Track statutory deadlines, urgency levels, penalties, and AI risk assessments</p>
           </header>
           <div className="flex-1 flex items-center justify-center">
             <div className="flex flex-col items-center gap-3">
@@ -134,7 +135,8 @@ export default function CompliancePage() {
       <div className="flex h-screen bg-background">
         <div className="flex-1 flex flex-col">
           <header className="bg-card border-b border-border px-6 py-4">
-            <h1 className="text-xl font-semibold text-foreground">Compliance Tracker</h1>
+            <h1 className="text-xl font-semibold text-foreground">Compliance</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">Track statutory deadlines, urgency levels, penalties, and AI risk assessments</p>
           </header>
           <div className="flex-1 flex items-center justify-center">
             <div className="flex flex-col items-center gap-3 text-center">
@@ -155,7 +157,8 @@ export default function CompliancePage() {
     <div className="flex h-screen bg-background">
       <div className="flex-1 flex flex-col">
         <header className="bg-card border-b border-border px-6 py-4">
-          <h1 className="text-xl font-semibold text-foreground">Compliance Tracker</h1>
+          <h1 className="text-xl font-semibold text-foreground">Compliance</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Track statutory deadlines, urgency levels, penalties, and AI risk assessments</p>
         </header>
         <div className="flex-1 overflow-y-auto p-6 bg-background">
           <div className="max-w-6xl mx-auto space-y-6">

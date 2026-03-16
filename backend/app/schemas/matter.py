@@ -1,8 +1,9 @@
+from __future__ import annotations
 from pydantic import BaseModel
 from decimal import Decimal
 from uuid import UUID
 from datetime import datetime
-from typing import Literal
+from typing import List, Literal, Optional
 from .company import CompanyResponse
 from .founder import FounderResponse
 from .preference import LegalPreferenceResponse
@@ -26,9 +27,9 @@ class MatterResponse(BaseModel):
     price: Decimal
     created_at: datetime
     updated_at: datetime
-    company: CompanyResponse | None = None
-    founders: list[FounderResponse] = []
-    preferences: LegalPreferenceResponse | None = None
+    company: Optional[CompanyResponse] = None
+    founders: List[FounderResponse] = []
+    preferences: Optional[LegalPreferenceResponse] = None
 
     class Config:
         from_attributes = True

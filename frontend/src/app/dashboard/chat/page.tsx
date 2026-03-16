@@ -454,7 +454,7 @@ export default function ChatPage() {
           <div className="flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
             <span className="text-[14px] font-semibold text-foreground/80">
-              {activeConversation?.title ?? "New conversation"}
+              AI Lawyer {activeConversation?.title ? `— ${activeConversation.title}` : ""}
             </span>
           </div>
         </div>
@@ -511,7 +511,7 @@ export default function ChatPage() {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
                 >
-                  How can I help you with legal matters today?
+                  Your AI legal assistant — ask questions, upload documents, get instant guidance
                 </motion.p>
               </motion.div>
 
