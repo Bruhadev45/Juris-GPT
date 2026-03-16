@@ -642,6 +642,45 @@ export const rtiApi = {
   },
 };
 
+// Drafting API
+export interface DraftingDocumentType {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+}
+
+export const draftingApi = {
+  async getTypes(): Promise<{ types: DraftingDocumentType[] }> {
+    const response = await fetch(`${API_URL}/api/drafting/types`);
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.json();
+  },
+
+  async generate(data: {
+    document_type: string;
+    description: string;
+  }): Promise<{ success: boolean; document_content?: string; document_type?: string; document_name?: string; error?: string }> {
+    const response = await fetch(`${API_URL}/api/drafting/generate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.json();
+  },
+
+  async downloadDocx(content: string, filename: string = "document.docx"): Promise<Blob> {
+    const response = await fetch(`${API_URL}/api/drafting/download`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content, filename }),
+    });
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.blob();
+  },
+};
+
 // News API
 export const newsApi = {
   async list(options?: { category?: string; limit?: number; offset?: number }) {

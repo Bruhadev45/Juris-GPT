@@ -12,6 +12,7 @@ import {
   FileScan,
   ShieldCheck,
   FolderOpen,
+  Sparkles,
   Wrench,
   Gavel,
   Users,
@@ -41,6 +42,7 @@ const mainNav: NavItem[] = [
   { icon: FileScan, label: "Contract Analyzer", href: "/dashboard/analyzer" },
   { icon: ShieldCheck, label: "Compliance", href: "/dashboard/compliance" },
   { icon: FolderOpen, label: "Documents", href: "/dashboard/documents" },
+  { icon: Sparkles, label: "AI Drafting", href: "/dashboard/drafting" },
 ];
 
 const toolsNav: NavItem[] = [

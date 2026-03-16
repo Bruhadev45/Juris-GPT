@@ -1,5 +1,5 @@
 """
-NyayaSetu Chatbot Service
+JurisGPT Chatbot Service
 Integrates RAG pipeline with FastAPI backend.
 Falls back to direct OpenAI when RAG is unavailable.
 """
@@ -39,7 +39,7 @@ class ChatResponse(BaseModel):
     error: Optional[str] = None
 
 
-class NyayaSetuChatbotService:
+class JurisGPTChatbotService:
     """Chatbot service for legal assistance — uses RAG or direct OpenAI."""
 
     def __init__(self):
@@ -54,10 +54,10 @@ class NyayaSetuChatbotService:
             return
 
         try:
-            from rag_pipeline import NyayaSetuRAG
-            self.rag = NyayaSetuRAG()
+            from rag_pipeline import JurisGPTRAG
+            self.rag = JurisGPTRAG()
             self._initialized = True
-            print("NyayaSetu RAG Pipeline initialized")
+            print("JurisGPT RAG Pipeline initialized")
         except ImportError as e:
             self._initialization_error = f"RAG dependencies not installed: {e}"
             print(f"RAG not available: {self._initialization_error}")
@@ -144,7 +144,7 @@ class NyayaSetuChatbotService:
         if not client:
             return self._get_fallback_response(request.message)
 
-        system_prompt = """You are NyayaSetu, an expert AI legal assistant specializing in Indian law. 
+        system_prompt = """You are JurisGPT, an expert AI legal assistant specializing in Indian law.
 You help Indian startups, MSMEs, and entrepreneurs with legal questions.
 
 Your expertise covers:
@@ -331,7 +331,7 @@ Non-compete agreements during employment are generally enforceable. However, **p
             success=True,
             message=f"""I understand you're asking about: **{query}**
 
-I'm NyayaSetu, your AI legal assistant for Indian startup law. I can help with:
+I'm JurisGPT, your AI legal assistant for Indian startup law. I can help with:
 
 - **Company Formation** — Incorporation, compliance, MCA filings
 - **Founder Agreements** — Equity split, vesting, roles
@@ -430,4 +430,4 @@ Please provide guidance on key clauses, important considerations, and common pit
 
 
 # Singleton instance
-chatbot_service = NyayaSetuChatbotService()
+chatbot_service = JurisGPTChatbotService()

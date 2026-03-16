@@ -423,6 +423,99 @@ def assess_compliance_risk(deadline_title: str, category: str, days_remaining: i
         return {"risk_note": "", "penalty_info": "", "action_items": []}
 
 
+DRAFTING_DOCUMENT_TYPES = [
+    {"id": "founder_agreement", "name": "Founder / Shareholder Agreement", "description": "Equity split, vesting, roles, and exit provisions for co-founders", "category": "Corporate"},
+    {"id": "partnership_deed", "name": "Partnership Deed", "description": "Rights, duties, and profit-sharing between partners under Indian Partnership Act", "category": "Corporate"},
+    {"id": "board_resolution", "name": "Board Resolution", "description": "Formal board resolution for corporate actions under Companies Act 2013", "category": "Corporate"},
+    {"id": "term_sheet", "name": "Term Sheet", "description": "Non-binding investment terms between startup and investor", "category": "Corporate"},
+    {"id": "nda", "name": "Non-Disclosure Agreement", "description": "Protect confidential information shared between parties", "category": "Contracts"},
+    {"id": "employment_contract", "name": "Employment Contract", "description": "Standard employment agreement compliant with Indian labour laws", "category": "Employment"},
+    {"id": "consulting_agreement", "name": "Consulting Agreement", "description": "Engagement terms for independent consultants", "category": "Contracts"},
+    {"id": "service_agreement", "name": "Service Level Agreement (SLA)", "description": "Define service standards, uptime, and penalties", "category": "Contracts"},
+    {"id": "freelancer_agreement", "name": "Freelancer Agreement", "description": "Independent contractor terms with IP assignment and payment", "category": "Employment"},
+    {"id": "loan_agreement", "name": "Loan Agreement", "description": "Terms for lending between parties with interest and repayment schedule", "category": "Finance"},
+    {"id": "investment_agreement", "name": "Investment Agreement", "description": "Terms for equity investment in a company", "category": "Finance"},
+    {"id": "rental_agreement", "name": "Rental / Lease Agreement", "description": "Residential or commercial lease under Transfer of Property Act", "category": "Property"},
+    {"id": "privacy_policy", "name": "Privacy Policy", "description": "DPDPA 2023 compliant privacy policy for websites and apps", "category": "Compliance"},
+    {"id": "terms_of_service", "name": "Terms of Service", "description": "Website/app terms of use with Indian law compliance", "category": "Compliance"},
+    {"id": "legal_notice", "name": "Legal Notice / Demand Letter", "description": "Formal legal notice or demand letter under Indian law", "category": "Legal"},
+    {"id": "power_of_attorney", "name": "Power of Attorney", "description": "Authorize someone to act on your behalf under PoA Act 1882", "category": "Legal"},
+    {"id": "mou", "name": "Memorandum of Understanding", "description": "Non-binding agreement outlining terms between parties", "category": "Contracts"},
+    {"id": "esop_plan", "name": "ESOP / Stock Option Plan", "description": "Employee stock option plan compliant with Companies Act 2013", "category": "Corporate"},
+]
+
+
+def generate_drafted_document(document_type: str, description: str) -> dict:
+    """
+    Generate a complete legal document from a natural language description using GPT-4o.
+    Returns markdown-formatted document content.
+    """
+    # Find the document type info
+    doc_type_info = next((t for t in DRAFTING_DOCUMENT_TYPES if t["id"] == document_type), None)
+    if not doc_type_info:
+        return {"success": False, "error": f"Unknown document type: {document_type}"}
+
+    type_name = doc_type_info["name"]
+
+    system_prompt = f"""You are an expert Indian corporate lawyer specializing in drafting legal documents.
+Generate a complete, professional {type_name} based on the user's description.
+
+The document MUST:
+1. Comply with all relevant Indian laws (Companies Act 2013, Indian Contract Act 1872, Transfer of Property Act, DPDPA 2023, IT Act 2000, etc.)
+2. Use proper legal terminology, numbered sections and subsections
+3. Include standard clauses appropriate for this document type
+4. Include proper preamble with date, parties, and recitals
+5. Include definitions section where applicable
+6. Include dispute resolution (arbitration preferred) and governing law clauses
+7. Include signature blocks for all parties
+8. Be comprehensive enough for lawyer review and client signature
+9. Use Indian Rupee (INR / Rs.) for monetary values
+
+FORMATTING RULES — VERY IMPORTANT:
+- Output ONLY plain text. Use simple numbering (1., 1.1, 1.1.1) for sections.
+- Use UPPERCASE for section headings.
+- Do NOT use any markdown syntax (no #, **, *, ```, ---, etc.)
+- Do NOT use any LaTeX, HTML, or special formatting.
+- Do NOT use bullet points with - or *. Use numbered lists or lettered lists (a), b), c)) instead.
+- Keep it clean, readable plain text that can be directly printed or pasted into a Word document.
+
+IMPORTANT: Generate a COMPLETE document, not a summary or outline. Every clause should have full legal text."""
+
+    user_prompt = f"""Generate a complete {type_name} based on the following description:
+
+{description}
+
+Generate the full legal document in plain text format. No markdown, no LaTeX, no HTML. Use simple numbered sections and UPPERCASE headings. Make it comprehensive, legally sound under Indian law, and ready for lawyer review."""
+
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+            temperature=0.3,
+            max_tokens=6000,
+        )
+
+        document_content = response.choices[0].message.content
+
+        return {
+            "success": True,
+            "document_content": document_content,
+            "document_type": document_type,
+            "document_name": type_name,
+        }
+
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e),
+            "document_type": document_type,
+            "document_name": type_name,
+        }
+
+
 def _generate_error_analysis(error_msg: str) -> dict:
     """Generate a structured error analysis when AI fails."""
     clause_names = [

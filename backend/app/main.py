@@ -20,6 +20,7 @@ from app.routes import (
     calculator,
     rti,
     news,
+    drafting,
 )
 
 app = FastAPI(
@@ -65,6 +66,7 @@ app.include_router(analyzer.router, prefix="/api/analyzer", tags=["analyzer"])
 app.include_router(calculator.router, prefix="/api/calculator", tags=["calculator"])
 app.include_router(rti.router, prefix="/api/rti", tags=["rti"])
 app.include_router(news.router, prefix="/api/news", tags=["news"])
+app.include_router(drafting.router, prefix="/api/drafting", tags=["drafting"])
 
 if __name__ == "__main__":
     import uvicorn
