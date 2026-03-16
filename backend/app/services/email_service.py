@@ -1,8 +1,8 @@
-from resend import Resend
+import resend
 from app.config import settings
 from typing import Optional
 
-resend = Resend(api_key=settings.resend_api_key)
+resend.api_key = settings.resend_api_key
 
 
 async def send_email(
@@ -14,13 +14,13 @@ async def send_email(
     """Send email using Resend"""
     try:
         params = {
-            "from": from_email,
+            "from_": from_email,
             "to": [to],
             "subject": subject,
             "html": html_content,
         }
-        
-        email = resend.emails.send(params)
+
+        email = resend.Emails.send(params)
         return True
     except Exception as e:
         print(f"Failed to send email: {str(e)}")
