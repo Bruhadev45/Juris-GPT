@@ -536,7 +536,7 @@ function HowItWorks() {
               <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 36, fontWeight: 700, color: C.burgundy, lineHeight: 1, marginBottom: 24, letterSpacing: "-0.02em" }}>{step.num}</div>
               <div style={{ fontSize: 17, fontWeight: 600, color: C.ink, marginBottom: 10, letterSpacing: "-0.01em" }}>{step.title}</div>
               <div style={{ fontSize: 14, color: C.textSub, lineHeight: 1.6, marginBottom: 18 }}>{step.desc}</div>
-              <div style={{ padding: "8px 10px", background: C.warmGray, border: `1px solid ${C.border}`, borderRadius: 4, fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: C.inkSoft, lineHeight: 1.5, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{step.code}</div>
+              <div style={{ padding: "8px 10px", background: C.warmGray, border: `1px solid ${C.border}`, borderRadius: 4, fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: C.inkSoft, lineHeight: 1.5, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{step.code}</div>
             </div>
           ))}
         </div>
