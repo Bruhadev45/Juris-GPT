@@ -1,0 +1,99 @@
+name: jurisgpt
+region: blr  # Bangalore region for India
+
+# Backend Service (FastAPI)
+services:
+  - name: backend
+    github:
+      repo: Bruhadev45/Juris-GPT
+      branch: main
+      deploy_on_push: true
+    source_dir: /backend
+    build_command: pip install -r requirements.txt
+    run_command: uvicorn app.main:app --host 0.0.0.0 --port 8080
+    environment_slug: python
+    instance_count: 1
+    instance_size_slug: professional-xs  # 1GB RAM, upgrade to basic-xxs for 512MB
+    http_port: 8080
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 60
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
+    envs:
+      - key: ENVIRONMENT
+        value: production
+      - key: OPENAI_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: JWT_SECRET
+        scope: RUN_TIME
+        type: SECRET
+      - key: RESEND_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: RAZORPAY_KEY_ID
+        scope: RUN_TIME
+        type: SECRET
+      - key: RAZORPAY_KEY_SECRET
+        scope: RUN_TIME
+        type: SECRET
+      - key: DO_SPACES_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: DO_SPACES_SECRET
+        scope: RUN_TIME
+        type: SECRET
+      - key: DO_SPACES_REGION
+        value: blr1
+      - key: DO_SPACES_BUCKET
+        value: jurisgpt-data
+      - key: SUPABASE_URL
+        scope: RUN_TIME
+        type: SECRET
+      - key: SUPABASE_KEY
+        scope: RUN_TIME
+        type: SECRET
+      - key: FRONTEND_URL
+        value: https://jurisgpt.me
+      - key: ALLOWED_ORIGINS
+        value: https://jurisgpt.me,https://www.jurisgpt.me
+
+# Frontend Service (Next.js)
+  - name: frontend
+    github:
+      repo: Bruhadev45/Juris-GPT
+      branch: main
+      deploy_on_push: true
+    source_dir: /frontend
+    build_command: npm install && npm run build
+    run_command: npm start
+    environment_slug: node-js
+    instance_count: 1
+    instance_size_slug: basic-xs
+    http_port: 3000
+    envs:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        value: ${backend.PUBLIC_URL}
+      - key: NEXT_PUBLIC_APP_URL
+        value: https://jurisgpt.me
+
+# Database (if not using Supabase)
+# databases:
+#   - name: jurisgpt-db
+#     engine: PG
+#     version: "14"
+#     production: true
+#     cluster_name: jurisgpt-cluster
+
+domains:
+  - domain: jurisgpt.me
+    type: PRIMARY
+    zone: jurisgpt.me
+  - domain: www.jurisgpt.me
+    type: ALIAS
+    zone: jurisgpt.me
