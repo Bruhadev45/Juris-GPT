@@ -1,0 +1,422 @@
+[
+  {
+    "id": 1,
+    "question": "What is the difference between a Private Limited Company, LLP, and OPC in India?",
+    "answer": "A Private Limited Company (Pvt Ltd) is a separate legal entity with limited liability, requiring minimum 2 directors and 2 shareholders, with more compliance requirements but better funding options. A Limited Liability Partnership (LLP) combines benefits of partnership and company, requiring minimum 2 partners, has lower compliance, and partners' liability is limited to their contribution. A One Person Company (OPC) allows a single person to own and manage a company with limited liability, requiring only 1 director and 1 shareholder (same person), with nominee director mandatory. Pvt Ltd is best for startups seeking funding, LLP for professional services, and OPC for solo entrepreneurs.",
+    "category": "business",
+    "related_laws": ["Companies Act, 2013 - Section 2(68)", "LLP Act, 2008", "Companies Act, 2013 - Section 2(62)"]
+  },
+  {
+    "id": 2,
+    "question": "How do I register a Private Limited Company in India?",
+    "answer": "To register a Pvt Ltd Company: 1) Obtain Digital Signature Certificate (DSC) for directors, 2) Apply for Director Identification Number (DIN) through SPICe+ form, 3) Reserve company name via RUN (Reserve Unique Name) service, 4) File SPICe+ form (INC-32) with MCA portal including MOA, AOA, 5) Pay registration fees based on authorized capital, 6) Obtain Certificate of Incorporation with PAN and TAN. Required documents: ID and address proof of directors/shareholders, registered office address proof, consent of directors. Timeline: 7-15 working days. Minimum capital: No minimum paid-up capital required.",
+    "category": "business",
+    "related_laws": ["Companies Act, 2013 - Section 7", "Companies (Incorporation) Rules, 2014", "MCA SPICe+ Guidelines"]
+  },
+  {
+    "id": 3,
+    "question": "What are the minimum requirements to start an LLP in India?",
+    "answer": "Minimum requirements for LLP: 1) At least 2 designated partners (individuals, one must be resident in India), 2) No minimum capital requirement, 3) Unique LLP name, 4) Registered office in India. Registration process: Obtain DSC and DIN for partners, reserve name through RUN-LLP, file FiLLiP form with LLP Agreement, obtain Certificate of Incorporation. Annual compliance: File Form 11 (Annual Return) and Form 8 (Statement of Accounts). Advantages: No audit required if turnover below Rs. 40 lakhs and contribution below Rs. 25 lakhs.",
+    "category": "business",
+    "related_laws": ["LLP Act, 2008 - Section 7", "LLP Rules, 2009", "LLP Act, 2008 - Section 34-35"]
+  },
+  {
+    "id": 4,
+    "question": "What are the essential clauses in an employment contract in India?",
+    "answer": "Essential clauses in employment contracts: 1) Job title, description, and responsibilities, 2) Compensation structure (salary, allowances, bonuses), 3) Working hours and leave policy, 4) Probation period and confirmation terms, 5) Notice period and termination clauses, 6) Confidentiality and non-disclosure provisions, 7) Non-compete clause (must be reasonable in scope and duration), 8) Intellectual property assignment, 9) Grievance redressal mechanism, 10) Applicable laws and jurisdiction. Note: Non-compete clauses post-employment are generally unenforceable under Section 27 of Indian Contract Act except for sale of goodwill.",
+    "category": "employment",
+    "related_laws": ["Indian Contract Act, 1872 - Section 27", "Shops and Establishments Act (State-specific)", "Industrial Employment (Standing Orders) Act, 1946"]
+  },
+  {
+    "id": 5,
+    "question": "How can an employer legally terminate an employee in India?",
+    "answer": "Legal termination requirements: For workmen under Industrial Disputes Act: 1) Show cause notice, 2) Domestic inquiry for misconduct cases, 3) 30-60 days notice or pay in lieu for retrenchment, 4) Retrenchment compensation (15 days wages per year of service), 5) Government approval for establishments with 100+ workers. For non-workmen: Follow employment contract terms, typically 1-3 months notice. Valid grounds: Misconduct, poor performance (after PIP), redundancy, business closure. Invalid termination leads to reinstatement with back wages. Always document performance issues and follow due process.",
+    "category": "employment",
+    "related_laws": ["Industrial Disputes Act, 1947 - Section 25F, 25N", "Shops and Establishments Act", "Indian Contract Act, 1872"]
+  },
+  {
+    "id": 6,
+    "question": "What is the procedure to purchase property in India?",
+    "answer": "Property purchase procedure: 1) Verify title documents (chain of ownership for 30+ years), 2) Check Encumbrance Certificate (EC) for past 13-30 years, 3) Verify approved building plan and completion certificate, 4) Check property tax receipts, 5) Draft and execute Sale Agreement with token advance (10-20%), 6) Apply for home loan if needed, 7) Pay stamp duty (varies by state, 5-7% typically) and registration charges (1%), 8) Execute Sale Deed and register at Sub-Registrar office, 9) Mutation in municipal records, 10) Obtain possession. For agricultural land, check conversion status and state-specific restrictions on non-agriculturists.",
+    "category": "property",
+    "related_laws": ["Transfer of Property Act, 1882 - Section 54", "Registration Act, 1908 - Section 17", "Indian Stamp Act, 1899", "RERA, 2016"]
+  },
+  {
+    "id": 7,
+    "question": "What is RERA and how does it protect property buyers?",
+    "answer": "RERA (Real Estate Regulation and Development Act, 2016) protects homebuyers by: 1) Mandatory project registration before advertising/selling, 2) Developers must deposit 70% of project funds in escrow account, 3) Buyers entitled to claim refund with interest for delays beyond agreement date, 4) Structural defect warranty for 5 years, 5) Carpet area-based selling mandatory, 6) Ban on changes to approved plans without consent, 7) Establishment of Real Estate Appellate Tribunal for dispute resolution. Complaint filing: Online through state RERA website. Timeline: Orders within 60 days. Penalties: Up to 10% of project cost for violations.",
+    "category": "property",
+    "related_laws": ["RERA, 2016 - Sections 3, 4, 11, 18", "RERA Rules (State-specific)"]
+  },
+  {
+    "id": 8,
+    "question": "What are the grounds for divorce under Hindu Marriage Act?",
+    "answer": "Grounds for divorce under HMA Section 13: 1) Adultery, 2) Cruelty (physical or mental), 3) Desertion for 2+ continuous years, 4) Conversion to another religion, 5) Unsoundness of mind, 6) Virulent leprosy (rarely used now), 7) Venereal disease in communicable form, 8) Renunciation of world (sanyasa), 9) Not heard alive for 7 years. Additional grounds for wife (Section 13(2)): Husband's rape/sodomy/bestiality, maintenance decree in her favor and no cohabitation for 1 year. Mutual consent divorce (Section 13B): Both parties agree, 6 months cooling period (can be waived by Supreme Court guidelines), minimum 1 year of marriage.",
+    "category": "family",
+    "related_laws": ["Hindu Marriage Act, 1955 - Section 13, 13A, 13B", "Supreme Court Guidelines on 13B cooling period"]
+  },
+  {
+    "id": 9,
+    "question": "How to claim maintenance (alimony) in India?",
+    "answer": "Maintenance claims: 1) Under Section 125 CrPC: Any wife (including Muslim), children, and parents can claim from husband/son. Quick remedy, maximum often limited. 2) Under personal laws: HMA Section 24 (pendente lite) and Section 25 (permanent alimony), amount based on husband's income and wife's needs. 3) Under DV Act 2005: Includes residence rights, monetary relief, covers live-in partners. Factors considered: Spouse's income, standard of living during marriage, wife's earning capacity, custody of children, health conditions. Typical range: 20-25% of husband's income, can go up to 33%. Maintenance continues until remarriage or death.",
+    "category": "family",
+    "related_laws": ["CrPC Section 125", "Hindu Marriage Act - Section 24, 25", "Protection of Women from Domestic Violence Act, 2005", "Hindu Adoption and Maintenance Act, 1956"]
+  },
+  {
+    "id": 10,
+    "question": "How do I file a consumer complaint in India?",
+    "answer": "Consumer complaint filing under Consumer Protection Act, 2019: 1) Identify appropriate forum: District Commission (up to Rs. 1 crore), State Commission (Rs. 1-10 crore), National Commission (above Rs. 10 crore). 2) Draft complaint with: Details of parties, facts, deficiency/defect, relief sought, supporting documents. 3) File online at e-daakhil.nic.in or physically. 4) Pay nominal fees (Rs. 100-5000 based on claim). 5) No lawyer mandatory. Timeline: Admission within 21 days, disposal within 3-5 months. Relief includes: Refund, replacement, compensation, costs. Appeal: Within 30 days to higher forum. Also covers e-commerce transactions.",
+    "category": "consumer",
+    "related_laws": ["Consumer Protection Act, 2019 - Section 34, 35, 58", "Consumer Protection Rules, 2020", "E-Commerce Rules, 2020"]
+  },
+  {
+    "id": 11,
+    "question": "What remedies are available for defective products under Consumer Protection Act?",
+    "answer": "Remedies for defective products: 1) Removal of defects from goods/services, 2) Replacement with new goods of similar description, 3) Return of price paid, 4) Award of compensation for loss/injury suffered, 5) Discontinuation of unfair/restrictive trade practice, 6) Cost of complaint. Product liability (new in 2019 Act): Manufacturer, seller, and service provider liable for defective products causing harm. No need to prove negligence for claims under Rs. 10 lakhs. Punitive damages available for gross negligence. E-commerce platforms also liable for products sold through them if they fail to exercise due diligence.",
+    "category": "consumer",
+    "related_laws": ["Consumer Protection Act, 2019 - Section 39, 84-87", "Consumer Protection (E-Commerce) Rules, 2020"]
+  },
+  {
+    "id": 12,
+    "question": "What constitutes cyber crime and how to report it?",
+    "answer": "Common cyber crimes under IT Act 2000: 1) Hacking (Section 66), 2) Identity theft (Section 66C), 3) Cheating by impersonation (Section 66D), 4) Publishing obscene material (Section 67), 5) Child pornography (Section 67B), 6) Cyber terrorism (Section 66F), 7) Data theft (Section 43). Reporting: File complaint at cybercrime.gov.in (National Cyber Crime Portal) or local cyber cell. Preserve evidence: Screenshots, URLs, emails, transaction details. Timeline: Report within 48 hours for financial frauds for better recovery chances. Banks must credit disputed amount within 10 days if fraud reported within 3 days.",
+    "category": "cyber_crime",
+    "related_laws": ["Information Technology Act, 2000 - Sections 43, 66, 66C, 66D, 67", "IT (Intermediary Guidelines) Rules, 2021", "RBI Circular on Unauthorized Transactions"]
+  },
+  {
+    "id": 13,
+    "question": "How to deal with online harassment and cyberstalking?",
+    "answer": "Legal remedies for online harassment: 1) Section 354D IPC - Stalking (up to 3 years imprisonment), 2) Section 509 IPC - Insulting modesty of woman, 3) Section 67 IT Act - Publishing obscene material, 4) Section 66E IT Act - Privacy violation by publishing private images. Steps: 1) Document evidence (screenshots with timestamps), 2) File complaint on cybercrime.gov.in, 3) Report to social media platform, 4) Approach local police station or cyber cell. For intimate image abuse: IT Act Section 66E carries 3 years imprisonment and Rs. 2 lakh fine. Platforms must remove reported content within 24-72 hours under IT Rules.",
+    "category": "cyber_crime",
+    "related_laws": ["IPC Section 354D, 509, 499-500", "IT Act 2000 - Section 66E, 67", "IT (Intermediary Guidelines) Rules, 2021"]
+  },
+  {
+    "id": 14,
+    "question": "What is the legal remedy for cheque bounce (dishonored cheque)?",
+    "answer": "Section 138 NI Act procedure: 1) Cheque must be presented within validity (3 months from date), 2) Cheque returned unpaid due to insufficient funds or exceeds arrangement, 3) Send legal notice within 30 days of receiving bank memo, demanding payment within 15 days, 4) If payment not made, file complaint within 30 days of notice period expiry. Punishment: Up to 2 years imprisonment and/or fine up to twice the cheque amount. Court: Metropolitan/Judicial Magistrate where cheque was drawn or presented. Interim compensation: Court can order 20% of cheque amount pending trial. Compoundable offense - can settle out of court.",
+    "category": "business",
+    "related_laws": ["Negotiable Instruments Act, 1881 - Section 138, 141, 142, 143", "Supreme Court guidelines on Section 138"]
+  },
+  {
+    "id": 15,
+    "question": "What documents are needed for legal notice in cheque bounce case?",
+    "answer": "Documents required for Section 138 notice: 1) Original dishonored cheque, 2) Bank returning memo stating reason (insufficient funds, payment stopped, etc.), 3) Details of underlying transaction (agreement, invoice, loan document), 4) Complete address of drawer for notice delivery. Legal notice must contain: Particulars of cheque (number, date, amount, bank), date of presentation and dishonor, demand for payment within 15 days, warning of legal action. Notice must be sent through registered post AD or speed post. Keep postal receipts and tracking details. Send to all addresses known of the drawer.",
+    "category": "business",
+    "related_laws": ["NI Act Section 138(b)(c)", "Supreme Court in Damodar S. Prabhu case on compounding"]
+  },
+  {
+    "id": 16,
+    "question": "How do I register for GST in India?",
+    "answer": "GST registration process: 1) Required if turnover exceeds Rs. 40 lakhs (Rs. 20 lakhs for services/special category states), 2) Visit gst.gov.in and fill GST REG-01, 3) Documents: PAN, Aadhaar, business proof, bank details, photos, 4) Verification via OTP/EVC, 5) ARN generated, 6) GSTIN issued within 3-7 working days. Mandatory registration regardless of turnover: Interstate supply, e-commerce operators, casual/non-resident taxable persons, TDS/TCS deductors. Types: Regular (monthly returns), Composition (quarterly, turnover < Rs. 1.5 crore, lower tax). GSTIN is 15-digit state-wise unique number.",
+    "category": "tax",
+    "related_laws": ["CGST Act, 2017 - Section 22, 24, 25", "GST Registration Rules, 2017"]
+  },
+  {
+    "id": 17,
+    "question": "What are the GST return filing requirements?",
+    "answer": "GST return filings: 1) GSTR-1: Outward supplies, monthly (11th) or quarterly (13th), 2) GSTR-3B: Summary return with tax payment, monthly (20th) or quarterly, 3) GSTR-9: Annual return (December 31st), 4) GSTR-9C: Audit reconciliation if turnover > Rs. 5 crore. Quarterly filers: QRMP scheme for turnover < Rs. 5 crore. Penalties: Rs. 50/day (Rs. 20 for nil return), max Rs. 5000 per return. Interest: 18% on late tax payment. Input Tax Credit: Claim on purchases reflected in GSTR-2B. Reconcile 2A/2B regularly to avoid ITC mismatches.",
+    "category": "tax",
+    "related_laws": ["CGST Act, 2017 - Section 37, 39, 44", "GST Return Rules", "CGST Rule 61"]
+  },
+  {
+    "id": 18,
+    "question": "How does TDS work on salary in India?",
+    "answer": "TDS on salary (Section 192): Employer deducts tax at applicable slab rates based on estimated annual income. Process: 1) Employee submits investment proofs (Form 12BB), 2) Employer calculates taxable salary after deductions (80C, 80D, HRA, etc.), 3) TDS deducted monthly, 4) Form 16 issued by June 15. Deductions available: Standard deduction Rs. 50,000, 80C (Rs. 1.5 lakh), 80D (medical insurance), HRA, LTA, NPS. New tax regime: Lower rates but minimal deductions. Employee can switch regimes annually. Employer deposits TDS by 7th of next month. PAN mandatory, else TDS at 20%.",
+    "category": "tax",
+    "related_laws": ["Income Tax Act, 1961 - Section 192, 80C, 80D, 10", "Income Tax Rules - Rule 26B"]
+  },
+  {
+    "id": 19,
+    "question": "What is TDS on payments to professionals and contractors?",
+    "answer": "TDS provisions: 1) Section 194J - Professional/technical services: 10% (2% for call centers), threshold Rs. 30,000/year. 2) Section 194C - Contractor payments: 1% (individuals/HUF) or 2% (others), threshold Rs. 30,000 single/Rs. 1 lakh aggregate. 3) Section 194H - Commission/brokerage: 5%, threshold Rs. 15,000. 4) Section 194I - Rent: 10% (land/building) or 2% (P&M), threshold Rs. 2.4 lakh. No TDS if payee provides 15G/15H (no tax liability). Lower deduction certificate: Apply in Form 13. TDS returns: Form 26Q quarterly. Non-deduction: Expense disallowed + interest 1-1.5% per month.",
+    "category": "tax",
+    "related_laws": ["Income Tax Act - Section 194C, 194H, 194I, 194J", "Income Tax Rules - Form 26Q, 27Q"]
+  },
+  {
+    "id": 20,
+    "question": "How to register a trademark in India?",
+    "answer": "Trademark registration process: 1) Conduct TM search on ipindia.gov.in to check availability, 2) File TM-A application online or through attorney, 3) Classes: Select appropriate class(es) from 45 Nice Classification classes, 4) Government fee: Rs. 4,500 (online, individuals/startups) or Rs. 9,000 (others), 5) Examination: 1-3 months, objections if any, 6) Publication in TM Journal for 4 months opposition period, 7) Registration certificate if no opposition. Duration: 10 years, renewable indefinitely. Protection starts from filing date. Use TM symbol after filing, R symbol after registration. Madrid Protocol available for international registration.",
+    "category": "intellectual_property",
+    "related_laws": ["Trade Marks Act, 1999 - Section 18, 25", "Trade Marks Rules, 2017", "Nice Classification"]
+  },
+  {
+    "id": 21,
+    "question": "How to register copyright in India?",
+    "answer": "Copyright registration: 1) Copyright exists automatically upon creation, registration provides evidence of ownership, 2) File Form XIV at copyright.gov.in with prescribed fee (Rs. 500-5,000 based on work type), 3) Mandatory 30-day waiting period for objections, 4) Examination and registration within 2-3 months. Works covered: Literary, dramatic, musical, artistic, cinematograph films, sound recordings. Duration: Author's lifetime + 60 years. No registration needed for protection, but useful for licensing and infringement suits. International protection through Berne Convention. Software copyright: Registered as literary work.",
+    "category": "intellectual_property",
+    "related_laws": ["Copyright Act, 1957 - Section 13, 22-29, 45", "Copyright Rules, 2013", "Berne Convention"]
+  },
+  {
+    "id": 22,
+    "question": "What are the benefits of MSME registration in India?",
+    "answer": "MSME Udyam registration benefits: 1) Collateral-free loans under CGTMSE scheme up to Rs. 2 crore, 2) Lower interest rates (1-1.5% concession), 3) Priority sector lending, 4) Delayed payment protection - interest at 3x bank rate if buyer delays beyond 45 days, 5) 50% subsidy on patent/trademark registration, 6) Government tender preference (25% procurement from MSMEs), 7) Credit linked capital subsidy (15% on plant & machinery), 8) ISO certification reimbursement, 9) Protection under MSMED Act for delayed payments. Registration: Free, instant on udyamregistration.gov.in with Aadhaar and PAN.",
+    "category": "business",
+    "related_laws": ["MSMED Act, 2006 - Section 15-24", "MSME Development Act", "Public Procurement Policy for MSEs Order, 2012"]
+  },
+  {
+    "id": 23,
+    "question": "What are the benefits under Startup India scheme?",
+    "answer": "Startup India benefits: 1) Tax exemption: 3 consecutive years out of first 10 years under Section 80-IAC, 2) Angel tax exemption for investments up to Rs. 25 crore, 3) Self-certification for 6 labor and 3 environmental laws, 4) Fast-track patent examination (80% rebate on patent fees), 5) Easy winding up within 90 days under Insolvency Code, 6) Fund of Funds access (Rs. 10,000 crore corpus), 7) Government tender exemption from prior experience/turnover criteria. Eligibility: Entity < 10 years old, turnover < Rs. 100 crore, working towards innovation/scalability. Recognition: Apply on startupindia.gov.in with pitch deck.",
+    "category": "business",
+    "related_laws": ["Startup India Action Plan, 2016", "Income Tax Act Section 80-IAC", "DPIIT Recognition Guidelines"]
+  },
+  {
+    "id": 24,
+    "question": "How do I file an FIR at the police station?",
+    "answer": "FIR filing procedure: 1) Visit police station having jurisdiction over place of offense, 2) Provide written or oral complaint to officer in charge, 3) For cognizable offenses, FIR must be registered (Section 154 CrPC), 4) Free of cost - no fee required, 5) Obtain copy of FIR signed by officer. If police refuses: 1) Send written complaint by registered post to SP, 2) Approach Magistrate under Section 156(3) CrPC, 3) File complaint through online portals (e-FIR) in many states. Zero FIR: Can file at any police station regardless of jurisdiction, will be transferred to correct station. Women can give statement at residence. FIR is public document, copies available under RTI.",
+    "category": "criminal",
+    "related_laws": ["CrPC Section 154, 155, 156, 157", "Lalita Kumari v. State of UP (Mandatory FIR)"]
+  },
+  {
+    "id": 25,
+    "question": "What are the types of bail in India?",
+    "answer": "Types of bail: 1) Regular bail (Section 437/439 CrPC): After arrest, from Magistrate or Sessions Court, 2) Anticipatory bail (Section 438 CrPC): Before arrest, apprehension of arrest, from Sessions Court or High Court, 3) Interim bail: Temporary bail pending main bail hearing, 4) Default bail (Section 167(2) CrPC): If chargesheet not filed within 60/90 days (based on offense severity). Bailable offenses: Bail as matter of right. Non-bailable: Court discretion, considering nature of offense, criminal history, flight risk, witness tampering possibility. Conditions: Personal bond, sureties, passport surrender, regular appearance. Bail bond: Financial guarantee, forfeited if conditions violated.",
+    "category": "criminal",
+    "related_laws": ["CrPC Section 436, 437, 438, 439, 167(2)", "Arnesh Kumar guidelines on arrest"]
+  },
+  {
+    "id": 26,
+    "question": "When can police arrest without warrant?",
+    "answer": "Arrest without warrant (Section 41 CrPC): 1) Cognizable offense committed in police presence, 2) Against whom reasonable complaint/credible information exists, 3) Proclaimed offender, 4) Possession of stolen property, 5) Obstruction of police duty, 6) Escapee from custody, 7) Deserter from armed forces. Arnesh Kumar guidelines (mandatory for offenses < 7 years punishment): 1) Arrest only if necessary to prevent tampering, ensure appearance, 2) Reasons to be recorded in writing, 3) Magistrate must verify compliance. Women: Cannot be arrested after sunset and before sunrise except in exceptional circumstances with written approval from Magistrate.",
+    "category": "criminal",
+    "related_laws": ["CrPC Section 41, 46, 50, 51", "Arnesh Kumar v. State of Bihar (2014)", "D.K. Basu guidelines"]
+  },
+  {
+    "id": 27,
+    "question": "How do I file an RTI application?",
+    "answer": "RTI filing procedure: 1) Write application to Public Information Officer (PIO) of concerned department, 2) Can be in English, Hindi, or official state language, 3) Fee: Rs. 10 (postal order, DD, cash, or online for central govt at rtionline.gov.in), 4) BPL applicants exempt from fee. Application content: Specific questions, not vague requests. Response time: 30 days (48 hours if life/liberty involved). First Appeal: To Appellate Authority within 30 days of response/non-response. Second Appeal: To Information Commission within 90 days. Penalty on PIO: Rs. 250/day up to Rs. 25,000 for unjustified denial. Exemptions: Section 8 covers national security, cabinet papers, personal privacy, etc.",
+    "category": "administrative",
+    "related_laws": ["RTI Act, 2005 - Section 6, 7, 8, 19", "RTI Rules, 2012"]
+  },
+  {
+    "id": 28,
+    "question": "What information is exempt from RTI disclosure?",
+    "answer": "Section 8 RTI exemptions: 1) National security/sovereignty/scientific/economic interests, 2) Information forbidden by court/tribunal, 3) Breach of parliamentary/legislative privilege, 4) Commercial confidence/trade secrets (unless larger public interest), 5) Information in fiduciary relationship, 6) Information from foreign government, 7) Life/safety endangerment of person, 8) Investigation/prosecution impediment, 9) Cabinet papers (after decision taken, can be disclosed), 10) Personal information with no public interest. Section 9: Copyright infringement. Note: No blanket exemption - authority must show specific harm. Public interest override available for most exemptions.",
+    "category": "administrative",
+    "related_laws": ["RTI Act, 2005 - Section 8, 9, 11", "CIC/SIC Decisions on exemptions"]
+  },
+  {
+    "id": 29,
+    "question": "What is the punishment for domestic violence in India?",
+    "answer": "Domestic Violence Act 2005 remedies (civil): 1) Protection orders (prohibiting abuse, contact, alienation of assets), 2) Residence orders (right to live in shared household), 3) Monetary relief (maintenance, compensation, medical expenses), 4) Custody orders for children, 5) Compensation for injuries. Criminal provisions: Section 498A IPC - Cruelty by husband/relatives (3 years imprisonment). Procedure: File complaint before Magistrate or through Protection Officer/Service Provider. No arrest merely on complaint (SC guidelines). Dowry death: Section 304B IPC (7 years to life). Dowry harassment: Section 406 IPC (criminal breach of trust). File within 3 years of act.",
+    "category": "family",
+    "related_laws": ["Protection of Women from Domestic Violence Act, 2005", "IPC Section 498A, 304B, 406", "Dowry Prohibition Act, 1961"]
+  },
+  {
+    "id": 30,
+    "question": "How to get child custody in divorce?",
+    "answer": "Child custody principles: 1) Welfare of child is paramount consideration, 2) Mother generally preferred for children under 5 (tender years doctrine), 3) Child's preference considered if mature enough (usually 9+), 4) Financial capacity, moral character, stability considered. Types: Physical custody (residence), legal custody (decision-making). Joint custody increasingly favored. Visitation rights for non-custodial parent. Guardian and Wards Act 1890 applies for Hindus, Muslims, Christians. Custody orders can be modified if circumstances change. International cases: Hague Convention on Child Abduction (India not signatory, but courts consider comity). Parental alienation increasingly recognized.",
+    "category": "family",
+    "related_laws": ["Hindu Minority and Guardianship Act, 1956", "Guardians and Wards Act, 1890", "HMA Section 26", "Child Welfare Principles"]
+  },
+  {
+    "id": 31,
+    "question": "What is anticipatory bail and when can it be granted?",
+    "answer": "Anticipatory bail (Section 438 CrPC): Pre-arrest bail when person apprehends arrest for non-bailable offense. Requirements: Reasonable belief of arrest, not speculative. Filing: Sessions Court or High Court. Grounds considered: 1) Nature and gravity of accusation, 2) Applicant's antecedents, 3) Possibility of fleeing, 4) Accusation made to injure/humiliate (mala fide). Conditions: Surrender passport, regular appearance, cooperation in investigation. Duration: Until end of trial (Sushila Aggarwal case). Not available: In certain offenses like SC/ST Act, POCSO (with restrictions). Interim protection usually granted for 2-3 weeks pending final hearing. Transit bail: When person is in different jurisdiction.",
+    "category": "criminal",
+    "related_laws": ["CrPC Section 438", "Sushila Aggarwal v. State (2020)", "Gurbaksh Singh Sibbia case"]
+  },
+  {
+    "id": 32,
+    "question": "How to recover money from a defaulting debtor?",
+    "answer": "Money recovery options: 1) Legal notice under Section 80 CPC before suing government, advocate notice for others, 2) Summary suit (Order 37 CPC) for bills of exchange, written contracts - faster process, 3) Regular money suit in civil court, 4) Insolvency proceedings (IBC for companies/LLPs, provincial acts for individuals), 5) Arbitration if contract has arbitration clause. Court fees: Ad valorem based on claim amount. Limitation: 3 years from date of default. Execution of decree: Attachment of property, arrest, sale of assets. For cheque bounce: Section 138 NI Act (criminal prosecution). For secured debts: SARFAESI Act allows banks to recover without court.",
+    "category": "business",
+    "related_laws": ["CPC Order 37", "Limitation Act, 1963", "IBC, 2016", "SARFAESI Act, 2002", "NI Act Section 138"]
+  },
+  {
+    "id": 33,
+    "question": "What is the process for property partition among Hindu family members?",
+    "answer": "Hindu partition: 1) All coparceners (joint family members) have equal rights in ancestral property, 2) Self-acquired property: Owner's discretion during lifetime, 3) Partition can be: Mutual agreement (partition deed, registered), or court decree. 2005 Amendment: Daughters have equal coparcenary rights by birth. Partition suit: File in civil court where property is located. Relief: Declaration of share, separate possession, accounts. Mesne profits can be claimed for wrongful possession. Preliminary decree first (shares declared), then final decree (actual division). Family settlement: Alternative to litigation, must be bona fide. Partial partition possible for some members.",
+    "category": "property",
+    "related_laws": ["Hindu Succession Act, 1956 - Section 6", "2005 Amendment", "CPC Order 20 Rule 18", "Partition Act, 1893"]
+  },
+  {
+    "id": 34,
+    "question": "How does succession work if someone dies without a will?",
+    "answer": "Intestate succession (no will): Hindus: Hindu Succession Act - Class I heirs (spouse, children, mother) inherit equally, then Class II. 2005 amendment: Daughters equal share in ancestral property. Muslims: Personal law - Sons get double daughters' share, wife gets 1/4 (no children) or 1/8 (with children). Christians and Parsis: Indian Succession Act - Equal share among widow and children. Succession certificate: Required from civil court for movable property, bank accounts. Legal heir certificate: From tehsildar for government dues. Property mutation: Change records at tehsil/municipal office. Probate: Required for will in some states (Mumbai, Kolkata, Chennai).",
+    "category": "property",
+    "related_laws": ["Hindu Succession Act, 1956", "Indian Succession Act, 1925", "Muslim Personal Law (Shariat) Application Act, 1937"]
+  },
+  {
+    "id": 35,
+    "question": "What is the punishment for defamation in India?",
+    "answer": "Defamation provisions: Criminal (IPC 499-500): Imprisonment up to 2 years and/or fine. Exceptions: Truth for public good, fair comment, good faith reports. Civil: Suit for damages and injunction. Defenses: Truth, fair comment, privilege (judicial/parliamentary proceedings). Corporate defamation: Only civil remedy after SC ruling. Online defamation: IT Act provisions also apply. Limitation: Criminal - 3 years, Civil - 1 year. Recent developments: Criminal defamation upheld by SC in Subramanian Swamy case. Sedition (Section 124A IPC) increasingly challenged - under review. SLAPP suits (Strategic Lawsuits Against Public Participation) being criticized.",
+    "category": "criminal",
+    "related_laws": ["IPC Section 499, 500, 501, 502", "Subramanian Swamy v. Union of India (2016)", "IT Act provisions"]
+  },
+  {
+    "id": 36,
+    "question": "What are the labor law compliance requirements for startups?",
+    "answer": "Key labor compliances for startups: 1) Shops & Establishments Act registration (state-specific), 2) PF registration if 20+ employees (or voluntary), contribution 12% each by employer/employee, 3) ESI registration if 10+ employees and wages < Rs. 21,000, contribution 3.25% employer + 0.75% employee, 4) Professional Tax (state-specific, monthly deduction), 5) Gratuity: Applicable after 5 years service, 15 days wages per year. 6) Bonus: Mandatory if salary < Rs. 21,000, minimum 8.33%. Labour Code reforms (2020): Four consolidated codes pending implementation. Startup India: Self-certification for 6 labor laws for 5 years. Gig workers: New regulations emerging.",
+    "category": "employment",
+    "related_laws": ["EPF Act, 1952", "ESI Act, 1948", "Payment of Gratuity Act, 1972", "Payment of Bonus Act, 1965", "Shops and Establishments Acts (State)"]
+  },
+  {
+    "id": 37,
+    "question": "How to handle sexual harassment at workplace?",
+    "answer": "POSH Act compliance: 1) Internal Complaints Committee (ICC) mandatory if 10+ employees, 2) At least 4 members, 50% women, presiding officer is senior woman, one external member, 3) Local Committee for smaller organizations. Complaint procedure: Written complaint within 3 months (extendable by 3 months), inquiry completed in 90 days, report within 10 days. Reliefs: Transfer, leave, compensation, termination of accused. Employer duties: Display policy, conduct awareness programs, annual report to district officer. Penalties: Rs. 50,000 fine for non-compliance, license cancellation on repeat offense. Anonymous complaints not maintainable. False complaints also penalized.",
+    "category": "employment",
+    "related_laws": ["Sexual Harassment of Women at Workplace (Prevention, Prohibition and Redressal) Act, 2013", "POSH Rules, 2013", "Vishaka Guidelines"]
+  },
+  {
+    "id": 38,
+    "question": "What documents are required for property registration in India?",
+    "answer": "Property registration documents: 1) Sale deed/conveyance deed (on stamp paper of requisite value), 2) Original title deed/chain documents of seller, 3) Encumbrance Certificate (EC) for 13-30 years, 4) Property tax receipts, 5) Approved building plan and completion/occupancy certificate, 6) NOC from society/housing board if applicable, 7) Power of Attorney if signing through representative, 8) PAN cards and Aadhaar of both parties, 9) Passport photos, 10) TDS certificate (1% if property value > Rs. 50 lakhs). Process: Calculate stamp duty, pay online, book appointment at SRO, biometric verification, document scanning and registration. Collect registered document within specified days.",
+    "category": "property",
+    "related_laws": ["Registration Act, 1908", "Indian Stamp Act, 1899", "State Stamp Acts", "Income Tax Section 194-IA (TDS)"]
+  },
+  {
+    "id": 39,
+    "question": "What is the punishment for cheating under IPC?",
+    "answer": "Cheating provisions: Section 415 IPC - Definition: Deception to deliver property, induce to do/omit. Section 420 IPC - Cheating causing wrongful gain/loss: Imprisonment up to 7 years + fine. Related offenses: Section 406 - Criminal breach of trust (3 years), Section 419 - Cheating by impersonation (3 years), Section 467 - Forgery of valuable security (life/10 years). Online cheating: IT Act Section 66D (impersonation, 3 years). Filing: FIR at police station or complaint before Magistrate. Cognizable and non-bailable. Compoundable with court permission. Civil remedy (damages) can run parallel to criminal case. Limitation: 3 years from discovery of fraud.",
+    "category": "criminal",
+    "related_laws": ["IPC Section 415, 417, 418, 419, 420", "IT Act Section 66D", "CrPC for procedure"]
+  },
+  {
+    "id": 40,
+    "question": "How to draft a valid will in India?",
+    "answer": "Will requirements (Indian Succession Act): 1) Testator must be major and of sound mind, 2) Written document (typed or handwritten), 3) Signed by testator at end, 4) Attested by 2 or more witnesses (sign in presence of testator and each other), 5) Witnesses should not be beneficiaries. Registration: Optional but recommended (prevents tampering, establishes date). Revocation: By later will/codicil, burning/destroying with intention, implied by marriage (for Christians). Special wills: Privileged will (soldiers/airmen/mariners - verbal permitted). Muslim law: Max 1/3 property by will, cannot exceed heirs' shares. Hindu: Can bequeath entire self-acquired property. Probate: Required in some states for will execution.",
+    "category": "property",
+    "related_laws": ["Indian Succession Act, 1925 - Part VI", "Hindu Succession Act, 1956", "Muslim Personal Law"]
+  },
+  {
+    "id": 41,
+    "question": "What is the process for mutual consent divorce?",
+    "answer": "Mutual consent divorce (HMA Section 13B): 1) Joint petition stating living separately for 1+ year, unable to reconcile, mutually agreed to dissolve, 2) First motion: Joint filing before Family Court, 3) Cooling period: 6 months (can be waived as per Amardeep Singh case if marriage irretrievably broken), 4) Second motion: Within 18 months of first motion, 5) Court satisfied about consent and terms, 6) Decree granted. Settlement terms included: Maintenance, property division, child custody/visitation, return of gifts/streedhan. Both parties must appear personally. No appeal lies against mutual consent decree. One party can withdraw consent before second motion.",
+    "category": "family",
+    "related_laws": ["Hindu Marriage Act Section 13B", "Amardeep Singh v. Harveen Kaur (2017) - Cooling period waiver", "Family Courts Act, 1984"]
+  },
+  {
+    "id": 42,
+    "question": "What are the regulations for e-commerce businesses in India?",
+    "answer": "E-commerce regulations: 1) Consumer Protection (E-Commerce) Rules, 2020: Mandatory registration, clear return/refund policy, grievance officer appointment, no flash sales manipulating prices, no preferential seller treatment. 2) FDI Policy: Marketplace model allowed 100% FDI, inventory model prohibited for foreign-owned entities. 3) IT Rules 2021: Due diligence, content moderation, significant social media intermediary (50 lakh users) additional compliance. 4) Legal Metrology: MRP display, net quantity declaration. 5) GST: Mandatory registration regardless of turnover for e-commerce operators, TCS collection 1%. 6) Data Protection: Consent, purpose limitation (DPDP Act 2023).",
+    "category": "business",
+    "related_laws": ["Consumer Protection (E-Commerce) Rules, 2020", "IT Rules, 2021", "FDI Policy", "DPDP Act, 2023", "Legal Metrology Act, 2009"]
+  },
+  {
+    "id": 43,
+    "question": "How to resolve a landlord-tenant dispute?",
+    "answer": "Landlord-tenant dispute resolution: 1) Rent Control Acts (state-specific) govern old tenancies - eviction only on specified grounds (non-payment, personal need, misuse), 2) Transfer of Property Act applies to non-controlled premises. Eviction grounds: Default in rent, subletting without consent, causing nuisance, bona fide personal requirement. Procedure: Notice as per agreement/Act, file eviction suit in civil court/Rent Controller. Tenant rights: Cannot be evicted without due process, receipt for rent paid. Landlord rights: Reasonable rent increase, inspection, repairs. Alternative: Negotiation, mediation before litigation. Standard rent: Can be fixed by Rent Court. Mesne profits claimable for overstay.",
+    "category": "property",
+    "related_laws": ["Transfer of Property Act, 1882", "State Rent Control Acts", "Model Tenancy Act, 2021"]
+  },
+  {
+    "id": 44,
+    "question": "What is the law on medical negligence in India?",
+    "answer": "Medical negligence: Duty of care + breach + causation + damage. Standards: Bolam test - doctor must exercise reasonable skill of ordinary competent practitioner. Criminal liability (IPC 304A): Rashness/negligence causing death - 2 years imprisonment. Gross negligence required. Civil remedy: Consumer forum complaint (service deficiency), civil suit for damages. Filing: Consumer forum within 2 years, unlimited compensation in civil court. Medical Council: Disciplinary action, license suspension/cancellation. Hospitals also vicariously liable. Res ipsa loquitur applies when negligence obvious. Informed consent mandatory - lack thereof is assault. Indian Medical Council (Professional Conduct) Regulations, 2002 guide standards.",
+    "category": "consumer",
+    "related_laws": ["Consumer Protection Act, 2019", "IPC Section 304A, 338", "Indian Medical Council Regulations", "Bolam v. Friern Hospital (standard)"]
+  },
+  {
+    "id": 45,
+    "question": "What is the procedure for adoption in India?",
+    "answer": "Adoption procedures: Hindus: Hindu Adoption and Maintenance Act, 1956 - deed of adoption, preferably registered. Requirements: Adopter must not have son/daughter of same sex (rule relaxed for unwed mothers). Others (or inter-country): Juvenile Justice Act 2015 + CARA (Central Adoption Resource Authority) guidelines. Process: Register on CARA portal, home study by adoption agency, child referral, acceptance, court order, birth certificate. Age limits: Single adopter 55 years max, couple's composite age max 110 years for 0-4 year child. Waiting period: 1-3 years depending on child category. Inter-country: Additional clearances, Hague Convention compliance.",
+    "category": "family",
+    "related_laws": ["Hindu Adoption and Maintenance Act, 1956", "Juvenile Justice (Care and Protection of Children) Act, 2015", "CARA Guidelines", "Hague Convention on Inter-country Adoption"]
+  },
+  {
+    "id": 46,
+    "question": "How to protect a business idea or trade secret?",
+    "answer": "Trade secret protection (no specific Indian law): 1) Identify confidential information, 2) Implement security measures (access controls, encryption), 3) Non-Disclosure Agreements (NDAs) with employees, contractors, partners, 4) Non-compete clauses (post-employment generally void under Section 27 Contract Act, but can include garden leave), 5) Employment contracts with IP assignment clauses. Remedies for breach: Injunction, damages, account of profits under contract law, tort of breach of confidence. For software: Copyright protection automatic, consider patent if novel technical solution. Database protection through copyright in compilation. Document everything for evidence.",
+    "category": "intellectual_property",
+    "related_laws": ["Indian Contract Act, 1872 - Section 27", "Information Technology Act, 2000", "Copyright Act, 1957", "Common law principles of breach of confidence"]
+  },
+  {
+    "id": 47,
+    "question": "What are the provisions for maternity and paternity leave in India?",
+    "answer": "Maternity leave (Maternity Benefit Act, 1961 amended 2017): 26 weeks paid leave for first two children (8 weeks pre-delivery), 12 weeks for third+ child. Eligibility: 80 days work in preceding 12 months. Adoptive/commissioning mothers: 12 weeks from date of receiving child (below 3 months age). Work from home: Option after 26 weeks if nature of work permits. Creche: Mandatory for 50+ employees. Paternity leave: No statutory provision in private sector, 15 days for Central Government employees. Some companies voluntarily provide 1-4 weeks. Dismissal during maternity leave prohibited. Benefits at average daily wage rate.",
+    "category": "employment",
+    "related_laws": ["Maternity Benefit Act, 1961 (amended 2017)", "Central Civil Services (Leave) Rules for government employees", "Code on Social Security, 2020"]
+  },
+  {
+    "id": 48,
+    "question": "How to deal with insurance claim rejection?",
+    "answer": "Insurance claim rejection remedies: 1) Internal grievance: Write to insurer's grievance cell within 30 days of rejection, 2) IRDAI IGMS portal: Escalate if unresolved, 3) Insurance Ombudsman: For claims up to Rs. 30 lakhs (no lawyer needed, free), 4) Consumer forum: File complaint as service deficiency, 5) Civil court: For complex disputes. Common rejection reasons: Non-disclosure, policy exclusions, lapse in premium, delay in intimation. Insurer must give written reasons for rejection. Limitation: 3 years from date of rejection. IRDAI regulations mandate settlement within 30 days of complete documentation. Surveyors' report can be challenged. Death claims: Nominee entitled, insurer cannot reject after 3 years on grounds of misrepresentation.",
+    "category": "consumer",
+    "related_laws": ["Insurance Act, 1938 - Section 45", "IRDAI Regulations", "Consumer Protection Act, 2019", "Insurance Ombudsman Rules, 2017"]
+  },
+  {
+    "id": 49,
+    "question": "What is the procedure for company winding up?",
+    "answer": "Company winding up options: 1) Voluntary liquidation (Solvent): Board resolution, 75% shareholders approval, declaration of solvency, appoint liquidator, complete within 1 year. 2) Voluntary liquidation (Insolvent): Under IBC, creditors' approval, resolution professional appointed. 3) Compulsory winding up: NCLT orders on grounds like inability to pay debts, just and equitable. 4) Strike off (non-operational): Apply to ROC using STK-2 form if no business for 2 years. Fast track exit: For defunct companies under Rs. 25 lakh assets. Process: Realize assets, pay creditors in priority order, distribute surplus to shareholders. Final accounts and dissolution application. Timeline: 6 months to 2 years.",
+    "category": "business",
+    "related_laws": ["Companies Act, 2013 - Section 270-365", "Insolvency and Bankruptcy Code, 2016", "Companies (Winding Up) Rules, 2020"]
+  },
+  {
+    "id": 50,
+    "question": "What are the legal requirements for hiring foreign employees in India?",
+    "answer": "Foreign employee hiring: 1) Employment visa: Required for all paid employment, issued for specific employer, extendable. 2) FRRO registration: Within 14 days of arrival if stay exceeds 180 days. 3) PAN card: Mandatory for tax purposes. 4) Tax residency: Resident if 182+ days in India or 60 days + 365 days in preceding 4 years. 5) Social security: If totalization agreement exists with home country (SSA), exemption possible. 6) No restriction on sectors (except some sensitive areas). 7) Minimum salary: Generally expected commensurate with qualifications. Work permit: Not separate document, employment visa serves purpose. Company obligations: Report joining/exit to FRRO, maintain records.",
+    "category": "employment",
+    "related_laws": ["Foreigners Act, 1946", "Visa Manual - Ministry of Home Affairs", "Income Tax Act provisions for NRs", "Social Security Agreements"]
+  },
+  {
+    "id": 51,
+    "question": "How to file a PIL (Public Interest Litigation) in India?",
+    "answer": "PIL filing procedure: 1) Identify public interest issue affecting class of people or public at large, 2) Draft petition with facts, legal grounds, relief sought, 3) File before High Court (Article 226) or Supreme Court (Article 32). No court fee typically. Standing: Any public-spirited person, not just aggrieved party. Grounds: Fundamental rights violation, environmental protection, consumer rights, government inaction. Court can dismiss frivolous PILs with costs. Recent restrictions on misuse - SC imposed costs for motivated PILs. Pro bono lawyers often assist. Affidavit required affirming facts. E-filing available in most High Courts. SC entertains only after HC remedy exhausted typically.",
+    "category": "administrative",
+    "related_laws": ["Constitution of India - Article 32, 226", "Supreme Court Rules on PIL", "High Court PIL Rules"]
+  },
+  {
+    "id": 52,
+    "question": "What is the procedure for appeal in criminal cases?",
+    "answer": "Criminal appeals: 1) From Magistrate: To Sessions Court (Section 374), within 30 days. 2) From Sessions Court: To High Court (Section 374), within 60 days (from conviction)/90 days (from sentence). 3) From High Court: To Supreme Court under Article 134 (as of right if death sentence or HC reversed acquittal to conviction), otherwise Special Leave Petition under Article 136. Grounds: Error in law/fact, sentence excessive, new evidence. Acquittal appeals: State can appeal against acquittal. Stay of sentence: Apply along with appeal. Suspended sentence pending appeal common except in serious cases. Revision (Section 397-401): Against interlocutory orders, limited scope compared to appeal.",
+    "category": "criminal",
+    "related_laws": ["CrPC Section 372-394", "Constitution Article 134, 136", "Limitation Act for appeal periods"]
+  },
+  {
+    "id": 53,
+    "question": "What is the law on bounced cheque for insufficient funds vs stop payment?",
+    "answer": "Section 138 NI Act applies to both: 1) Insufficient funds: Direct liability under Section 138. 2) Stop payment: If instructions given with intent to not honor valid debt, still liable. Defense: Stop payment for valid reasons (goods not delivered, services deficient) - mixed judicial views, accused must prove. Key difference: In stop payment, burden shifts to drawer to show legitimate reason. Amount exceeds arrangement with bank: Also covered under Section 138. Post-dated cheques: If presented on/after date mentioned and dishonored, Section 138 applies. Drawer must show cheque not issued for debt/liability - difficult to prove after issuing cheque.",
+    "category": "business",
+    "related_laws": ["NI Act Section 138, 139", "Supreme Court in MMTC Ltd v. Medchl Chemicals (Stop payment)", "Dashrath Rupsingh Rathod case (jurisdiction)"]
+  },
+  {
+    "id": 54,
+    "question": "How to protect against identity theft in India?",
+    "answer": "Identity theft protection and remedies: Prevention: 1) Secure personal documents, 2) Strong passwords, 2FA, 3) Monitor credit reports (CIBIL), 4) Freeze credit if suspicious activity. Legal remedies: IT Act Section 66C - Identity theft (3 years + Rs. 1 lakh fine). Filing: Report at cybercrime.gov.in immediately. For financial fraud: Inform bank within 3 days for zero liability. Freeze accounts, dispute unauthorized transactions. For SIM cloning: Report to telecom operator and police. Credit report dispute: Write to credit bureau, they must respond in 30 days. Data protection: DPDP Act 2023 gives right to correction/erasure. Document all communications and evidence.",
+    "category": "cyber_crime",
+    "related_laws": ["IT Act Section 66C, 66D", "RBI Circular on Unauthorized Transactions", "Digital Personal Data Protection Act, 2023", "Indian Contract Act (fraudulent misrepresentation)"]
+  },
+  {
+    "id": 55,
+    "question": "What are the penalties for tax evasion in India?",
+    "answer": "Tax evasion penalties: Income Tax: 1) Section 270A: Under-reporting - 50% of tax, misreporting - 200% of tax. 2) Section 276C: Willful evasion - 6 months to 7 years + fine (based on amount). 3) Section 271F: Non-filing of return - Rs. 5,000-10,000. GST: 1) Section 122: Penalty up to Rs. 25,000 or tax amount. 2) Section 132: Fraud/fake invoices - imprisonment up to 5 years. Benami transactions: Penalty 25% of FMV, confiscation. Black money: Foreign undisclosed income - 120% tax + 90% penalty. Prosecution: For evasion exceeding Rs. 25 lakhs (IT), Rs. 5 crore (GST). Voluntary disclosure schemes periodically offered. Income tax search and seizure (raids) for suspected evasion.",
+    "category": "tax",
+    "related_laws": ["Income Tax Act - Section 270A, 271, 276C", "CGST Act - Section 122, 132", "Benami Transactions (Prohibition) Act, 1988", "Black Money Act, 2015"]
+  },
+  {
+    "id": 56,
+    "question": "What is the process for patent registration in India?",
+    "answer": "Patent registration process: 1) Patentability check: Novel, inventive step, capable of industrial application. 2) File application (Form 1) with complete specification or provisional specification. 3) Publication: 18 months from priority date (or request early publication). 4) Examination request: Within 48 months. 5) First Examination Report (FER): 6-12 months. 6) Response to objections: Within 6 months. 7) Grant and publication. Fees: Rs. 4,000-8,000 (filing) + examination fees. Duration: 20 years from filing date. Excluded: Mathematical methods, business methods, computer programs per se (software with technical effect may qualify), plants/animals. PCT route available for international applications. Annual renewal fees mandatory.",
+    "category": "intellectual_property",
+    "related_laws": ["Patents Act, 1970 (amended 2005)", "Patents Rules, 2003", "TRIPS Agreement compliance"]
+  },
+  {
+    "id": 57,
+    "question": "How to deal with inheritance disputes between legal heirs?",
+    "answer": "Inheritance dispute resolution: 1) Family settlement: Written agreement, preferably registered, between all legal heirs. No stamp duty typically. 2) Partition suit: File in civil court where property located, seek declaration of shares and division. 3) Declaratory suit: When title disputed. 4) Succession certificate: For movable property from civil court. 5) Letters of Administration: When no will exists. Limitation: 12 years for possession, 3 years for declaration. Evidence needed: Death certificate, proof of relationship, property documents. Mediation (Lok Adalat): Often effective and faster. Will contests: File caveat against probate if suspecting fraud/undue influence. Costs: Court fees based on property value.",
+    "category": "property",
+    "related_laws": ["Hindu Succession Act, 1956", "Indian Succession Act, 1925", "Limitation Act, 1963", "Specific Relief Act, 1963"]
+  },
+  {
+    "id": 58,
+    "question": "What are the legal requirements for online payment gateways?",
+    "answer": "Payment gateway compliance: 1) RBI authorization: Payment Aggregators need PA license from RBI. 2) PCI-DSS certification: Card data security standard. 3) Data localization: Payment data must be stored in India. 4) KYC: Customer verification as per RBI norms. 5) Nodal account: For holding merchant funds. 6) Escrow mechanism: T+1 settlement to merchants. 7) Grievance redressal: Mandatory mechanism. 8) Cyber security: Per RBI guidelines, incident reporting within 6 hours. 9) Transaction limits: Based on license category. 10) Information security audit: Annual requirement. PPI guidelines for wallets: KYC-based limits (full KYC Rs. 2 lakh, minimum KYC Rs. 10,000). Merchant onboarding due diligence mandatory.",
+    "category": "business",
+    "related_laws": ["Payment and Settlement Systems Act, 2007", "RBI Payment Aggregator Guidelines, 2020", "Data Localization Circular, 2018", "PCI-DSS Standards"]
+  },
+  {
+    "id": 59,
+    "question": "What is the remedy for wrongful termination of employment?",
+    "answer": "Wrongful termination remedies: For workmen (Industrial Disputes Act): 1) Raise dispute through union or individually, 2) Conciliation before Labor Officer, 3) If unresolved, referral to Labor Court/Industrial Tribunal. Relief: Reinstatement with full back wages (up to 2 years limitation). For non-workmen: Civil suit for breach of contract - damages (notice period salary, earned benefits), specific performance rare. Consumer forum: Not applicable typically. Protective statutes: Whistleblower protection, maternity leave protection. Documentation crucial: Appointment letter, performance records, termination letter. Stigma damages recognized in some cases. Senior executives: Often governed by contractual terms including severance packages.",
+    "category": "employment",
+    "related_laws": ["Industrial Disputes Act, 1947 - Section 2A, 25F, 25G, 25N", "Indian Contract Act, 1872", "Specific Relief Act, 1963"]
+  },
+  {
+    "id": 60,
+    "question": "What is the law on prenuptial agreements in India?",
+    "answer": "Prenuptial agreements in India: Legal status unclear - not specifically recognized or prohibited. Courts generally hesitant to enforce provisions that: 1) Determine maintenance/alimony (public policy concern), 2) Preempt divorce grounds, 3) Affect custody rights. Enforceable aspects may include: Property division of pre-marital assets, business interests protection. Courts may consider as evidence of parties' intention but not binding. Alternative: Separate property ownership documentation, business structures (trusts), nomination changes. Hindu/Muslim law: No statutory provision for prenups. Special Marriage Act couples: Slightly more flexibility. Recommended: Get legal advice, notarize agreement, keep reasonable terms.",
+    "category": "family",
+    "related_laws": ["Indian Contract Act, 1872 - Section 23 (public policy)", "Hindu Marriage Act, 1955", "Special Marriage Act, 1954", "Case law: Krishna Kumar v. Khaitan"]
+  }
+]

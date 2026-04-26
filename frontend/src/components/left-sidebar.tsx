@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -14,29 +14,192 @@ import {
   Plus,
   Trash2,
   MessageSquare,
+  MoreHorizontal,
+  Pencil,
+  Check,
+  X,
+  Archive,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useChatOptional } from "@/app/dashboard/chat/chat-context";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-
-const gettingStartedItems = [
-  'Try: "Find Supreme Court c...',
-  "Learn to draft a legal notic...",
-  "Watch: How we ensure cit...",
-];
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import type { Conversation } from "@/types/chat";
 
 interface LeftSidebarProps {
   collapsed?: boolean;
   onToggle?: () => void;
 }
 
+// Helper to group conversations by time
+function groupConversationsByTime(conversations: Conversation[]) {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+  const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const lastMonth = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+  const groups: { label: string; conversations: Conversation[] }[] = [
+    { label: "Today", conversations: [] },
+    { label: "Yesterday", conversations: [] },
+    { label: "Previous 7 days", conversations: [] },
+    { label: "Previous 30 days", conversations: [] },
+    { label: "Older", conversations: [] },
+  ];
+
+  conversations.forEach((conv) => {
+    const date = new Date(conv.updatedAt);
+    if (date >= today) {
+      groups[0].conversations.push(conv);
+    } else if (date >= yesterday) {
+      groups[1].conversations.push(conv);
+    } else if (date >= lastWeek) {
+      groups[2].conversations.push(conv);
+    } else if (date >= lastMonth) {
+      groups[3].conversations.push(conv);
+    } else {
+      groups[4].conversations.push(conv);
+    }
+  });
+
+  return groups.filter((g) => g.conversations.length > 0);
+}
+
+// Conversation item component with rename functionality
+function ConversationItem({
+  conv,
+  isActive,
+  onSelect,
+  onDelete,
+  onRename,
+}: {
+  conv: Conversation;
+  isActive: boolean;
+  onSelect: () => void;
+  onDelete: () => void;
+  onRename: (newTitle: string) => void;
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState(conv.title);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
+
+  const handleSave = () => {
+    if (editTitle.trim()) {
+      onRename(editTitle.trim());
+    }
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setEditTitle(conv.title);
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSave();
+    } else if (e.key === "Escape") {
+      handleCancel();
+    }
+  };
+
+  if (isEditing) {
+    return (
+      <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/50">
+        <MessageSquare className="h-4 w-4 flex-shrink-0 text-primary/60" />
+        <input
+          ref={inputRef}
+          type="text"
+          value={editTitle}
+          onChange={(e) => setEditTitle(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onBlur={handleSave}
+          className="flex-1 bg-transparent border-b border-primary text-sm outline-none"
+        />
+        <button
+          onClick={handleSave}
+          className="p-1 rounded hover:bg-primary/10 text-primary"
+        >
+          <Check className="h-3.5 w-3.5" />
+        </button>
+        <button
+          onClick={handleCancel}
+          className="p-1 rounded hover:bg-destructive/10 text-muted-foreground"
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={cn(
+        "group flex items-center gap-2 rounded-lg px-3 py-2 text-[13px] cursor-pointer transition-colors",
+        isActive
+          ? "bg-primary/10 text-primary"
+          : "text-foreground/80 hover:bg-secondary"
+      )}
+      onClick={onSelect}
+    >
+      <MessageSquare className="h-4 w-4 flex-shrink-0 text-primary/60" />
+      <span className="flex-1 truncate">{conv.title}</span>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            onClick={(e) => e.stopPropagation()}
+            className={cn(
+              "h-6 w-6 flex items-center justify-center rounded text-muted-foreground hover:text-foreground hover:bg-secondary transition-all",
+              "opacity-0 group-hover:opacity-100",
+              isActive && "opacity-100"
+            )}
+          >
+            <MoreHorizontal className="h-4 w-4" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48">
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsEditing(true);
+            }}
+          >
+            <Pencil className="h-4 w-4 mr-2" />
+            Rename
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            className="text-destructive focus:text-destructive"
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+}
+
 export function LeftSidebar({ collapsed = false, onToggle }: LeftSidebarProps) {
-  const [workspacesOpen, setWorkspacesOpen] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
   const pathname = usePathname();
   const chat = useChatOptional();
 
@@ -47,161 +210,164 @@ export function LeftSidebar({ collapsed = false, onToggle }: LeftSidebarProps) {
     );
   }, [chat, chat?.hydrated, chat?.conversations]);
 
+  const filteredConversations = useMemo(() => {
+    if (!searchQuery.trim()) return sortedConversations;
+    const query = searchQuery.toLowerCase();
+    return sortedConversations.filter(
+      (conv) =>
+        conv.title.toLowerCase().includes(query) ||
+        conv.messages.some((m) => m.content.toLowerCase().includes(query))
+    );
+  }, [sortedConversations, searchQuery]);
+
+  const groupedConversations = useMemo(
+    () => groupConversationsByTime(filteredConversations),
+    [filteredConversations]
+  );
+
   const handleNewChat = () => {
     chat?.createNewConversation();
   };
 
+  if (collapsed) {
+    return (
+      <div className="flex h-full w-14 flex-col border-r border-border bg-background">
+        <div className="flex items-center justify-center py-4">
+          <button
+            onClick={onToggle}
+            className="rounded-lg p-2 text-muted-foreground hover:bg-secondary hover:text-primary transition-colors"
+          >
+            <ChevronRight className="h-5 w-5" strokeWidth={2.5} />
+          </button>
+        </div>
+        <div className="flex flex-col items-center gap-2 px-2">
+          <button
+            onClick={handleNewChat}
+            className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors"
+            title="New chat"
+          >
+            <Plus className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div
-      className={cn(
-        "flex h-full flex-col border-r border-border bg-background transition-all duration-300",
-        collapsed ? "w-0 overflow-hidden" : "w-60"
-      )}
-    >
-      {/* Logo and collapse toggle */}
-      <div className="flex items-center justify-between px-4 py-5">
+    <div className="flex h-full w-64 flex-col border-r border-border bg-background">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-4 border-b border-border">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <Image src="/logo.png" alt="JurisGPT" width={28} height={28} />
-          <span className="text-2xl font-bold tracking-tight text-primary">JurisGPT</span>
+          <Image src="/logo.png" alt="JurisGPT" width={26} height={26} />
+          <span className="text-xl font-bold tracking-tight text-primary">JurisGPT</span>
         </Link>
         <button
           onClick={onToggle}
           className="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-primary transition-colors"
         >
-          <ChevronLeft className="h-5 w-5" strokeWidth={2.5} />
+          <ChevronLeft className="h-4 w-4" strokeWidth={2.5} />
         </button>
       </div>
 
-      <ScrollArea className="flex-1 px-3">
-        {/* New chat */}
+      {/* New Chat Button */}
+      <div className="p-3 border-b border-border">
         <button
           onClick={handleNewChat}
-          className="mb-6 flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[15px] font-semibold text-primary transition-all hover:bg-primary/5"
+          className="flex w-full items-center gap-2 rounded-lg border border-border px-3 py-2.5 text-sm font-medium text-foreground hover:bg-secondary transition-colors"
         >
-          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-white">
-            <Plus className="h-4 w-4" />
-          </div>
+          <Plus className="h-4 w-4" />
           New chat
         </button>
+      </div>
 
-        {/* Recent chats */}
-        {sortedConversations.length > 0 && (
-          <div className="mb-4">
-            <div className="mb-2 px-3 text-xs font-medium text-muted-foreground">
-              Recent chats
-            </div>
-            <div className="space-y-0.5">
-              {sortedConversations.map((conv) => (
-                <div
-                  key={conv.id}
-                  className={cn(
-                    "group flex items-center gap-2 rounded-lg px-3 py-2 text-[14px] cursor-pointer transition-colors",
-                    chat?.activeConversationId === conv.id
-                      ? "bg-primary/10 text-primary font-medium"
-                      : "text-foreground/80 hover:bg-secondary"
-                  )}
-                  onClick={() => chat?.switchConversation(conv.id)}
-                >
-                  <MessageSquare className="h-4 w-4 flex-shrink-0 text-primary/60" />
-                  <span className="flex-1 truncate">{conv.title}</span>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      chat?.deleteConversation(conv.id);
-                    }}
-                    className="hidden group-hover:flex h-5 w-5 items-center justify-center rounded text-muted-foreground hover:text-destructive transition-colors"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Getting started section - only when no conversations */}
-        {sortedConversations.length === 0 && (
-          <div className="mb-4">
-            <div className="mb-2 px-3 text-xs font-medium text-muted-foreground">
-              Getting started
-            </div>
-            <div className="space-y-2">
-              {gettingStartedItems.map((item, idx) => (
-                <button
-                  key={idx}
-                  className="w-full truncate rounded-lg px-3 py-1.5 text-left text-[14px] text-foreground/80 hover:bg-secondary transition-colors"
-                >
-                  {item}
-                </button>
-              ))}
-              <button className="px-3 py-1.5 text-[14px] font-semibold text-primary hover:opacity-80 transition-opacity">
-                View all
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Main navigation */}
-        <div className="space-y-1">
-          <NavItem
-            icon={Search}
-            label="Research"
-            href="/dashboard/search"
-            active={pathname === "/dashboard/search"}
-          />
-          <NavItem
-            icon={FileText}
-            label="Drafts"
-            href="/dashboard/review"
-            active={pathname === "/dashboard/review"}
-          />
-          <NavItem
-            icon={FolderOpen}
-            label="Resources"
-            href="/dashboard/cases"
-            active={pathname === "/dashboard/cases"}
-          />
-        </div>
-
-        {/* Workspaces section */}
-        <Collapsible
-          open={workspacesOpen}
-          onOpenChange={setWorkspacesOpen}
-          className="mt-6"
-        >
-          <CollapsibleTrigger className="flex w-full items-center gap-1 px-3 py-2 text-sm font-medium text-primary">
-            <ChevronRight
-              className={cn(
-                "h-4 w-4 transition-transform",
-                workspacesOpen && "rotate-90"
-              )}
+      {/* Search */}
+      {sortedConversations.length > 3 && (
+        <div className="px-3 py-2 border-b border-border">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search chats..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full rounded-lg border border-border bg-background pl-8 pr-3 py-1.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
             />
-            Workspaces
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <div className="mx-3 mt-2 rounded-xl border border-dashed border-primary/30 bg-primary/5 p-4 transition-all hover:bg-primary/10 cursor-default">
-              <p className="text-[14px] font-semibold text-primary">
-                No workspaces yet
-              </p>
-              <p className="mt-1.5 text-[12px] leading-relaxed text-muted-foreground/80">
-                Workspaces keep all your research, drafts, and documents
-                organized by matter. Just start chatting, we&apos;ll create one
-                automatically.
+          </div>
+        </div>
+      )}
+
+      {/* Conversations List */}
+      <ScrollArea className="flex-1">
+        <div className="py-2">
+          {groupedConversations.length === 0 ? (
+            <div className="px-3 py-8 text-center">
+              <MessageSquare className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
+              <p className="text-sm text-muted-foreground">No conversations yet</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">
+                Start a new chat to get legal assistance
               </p>
             </div>
-          </CollapsibleContent>
-        </Collapsible>
+          ) : (
+            groupedConversations.map((group) => (
+              <div key={group.label} className="mb-4">
+                <div className="px-3 py-2 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                  {group.label}
+                </div>
+                <div className="space-y-1">
+                  {group.conversations.map((conv) => (
+                    <ConversationItem
+                      key={conv.id}
+                      conv={conv}
+                      isActive={chat?.activeConversationId === conv.id}
+                      onSelect={() => chat?.switchConversation(conv.id)}
+                      onDelete={() => chat?.deleteConversation(conv.id)}
+                      onRename={(newTitle) => chat?.renameConversation(conv.id, newTitle)}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </ScrollArea>
 
-      {/* Bottom settings */}
-      <div className="border-t border-border p-3">
-        <Link
+      {/* Bottom Navigation */}
+      <div className="border-t border-border p-2 space-y-1">
+        <NavItem
+          icon={Search}
+          label="Legal Search"
+          href="/dashboard/search"
+          active={pathname === "/dashboard/search"}
+        />
+        <NavItem
+          icon={FileText}
+          label="Documents"
+          href="/dashboard/documents"
+          active={pathname === "/dashboard/documents"}
+        />
+        <NavItem
+          icon={Settings}
+          label="Settings"
           href="/dashboard/settings"
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-foreground hover:bg-secondary"
-        >
-          <Settings className="h-4 w-4" />
-          Settings
-        </Link>
+          active={pathname === "/dashboard/settings"}
+        />
+
+        {sortedConversations.length > 0 && (
+          <>
+            <div className="my-2 border-t border-border" />
+            <button
+              onClick={() => {
+                if (confirm("Are you sure you want to clear all conversations?")) {
+                  chat?.clearAllConversations();
+                }
+              }}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-secondary hover:text-destructive transition-colors"
+            >
+              <Archive className="h-4 w-4" />
+              Clear all chats
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
@@ -218,21 +384,26 @@ function NavItem({
   href?: string;
   active?: boolean;
 }) {
-  const Component = href ? Link : "button";
-  const props = href ? { href } : {};
-  
+  const className = cn(
+    "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
+    active
+      ? "bg-primary/10 text-primary font-medium"
+      : "text-foreground/70 hover:bg-secondary hover:text-foreground"
+  );
+
+  if (href) {
+    return (
+      <Link href={href} className={className}>
+        <Icon className="h-4 w-4" />
+        {label}
+      </Link>
+    );
+  }
+
   return (
-    <Component
-      {...props}
-      className={cn(
-        "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[15px] font-medium transition-colors",
-        active
-          ? "bg-primary/5 text-primary"
-          : "text-foreground/80 hover:bg-secondary hover:text-primary"
-      )}
-    >
-      <Icon className={cn("h-5 w-5", active ? "text-primary" : "text-primary/70")} />
+    <button type="button" className={className}>
+      <Icon className="h-4 w-4" />
       {label}
-    </Component>
+    </button>
   );
 }

@@ -1,9 +1,22 @@
-from openai import OpenAI
 from app.config import settings
-from typing import Dict, List
+from typing import Dict, List, Optional
 from decimal import Decimal
 
-client = OpenAI(api_key=settings.openai_api_key)
+# Lazy-initialized OpenAI client
+_client: Optional["OpenAI"] = None
+
+def _get_openai_client():
+    """Get or create OpenAI client (lazy initialization to avoid startup errors)"""
+    global _client
+    if _client is None:
+        try:
+            from openai import OpenAI
+            if settings.openai_api_key and not settings.openai_api_key.startswith("sk-placeholder"):
+                _client = OpenAI(api_key=settings.openai_api_key)
+        except Exception as e:
+            print(f"OpenAI client initialization failed: {e}")
+            _client = None
+    return _client
 
 
 def generate_founder_agreement(
@@ -65,6 +78,10 @@ DOCUMENT REQUIREMENTS:
 Format the output as markdown with proper headings, sections, and formatting.
 Make it ready for conversion to Word document."""
 
+    client = _get_openai_client()
+    if not client:
+        raise Exception("OpenAI API is not configured. Please set a valid OPENAI_API_KEY.")
+
     try:
         response = client.chat.completions.create(
             model="gpt-4o",
@@ -75,7 +92,7 @@ Make it ready for conversion to Word document."""
             temperature=0.3,  # Lower temperature for more consistent legal language
             max_tokens=4000,
         )
-        
+
         return response.choices[0].message.content
     except Exception as e:
         raise Exception(f"Failed to generate document: {str(e)}")

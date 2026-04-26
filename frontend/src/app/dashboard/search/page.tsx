@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Search,
   FileText,
@@ -10,9 +11,13 @@ import {
   Building2,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   Sparkles,
   TrendingUp,
   ArrowRight,
+  Info,
+  ExternalLink,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -81,6 +86,334 @@ function relevanceProgressColor(score: number) {
   return "[&>div]:bg-gray-400";
 }
 
+// Expandable Search Result Card Component
+function SearchResultCard({ result, idx }: { result: SearchResult; idx: number }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <Card
+      key={`result-${idx}`}
+      className="shadow-sm border-border hover:shadow-md transition-all hover:border-primary/30"
+    >
+      <CardContent className="p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-2">
+              {typeIcon(result.type)}
+              <h3 className="text-base font-semibold text-foreground truncate">
+                {result.title}
+              </h3>
+            </div>
+            <p className="text-sm text-muted-foreground mb-3">
+              {result.subtitle}
+            </p>
+            <p className={`text-sm text-muted-foreground leading-relaxed ${!expanded ? "line-clamp-3" : ""}`}>
+              {result.content}
+            </p>
+
+            {/* Expanded Details */}
+            {expanded && (
+              <div className="mt-4 pt-4 border-t border-border/60 space-y-3">
+                {result.source && (
+                  <div className="flex items-start gap-2">
+                    <span className="text-xs font-medium text-muted-foreground w-20 flex-shrink-0">Source:</span>
+                    <span className="text-sm text-foreground">{result.source}</span>
+                  </div>
+                )}
+                {result.metadata?.court && (
+                  <div className="flex items-start gap-2">
+                    <span className="text-xs font-medium text-muted-foreground w-20 flex-shrink-0">Court:</span>
+                    <span className="text-sm text-foreground">{result.metadata.court}</span>
+                  </div>
+                )}
+                {result.metadata?.date && (
+                  <div className="flex items-start gap-2">
+                    <span className="text-xs font-medium text-muted-foreground w-20 flex-shrink-0">Date:</span>
+                    <span className="text-sm text-foreground">{result.metadata.date}</span>
+                  </div>
+                )}
+                {result.metadata?.citation && (
+                  <div className="flex items-start gap-2">
+                    <span className="text-xs font-medium text-muted-foreground w-20 flex-shrink-0">Citation:</span>
+                    <span className="text-sm text-foreground font-mono">{result.metadata.citation}</span>
+                  </div>
+                )}
+                {result.metadata?.section && (
+                  <div className="flex items-start gap-2">
+                    <span className="text-xs font-medium text-muted-foreground w-20 flex-shrink-0">Section:</span>
+                    <span className="text-sm text-foreground">{result.metadata.section}</span>
+                  </div>
+                )}
+                {result.metadata?.act && (
+                  <div className="flex items-start gap-2">
+                    <span className="text-xs font-medium text-muted-foreground w-20 flex-shrink-0">Act:</span>
+                    <span className="text-sm text-foreground">{result.metadata.act}</span>
+                  </div>
+                )}
+                {result.url && (
+                  <div className="flex items-start gap-2">
+                    <span className="text-xs font-medium text-muted-foreground w-20 flex-shrink-0">Link:</span>
+                    <a
+                      href={result.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-primary hover:underline flex items-center gap-1"
+                    >
+                      View original <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* More Info Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setExpanded(!expanded)}
+              className="mt-3 text-primary hover:text-primary hover:bg-primary/5 p-0 h-auto"
+            >
+              {expanded ? (
+                <>
+                  <ChevronUp className="h-4 w-4 mr-1" />
+                  Show less
+                </>
+              ) : (
+                <>
+                  <Info className="h-4 w-4 mr-1" />
+                  More info
+                </>
+              )}
+            </Button>
+          </div>
+          <div className="flex flex-col items-end gap-2 flex-shrink-0">
+            <Badge className={typeBadge(result.type)}>
+              {typeLabel(result.type)}
+            </Badge>
+            <div className="flex items-center gap-2">
+              <div className="w-16">
+                <Progress
+                  value={result.relevance_score * 100}
+                  className={`h-1.5 ${relevanceProgressColor(result.relevance_score)}`}
+                />
+              </div>
+              <span className={`text-xs font-medium ${relevanceColor(result.relevance_score)}`}>
+                {Math.round(result.relevance_score * 100)}%
+              </span>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Expandable Case Card Component
+function CaseCard({ caseData, idx }: { caseData: CaseSummary; idx: number }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <Card
+      key={`case-${idx}`}
+      className="shadow-sm border-border hover:shadow-md transition-shadow"
+    >
+      <CardContent className="p-6">
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              <Scale className="h-4 w-4 text-primary" />
+              <h3 className="text-base font-semibold text-foreground">
+                {caseData.case_name}
+              </h3>
+            </div>
+            <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+              <div className="flex items-center gap-1">
+                <BookOpen className="h-3.5 w-3.5" />
+                <span>{caseData.court}</span>
+              </div>
+              <span>{caseData.citation}</span>
+            </div>
+            <p className={`text-sm text-muted-foreground ${!expanded ? "line-clamp-3" : ""}`}>
+              {caseData.summary || caseData.principle}
+            </p>
+
+            {/* Expanded Details */}
+            {expanded && (
+              <div className="mt-4 pt-4 border-t border-border/60 space-y-3">
+                {caseData.principle && caseData.principle !== caseData.summary && (
+                  <div>
+                    <span className="text-xs font-medium text-muted-foreground">Legal Principle:</span>
+                    <p className="text-sm text-foreground mt-1">{caseData.principle}</p>
+                  </div>
+                )}
+                {caseData.relevance && (
+                  <div>
+                    <span className="text-xs font-medium text-muted-foreground">Relevance:</span>
+                    <p className="text-sm text-foreground mt-1">{caseData.relevance}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* More Info Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setExpanded(!expanded)}
+              className="mt-3 text-primary hover:text-primary hover:bg-primary/5 p-0 h-auto"
+            >
+              {expanded ? (
+                <>
+                  <ChevronUp className="h-4 w-4 mr-1" />
+                  Show less
+                </>
+              ) : (
+                <>
+                  <Info className="h-4 w-4 mr-1" />
+                  More info
+                </>
+              )}
+            </Button>
+          </div>
+          <Badge className="bg-blue-50 text-blue-700 border-blue-200 ml-4 flex-shrink-0">
+            Case Law
+          </Badge>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Expandable Companies Act Card Component
+function CompaniesActCard({ section, idx }: { section: CompaniesActSection; idx: number }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <Card
+      key={`ca-${idx}`}
+      className="shadow-sm border-border hover:shadow-md transition-shadow"
+    >
+      <CardContent className="p-6">
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              <Building2 className="h-4 w-4 text-primary" />
+              <h3 className="text-base font-semibold text-foreground">
+                Section {section.section}: {section.title}
+              </h3>
+            </div>
+            <p className={`text-sm text-muted-foreground ${!expanded ? "line-clamp-3" : ""}`}>
+              {section.content}
+            </p>
+
+            {/* Expanded Details */}
+            {expanded && (
+              <div className="mt-4 pt-4 border-t border-border/60 space-y-3">
+                <div className="flex items-start gap-2">
+                  <span className="text-xs font-medium text-muted-foreground w-20 flex-shrink-0">Act:</span>
+                  <span className="text-sm text-foreground">{section.act}</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-xs font-medium text-muted-foreground w-20 flex-shrink-0">Section:</span>
+                  <span className="text-sm text-foreground font-mono">{section.section}</span>
+                </div>
+              </div>
+            )}
+
+            {/* More Info Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setExpanded(!expanded)}
+              className="mt-3 text-primary hover:text-primary hover:bg-primary/5 p-0 h-auto"
+            >
+              {expanded ? (
+                <>
+                  <ChevronUp className="h-4 w-4 mr-1" />
+                  Show less
+                </>
+              ) : (
+                <>
+                  <Info className="h-4 w-4 mr-1" />
+                  More info
+                </>
+              )}
+            </Button>
+          </div>
+          <Badge className="bg-green-50 text-green-700 border-green-200 ml-4 flex-shrink-0">
+            Companies Act
+          </Badge>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Expandable Law Section Card Component
+function LawSectionCard({ section, lawName, idx }: { section: LawSection; lawName: string; idx: number }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <Card
+      key={`law-${idx}`}
+      className="shadow-sm border-border hover:shadow-md transition-shadow"
+    >
+      <CardContent className="p-6">
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              <BookOpen className="h-4 w-4 text-primary" />
+              <h3 className="text-base font-semibold text-foreground">
+                Section {section.section}: {section.title}
+              </h3>
+            </div>
+            <p className={`text-sm text-muted-foreground ${!expanded ? "line-clamp-3" : ""}`}>
+              {section.description}
+            </p>
+
+            {/* Expanded Details */}
+            {expanded && (
+              <div className="mt-4 pt-4 border-t border-border/60 space-y-3">
+                <div className="flex items-start gap-2">
+                  <span className="text-xs font-medium text-muted-foreground w-20 flex-shrink-0">Law:</span>
+                  <span className="text-sm text-foreground">{lawName.toUpperCase()}</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-xs font-medium text-muted-foreground w-20 flex-shrink-0">Section:</span>
+                  <span className="text-sm text-foreground font-mono">{section.section}</span>
+                </div>
+              </div>
+            )}
+
+            {/* More Info Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setExpanded(!expanded)}
+              className="mt-3 text-primary hover:text-primary hover:bg-primary/5 p-0 h-auto"
+            >
+              {expanded ? (
+                <>
+                  <ChevronUp className="h-4 w-4 mr-1" />
+                  Show less
+                </>
+              ) : (
+                <>
+                  <Info className="h-4 w-4 mr-1" />
+                  More info
+                </>
+              )}
+            </Button>
+          </div>
+          <Badge className="bg-purple-50 text-purple-700 border-purple-200 ml-4 flex-shrink-0">
+            {lawName.toUpperCase()}
+          </Badge>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState<FilterType>("all");
@@ -102,6 +435,7 @@ export default function SearchPage() {
   const [lawSections, setLawSections] = useState<LawSection[]>([]);
 
   const LIMIT = 15;
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     apiClient.listAvailableLaws().then(setLaws).catch(console.error);
@@ -109,6 +443,13 @@ export default function SearchPage() {
 
   const handleSearch = useCallback(async () => {
     if (!searchQuery.trim() && !selectedLaw) return;
+
+    // Cancel any in-flight search request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
     setLoading(true);
     setHasSearched(true);
@@ -132,6 +473,9 @@ export default function SearchPage() {
           offset: page * LIMIT,
         });
 
+        // Don't update state if this request was aborted
+        if (controller.signal.aborted) return;
+
         setSearchResults(response.results);
         setTotalResults(response.total);
         setSuggestions(response.suggestions);
@@ -140,7 +484,9 @@ export default function SearchPage() {
         setLawSections([]);
         setLoading(false);
         return;
-      } catch {
+      } catch (unifiedErr) {
+        if (controller.signal.aborted) return;
+        console.warn("Unified search unavailable, falling back:", unifiedErr);
         // Fall back to old search if unified fails
         setUseUnifiedSearch(false);
       }
@@ -159,7 +505,7 @@ export default function SearchPage() {
               limit: LIMIT,
               offset: page * LIMIT,
             })
-            .then(setCases)
+            .then((data) => { if (!controller.signal.aborted) setCases(data); })
         );
       } else {
         setCases([]);
@@ -173,7 +519,7 @@ export default function SearchPage() {
               limit: LIMIT,
               offset: page * LIMIT,
             })
-            .then(setCompaniesAct)
+            .then((data) => { if (!controller.signal.aborted) setCompaniesAct(data); })
         );
       } else {
         setCompaniesAct([]);
@@ -186,7 +532,7 @@ export default function SearchPage() {
         promises.push(
           apiClient
             .getLawSections(selectedLaw, { limit: LIMIT, offset: page * LIMIT })
-            .then(setLawSections)
+            .then((data) => { if (!controller.signal.aborted) setLawSections(data); })
         );
       } else {
         setLawSections([]);
@@ -194,9 +540,12 @@ export default function SearchPage() {
 
       await Promise.all(promises);
     } catch (error) {
+      if (controller.signal.aborted) return;
       console.error("Search error:", error);
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) {
+        setLoading(false);
+      }
     }
   }, [searchQuery, selectedFilter, selectedLaw, page, useUnifiedSearch]);
 
@@ -206,7 +555,13 @@ export default function SearchPage() {
         handleSearch();
       }
     }, 400);
-    return () => clearTimeout(debounce);
+    return () => {
+      clearTimeout(debounce);
+      // Abort in-flight request when deps change
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, [searchQuery, selectedFilter, selectedLaw, page, handleSearch]);
 
   const fallbackTotal = cases.length + companiesAct.length + lawSections.length;
@@ -216,15 +571,25 @@ export default function SearchPage() {
     <div className="flex h-screen bg-background">
       <div className="flex-1 flex flex-col">
         <header className="bg-card border-b border-border px-6 py-4">
-          <div className="flex items-center gap-2">
-            <Search className="h-5 w-5 text-primary" />
-            <h1 className="text-xl font-semibold text-foreground">
-              Legal Research
-            </h1>
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <Search className="h-5 w-5 text-primary" />
+                <h1 className="text-xl font-semibold text-foreground">
+                  Source Search
+                </h1>
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                Use manual source search to verify or deepen assistant answers with statutes, cases, and regulations
+              </p>
+            </div>
+            <Link href={searchQuery.trim() ? `/dashboard/chat?q=${encodeURIComponent(searchQuery.trim())}` : "/dashboard/chat"}>
+              <Button variant="outline" className="gap-1.5">
+                <Scale className="h-4 w-4" />
+                Ask JurisGPT
+              </Button>
+            </Link>
           </div>
-          <p className="text-sm text-muted-foreground mt-1">
-            Unified search across case law, statutes, and regulations — AI-powered summaries and relevance ranking
-          </p>
         </header>
         <div className="flex-1 overflow-y-auto p-6 bg-background">
           <div className="max-w-5xl mx-auto space-y-6">
@@ -381,45 +746,7 @@ export default function SearchPage() {
                 </div>
 
                 {searchResults.map((result, idx) => (
-                  <Card
-                    key={`result-${idx}`}
-                    className="shadow-sm border-border hover:shadow-md transition-all hover:border-primary/30"
-                  >
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-2">
-                            {typeIcon(result.type)}
-                            <h3 className="text-base font-semibold text-foreground truncate">
-                              {result.title}
-                            </h3>
-                          </div>
-                          <p className="text-sm text-muted-foreground mb-3">
-                            {result.subtitle}
-                          </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
-                            {result.content}
-                          </p>
-                        </div>
-                        <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                          <Badge className={typeBadge(result.type)}>
-                            {typeLabel(result.type)}
-                          </Badge>
-                          <div className="flex items-center gap-2">
-                            <div className="w-16">
-                              <Progress
-                                value={result.relevance_score * 100}
-                                className={`h-1.5 ${relevanceProgressColor(result.relevance_score)}`}
-                              />
-                            </div>
-                            <span className={`text-xs font-medium ${relevanceColor(result.relevance_score)}`}>
-                              {Math.round(result.relevance_score * 100)}%
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <SearchResultCard key={`result-${idx}`} result={result} idx={idx} />
                 ))}
               </div>
             )}
@@ -458,88 +785,15 @@ export default function SearchPage() {
                   </div>
 
                   {cases.map((c, idx) => (
-                    <Card
-                      key={`case-${idx}`}
-                      className="shadow-sm border-border hover:shadow-md transition-shadow"
-                    >
-                      <CardContent className="p-6">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Scale className="h-4 w-4 text-primary" />
-                              <h3 className="text-base font-semibold text-foreground">
-                                {c.case_name}
-                              </h3>
-                            </div>
-                            <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                              <div className="flex items-center gap-1">
-                                <BookOpen className="h-3.5 w-3.5" />
-                                <span>{c.court}</span>
-                              </div>
-                              <span>{c.citation}</span>
-                            </div>
-                            <p className="text-sm text-muted-foreground">
-                              {c.summary || c.principle}
-                            </p>
-                          </div>
-                          <Badge className="bg-blue-50 text-blue-700 border-blue-200 ml-4 flex-shrink-0">
-                            Case Law
-                          </Badge>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <CaseCard key={`case-${idx}`} caseData={c} idx={idx} />
                   ))}
 
                   {companiesAct.map((s, idx) => (
-                    <Card
-                      key={`ca-${idx}`}
-                      className="shadow-sm border-border hover:shadow-md transition-shadow"
-                    >
-                      <CardContent className="p-6">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <FileText className="h-4 w-4 text-primary" />
-                              <h3 className="text-base font-semibold text-foreground">
-                                Section {s.section}: {s.title}
-                              </h3>
-                            </div>
-                            <p className="text-sm text-muted-foreground">
-                              {s.content}
-                            </p>
-                          </div>
-                          <Badge className="bg-green-50 text-green-700 border-green-200 ml-4 flex-shrink-0">
-                            Companies Act
-                          </Badge>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <CompaniesActCard key={`ca-${idx}`} section={s} idx={idx} />
                   ))}
 
                   {lawSections.map((s, idx) => (
-                    <Card
-                      key={`law-${idx}`}
-                      className="shadow-sm border-border hover:shadow-md transition-shadow"
-                    >
-                      <CardContent className="p-6">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <BookOpen className="h-4 w-4 text-primary" />
-                              <h3 className="text-base font-semibold text-foreground">
-                                Section {s.section}: {s.title}
-                              </h3>
-                            </div>
-                            <p className="text-sm text-muted-foreground">
-                              {s.description}
-                            </p>
-                          </div>
-                          <Badge className="bg-purple-50 text-purple-700 border-purple-200 ml-4 flex-shrink-0">
-                            {selectedLaw.toUpperCase()}
-                          </Badge>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <LawSectionCard key={`law-${idx}`} section={s} lawName={selectedLaw} idx={idx} />
                   ))}
                 </div>
               )}

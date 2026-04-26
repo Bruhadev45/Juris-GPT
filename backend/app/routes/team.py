@@ -1,10 +1,16 @@
 from fastapi import APIRouter, HTTPException
 import uuid
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
+import aiofiles
+import aiofiles.os
+import asyncio
 
 router = APIRouter()
+
+# Lock for thread-safe file operations
+_team_lock = asyncio.Lock()
 
 TEAM_FILE = Path(__file__).parent.parent.parent / "data" / "team.json"
 
@@ -39,56 +45,67 @@ DEFAULT_TEAM = [
 ]
 
 
-def load_team():
+async def load_team():
+    """Load team from file (async)"""
     if not TEAM_FILE.exists():
         return DEFAULT_TEAM.copy()
-    with open(TEAM_FILE, "r") as f:
-        return json.load(f)
+    async with aiofiles.open(TEAM_FILE, "r") as f:
+        content = await f.read()
+        return json.loads(content)
 
 
-def save_team(team):
-    TEAM_FILE.parent.mkdir(parents=True, exist_ok=True)
-    with open(TEAM_FILE, "w") as f:
-        json.dump(team, f, indent=2)
+async def save_team(team):
+    """Save team to file (async)"""
+    await aiofiles.os.makedirs(TEAM_FILE.parent, exist_ok=True)
+    async with aiofiles.open(TEAM_FILE, "w") as f:
+        await f.write(json.dumps(team, indent=2))
 
 
 @router.get("")
 async def list_members():
-    team = load_team()
+    """List all team members"""
+    async with _team_lock:
+        team = await load_team()
     return {"data": team, "total": len(team)}
 
 
 @router.post("")
 async def add_member(data: dict):
-    team = load_team()
-    member = {
-        "id": str(uuid.uuid4()),
-        "name": data.get("name", ""),
-        "email": data.get("email", ""),
-        "role": data.get("role", ""),
-        "department": data.get("department", ""),
-        "status": "active",
-        "joined_at": datetime.utcnow().date().isoformat(),
-    }
-    team.append(member)
-    save_team(team)
+    """Add a new team member"""
+    async with _team_lock:
+        team = await load_team()
+        member = {
+            "id": str(uuid.uuid4()),
+            "name": data.get("name", ""),
+            "email": data.get("email", ""),
+            "role": data.get("role", ""),
+            "department": data.get("department", ""),
+            "status": "active",
+            "joined_at": datetime.now(timezone.utc).date().isoformat(),
+        }
+        team.append(member)
+        await save_team(team)
     return {"success": True, "member": member}
 
 
 @router.put("/{member_id}")
 async def update_member(member_id: str, data: dict):
-    team = load_team()
-    member = next((m for m in team if m["id"] == member_id), None)
-    if not member:
-        raise HTTPException(status_code=404, detail="Member not found")
-    member.update({k: v for k, v in data.items() if k != "id"})
-    save_team(team)
+    """Update a team member"""
+    async with _team_lock:
+        team = await load_team()
+        member = next((m for m in team if m["id"] == member_id), None)
+        if not member:
+            raise HTTPException(status_code=404, detail="Member not found")
+        member.update({k: v for k, v in data.items() if k != "id"})
+        await save_team(team)
     return {"success": True, "member": member}
 
 
 @router.delete("/{member_id}")
 async def remove_member(member_id: str):
-    team = load_team()
-    team = [m for m in team if m["id"] != member_id]
-    save_team(team)
+    """Remove a team member"""
+    async with _team_lock:
+        team = await load_team()
+        team = [m for m in team if m["id"] != member_id]
+        await save_team(team)
     return {"success": True}

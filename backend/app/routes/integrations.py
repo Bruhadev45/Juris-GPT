@@ -25,45 +25,75 @@ async def check_integrations():
             supabase_connected = False
 
     results.append({
+        "id": "supabase",
         "name": "Supabase",
-        "description": "Database & Storage",
+        "description": "Database & Storage for documents and user data",
+        "category": "Storage",
         "status": "connected" if supabase_connected else "disconnected",
-        "icon": "Database",
+        "icon": "/integrations/supabase.svg",
     })
 
     # OpenAI
     openai_connected = bool(settings.openai_api_key)
     results.append({
+        "id": "openai",
         "name": "OpenAI",
-        "description": "AI Document Generation (GPT-4o)",
+        "description": "AI-powered document generation and legal research",
+        "category": "AI Services",
         "status": "connected" if openai_connected else "disconnected",
-        "icon": "Zap",
+        "icon": "/integrations/openai.svg",
     })
 
     # Resend
     resend_connected = bool(settings.resend_api_key)
     results.append({
+        "id": "resend",
         "name": "Resend",
-        "description": "Email Notifications",
+        "description": "Email notifications for compliance alerts",
+        "category": "Communication",
         "status": "connected" if resend_connected else "disconnected",
-        "icon": "Mail",
+        "icon": "/integrations/resend.svg",
     })
 
     # Razorpay
     razorpay_connected = bool(getattr(settings, "razorpay_key_id", None))
     results.append({
+        "id": "razorpay",
         "name": "Razorpay",
-        "description": "Payment Gateway",
-        "status": "connected" if razorpay_connected else "available",
-        "icon": "CreditCard",
+        "description": "Payment gateway for subscriptions",
+        "category": "Payment",
+        "status": "connected" if razorpay_connected else "disconnected",
+        "icon": "/integrations/razorpay.svg",
     })
 
     # Google Drive
     results.append({
+        "id": "google-drive",
         "name": "Google Drive",
-        "description": "Cloud Document Storage",
-        "status": "available",
-        "icon": "Cloud",
+        "description": "Cloud document storage and backup",
+        "category": "Storage",
+        "status": "disconnected",
+        "icon": "/integrations/google.svg",
+    })
+
+    # DigiLocker
+    results.append({
+        "id": "digilocker",
+        "name": "DigiLocker",
+        "description": "Government document verification service",
+        "category": "Government",
+        "status": "disconnected",
+        "icon": "/integrations/digilocker.svg",
+    })
+
+    # MCA Portal
+    results.append({
+        "id": "mca",
+        "name": "MCA Portal",
+        "description": "Ministry of Corporate Affairs filing integration",
+        "category": "Government",
+        "status": "disconnected",
+        "icon": "/integrations/mca.svg",
     })
 
     return {"integrations": results}

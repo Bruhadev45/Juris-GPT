@@ -1,9 +1,8 @@
 // Shared types for frontend
 export type MatterStatus =
   | "draft"
-  | "payment_pending"
   | "ai_generating"
-  | "lawyer_review"
+  | "review"
   | "approved"
   | "rejected"
   | "completed";
@@ -36,7 +35,6 @@ export interface LegalMatter {
   company_id: string;
   matter_type: string;
   status: MatterStatus;
-  price: number;
   created_at: string;
   updated_at: string;
   company?: Company;

@@ -96,8 +96,9 @@ export default function SupportPage() {
     try {
       const result = await supportApi.listTickets();
       setTickets(result.data || result.tickets || []);
-    } catch {
-      // Tickets may not exist yet, that is fine
+    } catch (err) {
+      // Tickets may not exist yet on first load — only warn, not error
+      console.warn("Could not fetch support tickets:", err);
     } finally {
       setLoadingTickets(false);
     }
@@ -111,6 +112,19 @@ export default function SupportPage() {
     e.preventDefault();
     if (!form.name || !form.email || !form.subject || !form.message) {
       setError("Please fill in all required fields.");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    if (form.subject.length > 200) {
+      setError("Subject must be under 200 characters.");
+      return;
+    }
+    if (form.message.length > 5000) {
+      setError("Message must be under 5000 characters.");
       return;
     }
     try {
@@ -191,8 +205,8 @@ export default function SupportPage() {
                 },
                 {
                   icon: HelpCircle,
-                  title: "Account & Billing",
-                  desc: "Account settings and payment",
+                  title: "Account Settings",
+                  desc: "Manage your account and preferences",
                   articles: 5,
                 },
               ].map((cat) => {
@@ -346,7 +360,6 @@ export default function SupportPage() {
                         >
                           <option value="general">General Inquiry</option>
                           <option value="technical">Technical Issue</option>
-                          <option value="billing">Billing</option>
                           <option value="feature">Feature Request</option>
                           <option value="bug">Bug Report</option>
                         </select>

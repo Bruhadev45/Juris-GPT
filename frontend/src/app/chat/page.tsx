@@ -13,6 +13,9 @@ interface Message {
   content: string;
   sources?: ChatMessageResponse["sources"];
   suggestions?: string[];
+  citations?: ChatMessageResponse["citations"];
+  confidence?: ChatMessageResponse["confidence"];
+  limitations?: ChatMessageResponse["limitations"];
 }
 
 export default function ChatPage() {
@@ -25,7 +28,10 @@ export default function ChatPage() {
   useEffect(() => {
     chatApi.getSuggestions().then((data) => {
       setSuggestions(data.suggestions);
-    }).catch(() => {});
+    }).catch((error) => {
+      console.error('[ChatPage] Failed to load suggestions:', error);
+      // Suggestions are optional, so we don't show a toast error
+    });
   }, []);
 
   useEffect(() => {
@@ -44,9 +50,12 @@ export default function ChatPage() {
       const response = await chatApi.sendMessage(text.trim());
       const assistantMsg: Message = {
         role: "assistant",
-        content: response.message,
+        content: response.answer || response.message,
         sources: response.sources,
-        suggestions: response.suggestions,
+        suggestions: response.follow_up_questions || response.suggestions,
+        citations: response.citations,
+        confidence: response.confidence,
+        limitations: response.limitations,
       };
       setMessages((prev) => [...prev, assistantMsg]);
     } catch {
@@ -132,6 +141,43 @@ export default function ChatPage() {
                 }`}
               >
                 <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+
+                {msg.confidence && (
+                  <div className="mt-3 text-xs font-medium text-primary">
+                    Confidence: {msg.confidence}
+                  </div>
+                )}
+
+                {msg.limitations && (
+                  <p className="mt-2 text-xs text-muted-foreground">{msg.limitations}</p>
+                )}
+
+                {msg.citations && msg.citations.length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-border/30">
+                    <p className="text-xs font-medium mb-2 opacity-70">Citations:</p>
+                    <div className="space-y-2">
+                      {msg.citations.map((citation, j) => (
+                        <div key={`${citation.title}-${j}`} className="text-xs">
+                          <div className="font-medium">{citation.title}</div>
+                          <div className="text-muted-foreground">
+                            {citation.url ? (
+                              <a
+                                href={citation.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-primary hover:underline"
+                              >
+                                {citation.source}
+                              </a>
+                            ) : (
+                              citation.source
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {msg.sources && msg.sources.length > 0 && (
                   <div className="mt-3 pt-3 border-t border-border/30">

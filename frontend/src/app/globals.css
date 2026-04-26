@@ -41,92 +41,100 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  /* Legalwork purple colors */
-  --color-purple: var(--purple);
-  --color-purple-light: var(--purple-light);
-  --color-purple-bg: var(--purple-bg);
+  /* Legacy aliases kept for older components */
+  --color-purple: var(--burgundy);
+  --color-purple-light: var(--gold);
+  --color-purple-bg: var(--warm-gray);
+  --color-burgundy: var(--burgundy);
+  --color-gold: var(--gold);
+  --color-sage: var(--sage);
+  --color-warm-gray: var(--warm-gray);
 }
 
 :root {
   --radius: 0.5rem;
-  /* Deep Teal & Mist Gray Theme - Cool & Professional */
-  --background: #F5F7F9;
-  --foreground: #0A2A36;
+  /* Editorial legal palette from the Claude Design handoff */
+  --background: #FAF6EF;
+  --foreground: #0A0A0A;
   --card: #FFFFFF;
-  --card-foreground: #0A2A36;
+  --card-foreground: #0A0A0A;
   --popover: #FFFFFF;
-  --popover-foreground: #0A2A36;
-  /* Primary: Deep Teal */
-  --primary: #004E64;
-  --primary-foreground: #FFFFFF;
-  /* Secondary: Mist Gray */
-  --secondary: #E0E5E9;
-  --secondary-foreground: #0A2A36;
-  --muted: #E0E5E9;
-  --muted-foreground: #4A6E7D;
-  /* Accent: Light Teal */
-  --accent: #E0E5E9;
-  --accent-foreground: #004E64;
-  --destructive: #C62828;
-  --border: #C8D1D9;
-  --input: #F5F7F9;
-  --ring: #004E64;
+  --popover-foreground: #0A0A0A;
+  --primary: #7B1E2E;
+  --primary-foreground: #FAF6EF;
+  --secondary: #F4EFE5;
+  --secondary-foreground: #1A1A1A;
+  --muted: #F4EFE5;
+  --muted-foreground: #6B6B6B;
+  --accent: #F5EBD8;
+  --accent-foreground: #7B1E2E;
+  --destructive: #B91C1C;
+  --border: #E8E2D5;
+  --input: #FFFFFF;
+  --ring: #7B1E2E;
   /* Charts */
-  --chart-1: #004E64;
-  --chart-2: #1A6B82;
-  --chart-3: #3D8A9E;
-  --chart-4: #6AABB9;
-  --chart-5: #A8CDD6;
-  /* Sidebar - Teal tones */
-  --sidebar: #F5F7F9;
-  --sidebar-foreground: #3D6B7A;
-  --sidebar-primary: #004E64;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #E0E5E9;
-  --sidebar-accent-foreground: #004E64;
-  --sidebar-border: #C8D1D9;
-  --sidebar-ring: #004E64;
-  /* Legacy purple aliases */
-  --purple: #004E64;
-  --purple-light: #1A6B82;
-  --purple-bg: #F5F7F9;
+  --chart-1: #7B1E2E;
+  --chart-2: #B8884D;
+  --chart-3: #4A6B5C;
+  --chart-4: #5C7A8A;
+  --chart-5: #1A1A1A;
+  /* Sidebar */
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #6B6B6B;
+  --sidebar-primary: #0A0A0A;
+  --sidebar-primary-foreground: #FAF6EF;
+  --sidebar-accent: #F4EFE5;
+  --sidebar-accent-foreground: #0A0A0A;
+  --sidebar-border: #E8E2D5;
+  --sidebar-ring: #7B1E2E;
+  --burgundy: #7B1E2E;
+  --gold: #B8884D;
+  --sage: #4A6B5C;
+  --warm-gray: #F4EFE5;
+  --purple: #7B1E2E;
+  --purple-light: #B8884D;
+  --purple-bg: #FAF6EF;
 }
 
 .dark {
-  --background: #071E26;
-  --foreground: #E0E5E9;
-  --card: #0A2A36;
-  --card-foreground: #E0E5E9;
-  --popover: #0A2A36;
-  --popover-foreground: #E0E5E9;
-  --primary: #A8CDD6;
-  --primary-foreground: #071E26;
-  --secondary: #0F3644;
-  --secondary-foreground: #E0E5E9;
-  --muted: #0F3644;
-  --muted-foreground: #7BAAB8;
-  --accent: #A8CDD6;
-  --accent-foreground: #071E26;
+  --background: #0A0A0A;
+  --foreground: #FAF6EF;
+  --card: #111111;
+  --card-foreground: #FAF6EF;
+  --popover: #111111;
+  --popover-foreground: #FAF6EF;
+  --primary: #D9B072;
+  --primary-foreground: #0A0A0A;
+  --secondary: #1A1A1A;
+  --secondary-foreground: #FAF6EF;
+  --muted: #1A1A1A;
+  --muted-foreground: #B8B0A3;
+  --accent: #2A171A;
+  --accent-foreground: #F5EBD8;
   --destructive: #EF5350;
-  --border: #1A4A5A;
-  --input: #0F3644;
-  --ring: #A8CDD6;
-  --chart-1: #A8CDD6;
-  --chart-2: #6AABB9;
-  --chart-3: #3D8A9E;
-  --chart-4: #1A6B82;
-  --chart-5: #004E64;
-  --sidebar: #071E26;
-  --sidebar-foreground: #E0E5E9;
-  --sidebar-primary: #A8CDD6;
-  --sidebar-primary-foreground: #071E26;
-  --sidebar-accent: #0F3644;
-  --sidebar-accent-foreground: #A8CDD6;
-  --sidebar-border: #1A4A5A;
-  --sidebar-ring: #A8CDD6;
-  --purple: #A8CDD6;
-  --purple-light: #6AABB9;
-  --purple-bg: #071E26;
+  --border: #2B2824;
+  --input: #171717;
+  --ring: #D9B072;
+  --chart-1: #D9B072;
+  --chart-2: #B8884D;
+  --chart-3: #7B1E2E;
+  --chart-4: #4A6B5C;
+  --chart-5: #FAF6EF;
+  --sidebar: #0A0A0A;
+  --sidebar-foreground: #B8B0A3;
+  --sidebar-primary: #D9B072;
+  --sidebar-primary-foreground: #0A0A0A;
+  --sidebar-accent: #1A1A1A;
+  --sidebar-accent-foreground: #FAF6EF;
+  --sidebar-border: #2B2824;
+  --sidebar-ring: #D9B072;
+  --burgundy: #D9B072;
+  --gold: #B8884D;
+  --sage: #7A9A88;
+  --warm-gray: #1A1A1A;
+  --purple: #D9B072;
+  --purple-light: #B8884D;
+  --purple-bg: #0A0A0A;
 }
 
 @layer base {
@@ -142,6 +150,8 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     line-height: 1.6;
+    background-image: radial-gradient(circle at 1px 1px, rgba(10, 10, 10, 0.025) 1px, transparent 0);
+    background-size: 4px 4px;
   }
   h1, h2, h3, h4, h5, h6 {
     line-height: 1.2;

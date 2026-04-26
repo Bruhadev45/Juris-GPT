@@ -1,0 +1,444 @@
+{
+  "reviews": [
+    {
+      "id": "sample-nda-001",
+      "file_name": "sample-nda.txt",
+      "file_path": "data/uploads/sample-nda.txt",
+      "file_size": 2448,
+      "file_type": ".txt",
+      "status": "completed",
+      "analysis": {
+        "overall_risk_score": 35,
+        "summary": "This is a standard Non-Disclosure Agreement between TechStart Innovations Pvt. Ltd. and Future Ventures LLP for protecting confidential information during business evaluation. The agreement follows conventional NDA structure with clearly defined obligations, reasonable 2-year term, and appropriate Indian legal jurisdiction clauses. Overall, this is a balanced agreement with moderate protection for both parties.",
+        "clauses": [
+          {
+            "title": "Confidential Information Definition",
+            "type": "definition",
+            "risk_level": "low",
+            "content": "Broad definition covering business plans, financial data, technical specifications, source code, algorithms, customer lists, and marketing strategies.",
+            "analysis": "The definition is comprehensive and includes appropriate categories of confidential information. It uses 'including but not limited to' language which provides flexibility."
+          },
+          {
+            "title": "Receiving Party Obligations",
+            "type": "obligation",
+            "risk_level": "low",
+            "content": "Hold in strict confidence, no third-party disclosure without consent, use solely for Purpose, take reasonable protective measures.",
+            "analysis": "Standard NDA obligations that are reasonable and enforceable. The 'reasonable measures' standard is appropriate and not overly burdensome."
+          },
+          {
+            "title": "Term - 2 Years",
+            "type": "term",
+            "risk_level": "low",
+            "content": "Agreement remains in effect for two (2) years from execution date.",
+            "analysis": "A 2-year term is reasonable for business evaluation purposes. Consider if confidentiality should survive beyond the agreement term."
+          },
+          {
+            "title": "Return/Destruction of Information",
+            "type": "obligation",
+            "risk_level": "low",
+            "content": "Upon termination or request, Receiving Party shall return or destroy all Confidential Information.",
+            "analysis": "Standard provision. The 'or destroy' option provides flexibility. Consider adding certification requirement for destruction."
+          },
+          {
+            "title": "Governing Law - India (Bangalore)",
+            "type": "jurisdiction",
+            "risk_level": "low",
+            "content": "Governed by Indian law with exclusive jurisdiction in Bangalore courts.",
+            "analysis": "Appropriate jurisdiction for parties registered in Karnataka. Exclusive jurisdiction clause is enforceable under Indian law."
+          },
+          {
+            "title": "Stamp Duty Provision",
+            "type": "compliance",
+            "risk_level": "low",
+            "content": "Karnataka Stamp Act duty to be borne by Disclosing Party.",
+            "analysis": "Important compliance provision. Stamp duty is mandatory under Karnataka Stamp Act for enforceable agreements."
+          }
+        ],
+        "risks": [
+          {
+            "title": "Missing Exclusions from Confidentiality",
+            "severity": "medium",
+            "description": "The agreement does not specify standard exclusions such as publicly available information, independently developed information, or information received from third parties without restriction.",
+            "recommendation": "Add a clause specifying what does NOT constitute Confidential Information to prevent disputes.",
+            "legal_reference": "Standard NDA practice; Indian Contract Act, 1872"
+          },
+          {
+            "title": "No Survival Clause",
+            "severity": "medium",
+            "description": "The confidentiality obligations appear to expire with the 2-year agreement term. Sensitive information may require longer protection.",
+            "recommendation": "Consider adding a survival clause extending confidentiality obligations for 3-5 years post-termination.",
+            "legal_reference": "Commercial practice for technology-related NDAs"
+          },
+          {
+            "title": "Missing Remedies Clause",
+            "severity": "low",
+            "description": "The agreement does not explicitly state available remedies for breach, including injunctive relief.",
+            "recommendation": "Add a clause acknowledging that monetary damages may be inadequate and that injunctive relief may be sought.",
+            "legal_reference": "Specific Relief Act, 1963"
+          }
+        ],
+        "suggestions": [
+          "Add standard exclusions from confidentiality (public information, prior knowledge, independent development)",
+          "Include a survival clause extending obligations beyond the 2-year term",
+          "Add provision for injunctive relief in case of breach",
+          "Consider adding a residuals clause for information retained in unaided memory",
+          "Include certification requirement for destruction of confidential information",
+          "Add dispute resolution mechanism (mediation/arbitration) before litigation"
+        ]
+      },
+      "created_at": "2024-01-15T10:30:00.000Z",
+      "analyzed_at": "2024-01-15T10:31:15.000Z"
+    },
+    {
+      "id": "sample-emp-002",
+      "file_name": "sample-employment.txt",
+      "file_path": "data/uploads/sample-employment.txt",
+      "file_size": 2653,
+      "file_type": ".txt",
+      "status": "completed",
+      "analysis": {
+        "overall_risk_score": 55,
+        "summary": "This Employment Agreement for Digital Solutions India Pvt. Ltd. covers appointment of a Senior Software Engineer with annual CTC of Rs. 18 Lakhs. The agreement includes standard provisions for compensation, leave, working hours, and statutory compliance. However, it contains a potentially problematic 12-month non-compete clause and broad IP assignment provisions that may require attention.",
+        "clauses": [
+          {
+            "title": "Appointment and Designation",
+            "type": "appointment",
+            "risk_level": "low",
+            "content": "Appointment as Senior Software Engineer in Technology Department.",
+            "analysis": "Clear designation with defined department. Job description and responsibilities should be detailed in a separate annexure."
+          },
+          {
+            "title": "Probation Period - 6 Months",
+            "type": "term",
+            "risk_level": "low",
+            "content": "6-month probation with confirmation subject to satisfactory performance.",
+            "analysis": "Standard probation period for IT industry. Ensure performance evaluation criteria are clearly defined."
+          },
+          {
+            "title": "Compensation Structure",
+            "type": "compensation",
+            "risk_level": "low",
+            "content": "Annual CTC Rs. 18,00,000 with detailed breakdown: Basic 50%, HRA 25%, Special Allowance 25%, plus PF contributions.",
+            "analysis": "Standard compensation structure compliant with statutory requirements. Basic salary at 50% ensures adequate PF contribution base."
+          },
+          {
+            "title": "Statutory Deductions",
+            "type": "compliance",
+            "risk_level": "low",
+            "content": "PF under EPF Act 1952, Professional Tax under Karnataka Act, TDS under Income Tax Act.",
+            "analysis": "Comprehensive statutory compliance provisions covering all mandatory deductions."
+          },
+          {
+            "title": "Non-Compete Clause - 12 Months",
+            "type": "restriction",
+            "risk_level": "high",
+            "content": "For 12 months after termination, Employee shall not join any competitor organization within India.",
+            "analysis": "This broad non-compete clause covering all of India for 12 months may be unenforceable under Indian law, as Section 27 of the Indian Contract Act generally voids agreements in restraint of trade."
+          },
+          {
+            "title": "Intellectual Property Assignment",
+            "type": "ip_rights",
+            "risk_level": "medium",
+            "content": "All work product created during employment shall be exclusive property of Employer.",
+            "analysis": "Very broad IP assignment. Consider clarifying scope to work created within employment duties and using company resources."
+          },
+          {
+            "title": "Notice Period",
+            "type": "termination",
+            "risk_level": "low",
+            "content": "1 month during probation, 2 months after confirmation.",
+            "analysis": "Standard notice periods for IT industry. Payment in lieu of notice is explicitly permitted."
+          }
+        ],
+        "risks": [
+          {
+            "title": "Unenforceable Non-Compete Clause",
+            "severity": "high",
+            "description": "The 12-month post-employment non-compete restriction covering all of India is likely unenforceable. Section 27 of the Indian Contract Act, 1872 renders void any agreement in restraint of trade. Indian courts have consistently struck down broad non-compete clauses.",
+            "recommendation": "Consider replacing with a narrowly tailored non-solicitation clause (clients/employees) and confidentiality obligations which are more likely to be enforceable.",
+            "legal_reference": "Section 27, Indian Contract Act, 1872; Niranjan Shankar Golikari v. Century Spinning (1967)"
+          },
+          {
+            "title": "Overly Broad IP Assignment",
+            "severity": "medium",
+            "description": "The IP clause assigns ALL work product to the employer without distinguishing between work created during employment hours/with company resources and personal projects.",
+            "recommendation": "Clarify that IP assignment covers only work created (a) within scope of employment, (b) using company resources, or (c) relating to company's business.",
+            "legal_reference": "Patents Act, 1970; Copyright Act, 1957"
+          },
+          {
+            "title": "Missing Gratuity Provision",
+            "severity": "medium",
+            "description": "No mention of gratuity entitlement which is mandatory under the Payment of Gratuity Act, 1972 for employees completing 5 years of service.",
+            "recommendation": "Add reference to gratuity eligibility as per Payment of Gratuity Act, 1972.",
+            "legal_reference": "Payment of Gratuity Act, 1972"
+          },
+          {
+            "title": "Aadhaar Number Mentioned",
+            "severity": "low",
+            "description": "Aadhaar number is included in the agreement. Under DPDP Act 2023 and Aadhaar regulations, Aadhaar should only be collected for specific purposes.",
+            "recommendation": "Consider if Aadhaar collection is necessary. If required, ensure proper consent and data protection measures.",
+            "legal_reference": "DPDP Act, 2023; Aadhaar Act, 2016"
+          }
+        ],
+        "suggestions": [
+          "Replace non-compete with enforceable non-solicitation clause for clients and employees",
+          "Narrow IP assignment to work created within employment scope using company resources",
+          "Add gratuity clause referencing Payment of Gratuity Act, 1972",
+          "Include detailed job description as an annexure",
+          "Add data protection acknowledgment for personal data collected",
+          "Consider adding POSH policy acknowledgment clause",
+          "Include variable compensation/bonus structure if applicable",
+          "Add remote work policy details for hybrid arrangement"
+        ]
+      },
+      "created_at": "2024-02-01T09:00:00.000Z",
+      "analyzed_at": "2024-02-01T09:02:30.000Z"
+    },
+    {
+      "id": "sample-msa-003",
+      "file_name": "sample-service-agreement.txt",
+      "file_path": "data/uploads/sample-service-agreement.txt",
+      "file_size": 3511,
+      "file_type": ".txt",
+      "status": "completed",
+      "analysis": {
+        "overall_risk_score": 40,
+        "summary": "This Master Service Agreement between CloudTech Services Pvt. Ltd. (provider) and RetailMax India Pvt. Ltd. (client) covers IT services including cloud infrastructure, application development, and support. The agreement is well-structured with clear commercial terms (Rs. 5 Lakhs monthly), SLA commitments (99.9% uptime), and comprehensive legal provisions. The liability cap and indemnification clauses require careful review.",
+        "clauses": [
+          {
+            "title": "Scope of Services",
+            "type": "scope",
+            "risk_level": "low",
+            "content": "Cloud infrastructure management, application development/maintenance, 24/7 support, data backup and disaster recovery.",
+            "analysis": "Well-defined service categories. Detailed specifications in Annexure A (Statement of Work) should clearly define deliverables and acceptance criteria."
+          },
+          {
+            "title": "Contract Term - 24 Months with Auto-Renewal",
+            "type": "term",
+            "risk_level": "medium",
+            "content": "Initial 24-month term with automatic 12-month renewals unless terminated.",
+            "analysis": "Auto-renewal clause requires proactive termination notice. Ensure adequate advance notice period is specified to avoid unintended renewals."
+          },
+          {
+            "title": "Fees and Payment",
+            "type": "commercial",
+            "risk_level": "low",
+            "content": "Monthly Rs. 5,00,000 + 18% GST = Rs. 5,90,000. Net 30 payment terms. 1.5% monthly late payment interest.",
+            "analysis": "Clear pricing structure with GST compliance. Late payment interest at 1.5% per month (18% annually) is reasonable but enforceable under Indian law."
+          },
+          {
+            "title": "GST Compliance",
+            "type": "compliance",
+            "risk_level": "low",
+            "content": "GST-compliant invoicing, accurate return filing, Input Tax Credit availability.",
+            "analysis": "Standard GST compliance provisions ensuring both parties fulfill CGST/SGST requirements."
+          },
+          {
+            "title": "TDS Provisions",
+            "type": "compliance",
+            "risk_level": "low",
+            "content": "TDS at 2% under Section 194J with certificate issuance requirements.",
+            "analysis": "Correct TDS rate for technical services. Ensure timely TDS certificate issuance for vendor's tax credit."
+          },
+          {
+            "title": "Service Level Agreement",
+            "type": "sla",
+            "risk_level": "low",
+            "content": "99.9% uptime, Response times: Critical 1hr, High 4hr, Medium 24hr. 5% credit penalty per 0.1% below SLA.",
+            "analysis": "Industry-standard SLA metrics. The penalty structure provides meaningful accountability without being punitive."
+          },
+          {
+            "title": "Liability Cap",
+            "type": "liability",
+            "risk_level": "medium",
+            "content": "Total liability capped at fees paid in preceding 12 months. No indirect/consequential damages.",
+            "analysis": "12-month cap is standard but may be insufficient for critical service failures. Exclusion of consequential damages is common but may leave client exposed."
+          },
+          {
+            "title": "Indemnification",
+            "type": "indemnity",
+            "risk_level": "medium",
+            "content": "Mutual indemnification for breach, negligence, and IP infringement claims.",
+            "analysis": "Balanced mutual indemnification. Consider adding caps on indemnification obligations and defense/settlement procedures."
+          },
+          {
+            "title": "Dispute Resolution",
+            "type": "dispute",
+            "risk_level": "low",
+            "content": "30-day negotiation, then ICADR mediation, then arbitration under Arbitration Act 1996 in Bangalore.",
+            "analysis": "Well-structured escalation mechanism. ICADR mediation before arbitration encourages resolution. Single arbitrator may be faster for disputes under this contract value."
+          }
+        ],
+        "risks": [
+          {
+            "title": "Auto-Renewal Without Defined Notice Period",
+            "severity": "medium",
+            "description": "The auto-renewal clause does not specify how far in advance termination notice must be given to prevent renewal. This could lead to unintended contract extensions.",
+            "recommendation": "Specify that termination notice must be provided at least 60-90 days before the end of the current term to prevent auto-renewal.",
+            "legal_reference": "Indian Contract Act, 1872"
+          },
+          {
+            "title": "Liability Cap May Be Insufficient",
+            "severity": "medium",
+            "description": "Capping liability at 12-month fees (Rs. 60 Lakhs) may not cover significant damages from data breaches or extended service outages affecting client's business.",
+            "recommendation": "Consider higher caps for specific scenarios (data breach, security incidents) or require adequate cyber insurance coverage.",
+            "legal_reference": "DPDP Act, 2023; IT Act, 2000"
+          },
+          {
+            "title": "Missing Data Protection Provisions",
+            "severity": "medium",
+            "description": "Given DPDP Act 2023 requirements, the agreement lacks specific provisions for personal data processing, data processor obligations, and breach notification.",
+            "recommendation": "Add a Data Processing Addendum (DPA) specifying data handling responsibilities, security measures, and breach notification procedures.",
+            "legal_reference": "Digital Personal Data Protection Act, 2023"
+          },
+          {
+            "title": "Undefined Annexures",
+            "severity": "low",
+            "description": "Annexures A, B, and C are referenced but not included. Critical terms like detailed SOW and SLA metrics are undefined.",
+            "recommendation": "Ensure all annexures are properly drafted and attached before execution.",
+            "legal_reference": "Contract formation requirements"
+          }
+        ],
+        "suggestions": [
+          "Specify advance notice period for preventing auto-renewal (60-90 days recommended)",
+          "Add Data Processing Addendum for DPDP Act compliance",
+          "Consider cyber insurance requirements for data breach scenarios",
+          "Include change management procedure for scope modifications",
+          "Add force majeure clause with specific pandemic/disaster provisions",
+          "Include audit rights for service quality verification",
+          "Specify ownership and transition assistance for contract termination",
+          "Add business continuity and disaster recovery testing requirements",
+          "Consider adding a most favored customer clause for pricing protection"
+        ]
+      },
+      "created_at": "2024-03-01T14:00:00.000Z",
+      "analyzed_at": "2024-03-01T14:03:45.000Z"
+    },
+    {
+      "id": "sample-privacy-004",
+      "file_name": "sample-privacy-policy.txt",
+      "file_path": "data/uploads/sample-privacy-policy.txt",
+      "file_size": 4089,
+      "file_type": ".txt",
+      "status": "completed",
+      "analysis": {
+        "overall_risk_score": 30,
+        "summary": "This Privacy Policy for ShopEasy Technologies Pvt. Ltd. demonstrates good compliance with the Digital Personal Data Protection Act, 2023 (DPDP Act). It covers data collection transparency, processing purposes, user rights, and grievance redressal mechanisms. The policy is well-structured and addresses most DPDP requirements, though some areas could be strengthened for full compliance.",
+        "clauses": [
+          {
+            "title": "Data Collection Disclosure",
+            "type": "transparency",
+            "risk_level": "low",
+            "content": "Comprehensive list of collected data: personal info, usage data, cookies. PAN requirement for orders above Rs. 2 Lakhs noted.",
+            "analysis": "Transparent disclosure of data types collected. PAN collection for high-value orders aligns with Income Tax requirements. Payment data handled by third parties reduces PCI-DSS scope."
+          },
+          {
+            "title": "Purpose of Processing",
+            "type": "purpose",
+            "risk_level": "low",
+            "content": "Six specified purposes: service provision, transactions, promotions (with consent), customer service, legal compliance, fraud prevention.",
+            "analysis": "Clear purpose specification as required under DPDP Act. Marketing communications requiring separate consent is good practice."
+          },
+          {
+            "title": "Legal Basis under DPDP Act",
+            "type": "compliance",
+            "risk_level": "low",
+            "content": "Consent, contract performance, legal obligations, and legitimate interests cited as processing bases.",
+            "analysis": "Correctly identifies grounds for processing under DPDP Act, 2023. Note that DPDP Act has simplified consent requirements compared to GDPR."
+          },
+          {
+            "title": "Data Retention Periods",
+            "type": "retention",
+            "risk_level": "low",
+            "content": "Transactions: 8 years (Income Tax), Communications: 3 years, Marketing: until consent withdrawal.",
+            "analysis": "Retention periods aligned with legal requirements. 8-year transaction retention complies with Income Tax record-keeping rules."
+          },
+          {
+            "title": "Data Principal Rights",
+            "type": "rights",
+            "risk_level": "low",
+            "content": "Access, correction, erasure, portability, consent withdrawal, grievance redressal rights listed.",
+            "analysis": "Comprehensive coverage of rights under DPDP Act, 2023. Right to grievance redressal with Data Protection Board is correctly included."
+          },
+          {
+            "title": "Data Security Measures",
+            "type": "security",
+            "risk_level": "low",
+            "content": "SSL/TLS, AES-256 encryption, security audits, access controls, employee training.",
+            "analysis": "Robust security measures described. These align with 'reasonable security safeguards' requirement under DPDP Act and IT Rules."
+          },
+          {
+            "title": "Cross-Border Data Transfer",
+            "type": "transfer",
+            "risk_level": "medium",
+            "content": "Data may be transferred outside India with 'adequate safeguards as per DPDP Act'.",
+            "analysis": "DPDP Act restricts transfers to countries notified by Central Government. Ensure transfer destinations are on approved list or implement additional safeguards."
+          },
+          {
+            "title": "Children's Privacy",
+            "type": "special_category",
+            "risk_level": "low",
+            "content": "Services not intended for under-18. No knowing collection without verifiable parental consent.",
+            "analysis": "Good practice for DPDP compliance. Note that DPDP Act requires verifiable parental consent for processing children's data."
+          },
+          {
+            "title": "Grievance Officer",
+            "type": "compliance",
+            "risk_level": "low",
+            "content": "Named officer: Priya Sharma with contact details. 30-day response commitment.",
+            "analysis": "Compliant with DPDP Act requirement for designated contact person. 30-day response timeline aligns with regulatory expectations."
+          }
+        ],
+        "risks": [
+          {
+            "title": "Cross-Border Transfer Compliance",
+            "severity": "medium",
+            "description": "The policy mentions cross-border transfers but doesn't specify which countries or detail the specific safeguards implemented. DPDP Act restricts transfers to non-notified countries.",
+            "recommendation": "Specify permitted transfer destinations. If transferring to restricted countries, implement and document additional safeguards. Monitor Central Government notifications.",
+            "legal_reference": "Section 16, DPDP Act, 2023"
+          },
+          {
+            "title": "Consent Mechanism Not Detailed",
+            "severity": "medium",
+            "description": "While consent is mentioned as a basis for processing, the policy doesn't describe how consent is obtained, recorded, or how withdrawal requests are processed.",
+            "recommendation": "Add details about consent collection (explicit, granular), consent management interface, and withdrawal process timeline.",
+            "legal_reference": "Section 6, DPDP Act, 2023"
+          },
+          {
+            "title": "Data Breach Notification Missing",
+            "severity": "medium",
+            "description": "No mention of data breach notification procedures to affected individuals or the Data Protection Board as required under DPDP Act.",
+            "recommendation": "Add clause describing breach notification process, timelines (as specified by DPB), and user notification mechanism.",
+            "legal_reference": "Section 8(6), DPDP Act, 2023"
+          },
+          {
+            "title": "Third-Party Data Sharing Details",
+            "severity": "low",
+            "description": "Categories of recipients are listed but specific data sharing arrangements and processor obligations are not detailed.",
+            "recommendation": "Consider adding Data Processing Agreements with service providers and disclosing key processor categories more specifically.",
+            "legal_reference": "Section 8, DPDP Act, 2023"
+          }
+        ],
+        "suggestions": [
+          "Add detailed data breach notification procedure and timelines",
+          "Specify consent collection mechanism and withdrawal process",
+          "List permitted cross-border transfer destinations",
+          "Include Data Processing Agreement requirements for vendors",
+          "Add cookie consent management details (cookie banner, preferences)",
+          "Consider adding specific examples for each data principal right",
+          "Include data minimization commitment",
+          "Add version history for policy changes",
+          "Consider multilingual policy for broader accessibility",
+          "Add links to exercise rights (opt-out, access request forms)"
+        ]
+      },
+      "created_at": "2024-01-01T08:00:00.000Z",
+      "analyzed_at": "2024-01-01T08:02:20.000Z"
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "last_updated": "2024-03-01T00:00:00.000Z",
+    "description": "Sample pre-analyzed document reviews for JurisGPT Document Review feature demonstration"
+  }
+}

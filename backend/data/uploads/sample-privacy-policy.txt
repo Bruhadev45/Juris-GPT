@@ -1,0 +1,125 @@
+PRIVACY POLICY
+
+Last Updated: January 1, 2024
+Effective Date: January 1, 2024
+
+ShopEasy Technologies Pvt. Ltd. ("Company", "we", "us", or "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website www.shopeasy.in and use our mobile application.
+
+1. INFORMATION WE COLLECT
+
+1.1 Personal Data
+We may collect personally identifiable information, including:
+- Full Name
+- Email Address
+- Phone Number
+- Postal Address
+- Date of Birth
+- PAN Card Number (for orders above Rs. 2,00,000)
+- Payment Information (processed by third-party payment gateways)
+
+1.2 Usage Data
+We automatically collect:
+- IP Address
+- Browser Type and Version
+- Device Information
+- Pages Visited
+- Time and Date of Access
+- Referring Website
+
+1.3 Cookies and Tracking
+We use cookies and similar tracking technologies to track activity and store certain information.
+
+2. PURPOSE OF DATA PROCESSING
+
+We process your personal data for the following purposes:
+(a) To provide and maintain our services
+(b) To process transactions and send related information
+(c) To send promotional communications (with your consent)
+(d) To respond to customer service requests
+(e) To comply with legal obligations
+(f) To prevent fraud and enhance security
+
+3. LEGAL BASIS FOR PROCESSING
+
+Under the Digital Personal Data Protection Act, 2023 (DPDP Act), we process your data based on:
+(a) Your consent
+(b) Performance of contract
+(c) Compliance with legal obligations
+(d) Legitimate interests
+
+4. DATA RETENTION
+
+We retain your personal data only for as long as necessary:
+- Transaction records: 8 years (as per Income Tax Act)
+- Communication records: 3 years
+- Marketing preferences: Until consent withdrawal
+
+5. DATA SHARING AND DISCLOSURE
+
+We may share your information with:
+(a) Service providers (payment processors, logistics partners)
+(b) Business partners (with your consent)
+(c) Legal authorities (when required by law)
+(d) Affiliated companies
+
+We do NOT sell your personal data to third parties.
+
+6. YOUR RIGHTS UNDER DPDP ACT, 2023
+
+You have the following rights:
+(a) Right to Access: Request a copy of your personal data
+(b) Right to Correction: Request correction of inaccurate data
+(c) Right to Erasure: Request deletion of your data
+(d) Right to Data Portability: Receive data in machine-readable format
+(e) Right to Withdraw Consent: Withdraw consent at any time
+(f) Right to Grievance Redressal: File complaints with Data Protection Board
+
+7. DATA SECURITY
+
+We implement appropriate security measures including:
+- SSL/TLS encryption for data in transit
+- AES-256 encryption for data at rest
+- Regular security audits
+- Access controls and authentication
+- Employee training on data protection
+
+8. CROSS-BORDER DATA TRANSFER
+
+Your data may be transferred to and processed in countries outside India. We ensure adequate safeguards are in place as per DPDP Act requirements.
+
+9. CHILDREN'S PRIVACY
+
+Our services are not intended for users under 18 years. We do not knowingly collect data from minors without verifiable parental consent.
+
+10. CHANGES TO THIS POLICY
+
+We may update this Privacy Policy from time to time. Changes will be notified via email or prominent notice on our website.
+
+11. GRIEVANCE OFFICER
+
+For any privacy-related concerns, contact our Grievance Officer:
+
+Name: Priya Sharma
+Email: privacy@shopeasy.in
+Phone: +91-80-12345678
+Address: 100 Indiranagar, Bangalore, Karnataka 560038
+
+Response Time: Within 30 days of receiving your request
+
+12. DATA PROTECTION BOARD
+
+If you are not satisfied with our response, you may file a complaint with the Data Protection Board of India as established under the DPDP Act, 2023.
+
+13. CONSENT
+
+By using our services, you consent to this Privacy Policy.
+
+14. GOVERNING LAW
+
+This Privacy Policy is governed by the laws of India, including the Digital Personal Data Protection Act, 2023, and the Information Technology Act, 2000.
+
+---
+
+For ShopEasy Technologies Pvt. Ltd.
+CIN: U72200KA2021PTC145678
+Registered Office: 100 Indiranagar, Bangalore, Karnataka 560038

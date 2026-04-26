@@ -22,6 +22,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { teamApi, type TeamMember } from "@/lib/api";
 
 export default function TeamPage() {
@@ -31,6 +41,7 @@ export default function TeamPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [adding, setAdding] = useState(false);
   const [removingIds, setRemovingIds] = useState<Set<string>>(new Set());
+  const [removeDialog, setRemoveDialog] = useState<{ id: string; name: string } | null>(null);
 
   const [newMember, setNewMember] = useState({
     name: "",
@@ -78,10 +89,14 @@ export default function TeamPage() {
     }
   };
 
-  const handleRemove = async (id: string, name: string) => {
-    if (!window.confirm(`Are you sure you want to remove ${name} from the team?`)) {
-      return;
-    }
+  const handleRemoveClick = (id: string, name: string) => {
+    setRemoveDialog({ id, name });
+  };
+
+  const handleRemoveConfirm = async () => {
+    if (!removeDialog) return;
+    const { id } = removeDialog;
+    setRemoveDialog(null);
     try {
       setRemovingIds((prev) => new Set(prev).add(id));
       setError(null);
@@ -411,7 +426,7 @@ export default function TeamPage() {
                             className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
                             disabled={removingIds.has(member.id)}
                             onClick={() =>
-                              handleRemove(member.id, member.name)
+                              handleRemoveClick(member.id, member.name)
                             }
                           >
                             {removingIds.has(member.id) ? (
@@ -436,6 +451,27 @@ export default function TeamPage() {
           </div>
         </div>
       </div>
+
+      {/* Remove Confirmation Dialog */}
+      <AlertDialog open={!!removeDialog} onOpenChange={(open) => { if (!open) setRemoveDialog(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Team Member</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove {removeDialog?.name} from the team? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleRemoveConfirm}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

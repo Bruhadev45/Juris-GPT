@@ -13,7 +13,6 @@ import {
   ScrollText,
   ArrowRight,
   Clock,
-  IndianRupee,
   FormInput,
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -194,18 +193,15 @@ export default function DocumentsPage() {
                         {template.description}
                       </CardDescription>
                       <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground">
-                        {template.price !== undefined && (
-                          <span className="flex items-center gap-0.5">
-                            <IndianRupee className="h-3 w-3" />
-                            {template.price === 0 ? "Free" : template.price}
-                          </span>
-                        )}
                         {template.fields_count !== undefined && (
                           <span className="flex items-center gap-0.5">
                             <FormInput className="h-3 w-3" />
                             {template.fields_count} fields
                           </span>
                         )}
+                        <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 text-xs">
+                          Free
+                        </Badge>
                       </div>
                     </CardContent>
                   </Card>

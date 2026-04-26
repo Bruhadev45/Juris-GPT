@@ -1,0 +1,79 @@
+EMPLOYMENT AGREEMENT
+
+This Employment Agreement ("Agreement") is entered into as of February 1, 2024
+
+BETWEEN:
+
+EMPLOYER: Digital Solutions India Pvt. Ltd.
+CIN: U72200KA2020PTC123456
+Registered Office: 789 Electronic City, Phase 1, Bangalore, Karnataka 560100
+GSTIN: 29AABCD1234E1Z5
+
+AND
+
+EMPLOYEE: Rahul Kumar
+PAN: ABCPK1234D
+Address: 101 Palm Residency, Whitefield, Bangalore, Karnataka 560066
+Aadhaar: XXXX-XXXX-1234
+
+1. APPOINTMENT
+The Employer hereby appoints the Employee as "Senior Software Engineer" in the Technology Department, and the Employee accepts such appointment on the terms and conditions set forth herein.
+
+2. COMMENCEMENT AND PROBATION
+(a) Date of Joining: February 1, 2024
+(b) Probation Period: 6 months
+(c) Confirmation shall be subject to satisfactory performance review
+
+3. COMPENSATION
+(a) Annual CTC: Rs. 18,00,000 (Rupees Eighteen Lakhs Only)
+(b) Monthly Gross: Rs. 1,50,000
+(c) Basic Salary: Rs. 75,000 (50% of gross)
+(d) HRA: Rs. 37,500 (25% of gross)
+(e) Special Allowance: Rs. 37,500
+(f) PF Contribution (Employee): Rs. 9,000 (12% of basic)
+(g) PF Contribution (Employer): Rs. 9,000 (12% of basic)
+
+4. STATUTORY DEDUCTIONS
+The following deductions shall be made as per applicable laws:
+(a) Provident Fund as per EPF Act, 1952
+(b) Professional Tax as per Karnataka Tax on Professions Act
+(c) TDS as per Income Tax Act, 1961
+
+5. LEAVE ENTITLEMENT
+(a) Earned Leave: 18 days per annum
+(b) Casual Leave: 12 days per annum
+(c) Sick Leave: 6 days per annum
+(d) Public Holidays: As per Karnataka state calendar
+
+6. WORKING HOURS
+(a) Standard Hours: 9:00 AM to 6:00 PM, Monday to Friday
+(b) Work Location: Bangalore Office (Hybrid - 3 days office)
+
+7. NOTICE PERIOD
+(a) During Probation: 1 month
+(b) After Confirmation: 2 months
+
+8. CONFIDENTIALITY
+The Employee shall maintain strict confidentiality of all proprietary information and shall not disclose the same during or after employment.
+
+9. NON-COMPETE
+For a period of 12 months after termination, the Employee shall not join any competitor organization within India.
+
+10. INTELLECTUAL PROPERTY
+All work product created during employment shall be the exclusive property of the Employer.
+
+11. TERMINATION
+Either party may terminate this Agreement by providing notice as specified above or payment in lieu thereof.
+
+12. GOVERNING LAW
+This Agreement shall be governed by the laws of India and courts in Bangalore shall have exclusive jurisdiction.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement.
+
+For Digital Solutions India Pvt. Ltd.
+Name: _______________ (Authorized Signatory)
+Date: _______________
+
+Employee Acceptance:
+Name: Rahul Kumar
+Date: _______________

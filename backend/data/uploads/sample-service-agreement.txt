@@ -1,0 +1,113 @@
+MASTER SERVICE AGREEMENT
+
+This Master Service Agreement ("Agreement") is entered into on March 1, 2024
+
+BETWEEN:
+
+SERVICE PROVIDER:
+CloudTech Services Pvt. Ltd.
+CIN: U72300KA2019PTC134567
+Address: 200 Koramangala, 4th Block, Bangalore 560034
+GSTIN: 29AABCC5678F1Z9
+PAN: AABCC5678F
+
+AND
+
+CLIENT:
+RetailMax India Pvt. Ltd.
+CIN: U52100KA2018PTC112233
+Address: 500 MG Road, Bangalore 560001
+GSTIN: 29AABCR9012G1Z3
+PAN: AABCR9012G
+
+RECITALS:
+A. The Service Provider is engaged in the business of providing IT services and solutions.
+B. The Client wishes to engage the Service Provider for certain services on the terms set forth herein.
+
+NOW THEREFORE, the parties agree as follows:
+
+1. SCOPE OF SERVICES
+The Service Provider shall provide the following services:
+(a) Cloud infrastructure management
+(b) Application development and maintenance
+(c) 24/7 technical support
+(d) Data backup and disaster recovery
+Details are specified in Annexure A - Statement of Work.
+
+2. TERM
+(a) Initial Term: 24 months from Effective Date
+(b) Renewal: Automatic renewal for 12-month periods unless terminated
+
+3. FEES AND PAYMENT
+(a) Monthly Retainer: Rs. 5,00,000 (Rupees Five Lakhs Only)
+(b) GST: 18% additional (Rs. 90,000)
+(c) Total Monthly Invoice: Rs. 5,90,000
+(d) Payment Terms: Net 30 days from invoice date
+(e) Late Payment Interest: 1.5% per month
+
+4. GST COMPLIANCE
+(a) The Service Provider shall issue GST-compliant tax invoices
+(b) Both parties shall file accurate GST returns
+(c) Input Tax Credit shall be available to the Client
+
+5. TDS PROVISIONS
+(a) The Client shall deduct TDS at applicable rates (currently 2% u/s 194J)
+(b) TDS certificates shall be provided within prescribed timelines
+(c) Annual TDS: Rs. 1,20,000 (on base amount of Rs. 60,00,000)
+
+6. SERVICE LEVEL AGREEMENT
+(a) System Uptime: 99.9%
+(b) Response Time: Critical - 1 hour, High - 4 hours, Medium - 24 hours
+(c) Penalty: 5% credit for each 0.1% below uptime SLA
+
+7. INTELLECTUAL PROPERTY
+(a) Pre-existing IP remains with respective parties
+(b) Developed IP shall be owned by the Client upon full payment
+(c) Service Provider retains license for generic tools and methodologies
+
+8. CONFIDENTIALITY
+Both parties shall maintain confidentiality of proprietary information for 5 years.
+
+9. LIABILITY
+(a) Total liability capped at fees paid in preceding 12 months
+(b) Neither party liable for indirect/consequential damages
+(c) Liability exclusions do not apply to gross negligence or willful misconduct
+
+10. INDEMNIFICATION
+Each party shall indemnify the other against third-party claims arising from:
+(a) Breach of this Agreement
+(b) Negligence or willful misconduct
+(c) Infringement of intellectual property rights
+
+11. TERMINATION
+(a) For Convenience: 90 days written notice
+(b) For Cause: 30 days cure period for material breach
+(c) Immediate: In case of insolvency or bankruptcy
+
+12. DISPUTE RESOLUTION
+(a) Good faith negotiations for 30 days
+(b) Mediation under ICADR rules
+(c) Arbitration in Bangalore under Arbitration and Conciliation Act, 1996
+
+13. GOVERNING LAW
+This Agreement shall be governed by laws of India.
+
+14. NOTICES
+All notices shall be in writing and sent to registered addresses.
+
+ANNEXURES:
+Annexure A - Statement of Work
+Annexure B - Pricing Schedule
+Annexure C - SLA Metrics
+
+IN WITNESS WHEREOF:
+
+For CloudTech Services Pvt. Ltd.
+Authorized Signatory: _______________
+Name: _______________
+Date: _______________
+
+For RetailMax India Pvt. Ltd.
+Authorized Signatory: _______________
+Name: _______________
+Date: _______________

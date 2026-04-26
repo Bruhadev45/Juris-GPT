@@ -1,0 +1,299 @@
+{
+  "timestamp": "2026-04-26T09:50:15.211563+00:00",
+  "total_queries": 10,
+  "aggregate": {
+    "recall_at_5": 0.9,
+    "precision_at_5": 0.88,
+    "mrr": 0.8583,
+    "ndcg_at_5": 0.7242,
+    "groundedness_rate": 1.0,
+    "hallucination_proxy_rate": 0.0,
+    "avg_response_time": 0.01
+  },
+  "confidence_distribution": {
+    "high": 1,
+    "medium": 7,
+    "low": 2
+  },
+  "category_metrics": {
+    "company_formation": {
+      "count": 10,
+      "recall_at_5": 0.9,
+      "precision_at_5": 0.88,
+      "mrr": 0.8583,
+      "ndcg_at_5": 0.7242,
+      "groundedness_rate": 1.0,
+      "avg_elapsed": 0.01
+    }
+  },
+  "per_query": [
+    {
+      "query_id": "CF-001",
+      "category": "company_formation",
+      "query": "What is Section 7 of the Companies Act, 2013?",
+      "recall_at_5": 1.0,
+      "precision_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 1.0,
+      "grounded": true,
+      "hallucination_proxy": 0.0,
+      "confidence": "high",
+      "model_used": "local-lexical",
+      "num_citations": 5,
+      "elapsed_seconds": 0.009,
+      "retrieved_doc_types": [
+        "statute"
+      ],
+      "retrieved_acts": [
+        "Companies Act, 2013"
+      ]
+    },
+    {
+      "query_id": "CF-002",
+      "category": "company_formation",
+      "query": "What are the requirements for incorporating a private limited company in India?",
+      "recall_at_5": 1.0,
+      "precision_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 0.7576,
+      "grounded": true,
+      "hallucination_proxy": 0.0,
+      "confidence": "medium",
+      "model_used": "local-lexical",
+      "num_citations": 5,
+      "elapsed_seconds": 0.011,
+      "retrieved_doc_types": [
+        "faq",
+        "statute"
+      ],
+      "retrieved_acts": [
+        "Companies Act, 2013",
+        "Companies Act, 2013 - Section 2(68), LLP Act, 2008, Companies Act, 2013 - Section 2(62)",
+        "Companies Act, 2013 - Section 7, Companies (Incorporation) Rules, 2014, MCA SPICe+ Guidelines",
+        "Foreigners Act, 1946, Visa Manual - Ministry of Home Affairs, Income Tax Act provisions for NRs, Social Security Agreements"
+      ]
+    },
+    {
+      "query_id": "CF-003",
+      "category": "company_formation",
+      "query": "What is the minimum number of directors required for a private limited company?",
+      "recall_at_5": 1.0,
+      "precision_at_5": 0.6,
+      "mrr": 0.3333,
+      "ndcg_at_5": 0.4469,
+      "grounded": true,
+      "hallucination_proxy": 0.0,
+      "confidence": "medium",
+      "model_used": "local-lexical",
+      "num_citations": 5,
+      "elapsed_seconds": 0.013,
+      "retrieved_doc_types": [
+        "faq",
+        "statute"
+      ],
+      "retrieved_acts": [
+        "Companies Act, 2013",
+        "Companies Act, 2013 - Section 2(68), LLP Act, 2008, Companies Act, 2013 - Section 2(62)",
+        "Companies Act, 2013 - Section 7, Companies (Incorporation) Rules, 2014, MCA SPICe+ Guidelines"
+      ]
+    },
+    {
+      "query_id": "CF-004",
+      "category": "company_formation",
+      "query": "What is the difference between authorized and paid-up capital?",
+      "recall_at_5": 1.0,
+      "precision_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 0.6842,
+      "grounded": true,
+      "hallucination_proxy": 0.0,
+      "confidence": "medium",
+      "model_used": "local-lexical",
+      "num_citations": 5,
+      "elapsed_seconds": 0.009,
+      "retrieved_doc_types": [
+        "faq",
+        "statute"
+      ],
+      "retrieved_acts": [
+        "Companies Act, 2013",
+        "Companies Act, 2013 - Section 2(68), LLP Act, 2008, Companies Act, 2013 - Section 2(62)",
+        "Companies Act, 2013 - Section 7, Companies (Incorporation) Rules, 2014, MCA SPICe+ Guidelines",
+        "Income Tax Act, 1961"
+      ]
+    },
+    {
+      "query_id": "CF-005",
+      "category": "company_formation",
+      "query": "How to convert a partnership into a private limited company?",
+      "recall_at_5": 1.0,
+      "precision_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 0.7688,
+      "grounded": true,
+      "hallucination_proxy": 0.0,
+      "confidence": "low",
+      "model_used": "local-lexical",
+      "num_citations": 5,
+      "elapsed_seconds": 0.011,
+      "retrieved_doc_types": [
+        "faq",
+        "statute"
+      ],
+      "retrieved_acts": [
+        "Companies Act, 2013",
+        "Companies Act, 2013 - Section 2(68), LLP Act, 2008, Companies Act, 2013 - Section 2(62)",
+        "Companies Act, 2013 - Section 7, Companies (Incorporation) Rules, 2014, MCA SPICe+ Guidelines"
+      ]
+    },
+    {
+      "query_id": "CF-006",
+      "category": "company_formation",
+      "query": "What is the role of the Registrar of Companies?",
+      "recall_at_5": 0.5,
+      "precision_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 1.0,
+      "grounded": true,
+      "hallucination_proxy": 0.0,
+      "confidence": "medium",
+      "model_used": "local-lexical",
+      "num_citations": 5,
+      "elapsed_seconds": 0.006,
+      "retrieved_doc_types": [
+        "statute"
+      ],
+      "retrieved_acts": [
+        "Companies Act, 2013"
+      ]
+    },
+    {
+      "query_id": "CF-007",
+      "category": "company_formation",
+      "query": "What are the contents of Memorandum of Association?",
+      "recall_at_5": 1.0,
+      "precision_at_5": 0.8,
+      "mrr": 1.0,
+      "ndcg_at_5": 0.6372,
+      "grounded": true,
+      "hallucination_proxy": 0.0,
+      "confidence": "low",
+      "model_used": "local-lexical",
+      "num_citations": 5,
+      "elapsed_seconds": 0.006,
+      "retrieved_doc_types": [
+        "case",
+        "statute"
+      ],
+      "retrieved_acts": [
+        "Companies Act, 2013",
+        "The Patents Act, 1970"
+      ]
+    },
+    {
+      "query_id": "CF-008",
+      "category": "company_formation",
+      "query": "What is Section 12 regarding registered office?",
+      "recall_at_5": 1.0,
+      "precision_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 0.9288,
+      "grounded": true,
+      "hallucination_proxy": 0.0,
+      "confidence": "medium",
+      "model_used": "local-lexical",
+      "num_citations": 5,
+      "elapsed_seconds": 0.01,
+      "retrieved_doc_types": [
+        "statute"
+      ],
+      "retrieved_acts": [
+        "Companies Act, 2013",
+        "Delhi Shops and Establishments Act, 1954"
+      ]
+    },
+    {
+      "query_id": "CF-009",
+      "category": "company_formation",
+      "query": "What are the different types of companies under Companies Act?",
+      "recall_at_5": 0.5,
+      "precision_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 0.9075,
+      "grounded": true,
+      "hallucination_proxy": 0.0,
+      "confidence": "medium",
+      "model_used": "local-lexical",
+      "num_citations": 5,
+      "elapsed_seconds": 0.01,
+      "retrieved_doc_types": [
+        "statute"
+      ],
+      "retrieved_acts": [
+        "Companies Act, 2013"
+      ]
+    },
+    {
+      "query_id": "CF-010",
+      "category": "company_formation",
+      "query": "What is the process for name reservation on MCA portal?",
+      "recall_at_5": 1.0,
+      "precision_at_5": 0.4,
+      "mrr": 0.25,
+      "ndcg_at_5": 0.1105,
+      "grounded": true,
+      "hallucination_proxy": 0.0,
+      "confidence": "medium",
+      "model_used": "local-lexical",
+      "num_citations": 5,
+      "elapsed_seconds": 0.015,
+      "retrieved_doc_types": [
+        "faq",
+        "news",
+        "statute"
+      ],
+      "retrieved_acts": [
+        "Companies Act, 2013",
+        "Companies Act, 2013 - Section 7, Companies (Incorporation) Rules, 2014, MCA SPICe+ Guidelines",
+        "MCA"
+      ]
+    }
+  ],
+  "rag_config": {
+    "vector_store": "lexical",
+    "llm_type": "none",
+    "hybrid_search": false,
+    "use_reranker": false,
+    "corpus_size": 393,
+    "corpus_source": "local",
+    "corpus_doc_types": {
+      "case": 62,
+      "clause": 4,
+      "compliance": 41,
+      "faq": 60,
+      "news": 25,
+      "statute": 201
+    },
+    "loaded_corpus_files": [
+      "companies_act_sections.json",
+      "patent_act_sections.json",
+      "trademark_act_sections.json",
+      "income_tax_act_sections.json",
+      "gst_act_sections.json",
+      "consumer_protection_act_sections.json",
+      "industrial_disputes_act_sections.json",
+      "sebi_regulations_sections.json",
+      "shops_establishments_act_sections.json",
+      "case_summaries.json",
+      "legal_faqs.json",
+      "founder_agreement_clauses.json",
+      "compliance_deadlines.json",
+      "legal_news.json"
+    ],
+    "cloud_error": null
+  },
+  "methodology_notes": [
+    "Automatic hallucination proxy checks whether generated answers reference retrieved citation markers.",
+    "Human legal correctness and Fleiss kappa require external annotation and are not generated here."
+  ]
+}

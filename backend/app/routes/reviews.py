@@ -8,7 +8,7 @@ from typing import Optional
 import uuid
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from app.services.ai_analyzer import extract_text_from_file, review_document_with_ai
@@ -17,13 +17,37 @@ router = APIRouter()
 
 REVIEWS_FILE = Path(__file__).parent.parent.parent / "data" / "reviews.json"
 UPLOAD_DIR = Path(__file__).parent.parent.parent / "data" / "uploads"
+SAMPLE_REVIEWS_FILE = Path(__file__).parent.parent.parent / "data" / "datasets" / "samples" / "document_reviews.json"
 
 
-def load_reviews():
-    if not REVIEWS_FILE.exists():
+def load_sample_reviews():
+    """Load pre-analyzed sample reviews for demonstration."""
+    if not SAMPLE_REVIEWS_FILE.exists():
         return []
-    with open(REVIEWS_FILE, "r") as f:
-        return json.load(f)
+    try:
+        with open(SAMPLE_REVIEWS_FILE, "r") as f:
+            data = json.load(f)
+            return data.get("reviews", [])
+    except (json.JSONDecodeError, IOError):
+        return []
+
+
+def load_reviews(include_samples: bool = True):
+    """Load reviews from storage, optionally including sample data for demonstration."""
+    real_reviews = []
+    if REVIEWS_FILE.exists():
+        with open(REVIEWS_FILE, "r") as f:
+            real_reviews = json.load(f)
+
+    if include_samples:
+        # Combine sample reviews with real reviews
+        sample_reviews = load_sample_reviews()
+        # Avoid duplicates by ID
+        real_ids = {r["id"] for r in real_reviews}
+        combined = real_reviews + [s for s in sample_reviews if s["id"] not in real_ids]
+        return combined
+
+    return real_reviews
 
 
 def save_reviews(reviews):
@@ -63,10 +87,11 @@ async def upload_document(file: UploadFile = File(...)):
         "file_type": ext,
         "status": "pending",
         "analysis": None,
-        "created_at": datetime.utcnow().isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
     }
 
-    reviews = load_reviews()
+    # Load only real reviews for saving (exclude samples)
+    reviews = load_reviews(include_samples=False)
     reviews.append(review)
     save_reviews(reviews)
 
@@ -93,7 +118,15 @@ async def get_review(review_id: str):
 @router.post("/{review_id}/analyze")
 async def analyze_document(review_id: str):
     """Trigger real AI analysis on an uploaded document using GPT-4o."""
-    reviews = load_reviews()
+    # Check if this is a sample review (read-only)
+    sample_reviews = load_sample_reviews()
+    if any(r["id"] == review_id for r in sample_reviews):
+        # Return existing sample analysis without re-analyzing
+        review = next(r for r in sample_reviews if r["id"] == review_id)
+        return {"success": True, "review": review}
+
+    # Load only real reviews for modification
+    reviews = load_reviews(include_samples=False)
     review = next((r for r in reviews if r["id"] == review_id), None)
     if not review:
         raise HTTPException(status_code=404, detail="Review not found")
@@ -115,7 +148,7 @@ async def analyze_document(review_id: str):
 
         review["status"] = "completed"
         review["analysis"] = analysis
-        review["analyzed_at"] = datetime.utcnow().isoformat()
+        review["analyzed_at"] = datetime.now(timezone.utc).isoformat()
 
     except Exception as e:
         review["status"] = "failed"

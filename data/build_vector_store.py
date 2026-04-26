@@ -16,8 +16,49 @@ VECTORS_DIR = BASE_DIR / "vectors"
 VECTORS_DIR.mkdir(exist_ok=True)
 
 
-def get_embedding_function(model_type: str = "sentence_transformers"):
-    """Get embedding function based on model type"""
+def get_embedding_function(model_type: str = "inlegalbert"):
+    """Get embedding function based on model type.
+
+    Options:
+      - "inlegalbert" (default): law-ai/InLegalBERT (768d, legal-domain)
+      - "sentence_transformers": all-MiniLM-L6-v2 (384d, generic)
+      - "openai": text-embedding-3-small (requires API key)
+    """
+
+    if model_type == "inlegalbert":
+        try:
+            from transformers import AutoTokenizer, AutoModel
+            import torch
+            import numpy as np
+
+            class InLegalBERTEmbeddingFunction:
+                """Wrapper compatible with both ChromaDB and LangChain."""
+                def __init__(self, model_name="law-ai/InLegalBERT"):
+                    self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+                    self.model = AutoModel.from_pretrained(model_name)
+                    self.model.eval()
+
+                def _encode(self, texts):
+                    encoded = self.tokenizer(
+                        texts, padding=True, truncation=True, max_length=512, return_tensors="pt"
+                    )
+                    with torch.no_grad():
+                        outputs = self.model(**encoded)
+                    embeddings = outputs.last_hidden_state[:, 0, :]
+                    embeddings = torch.nn.functional.normalize(embeddings, p=2, dim=1)
+                    return embeddings.cpu().numpy().tolist()
+
+                def embed_query(self, text):
+                    return self._encode([text])[0]
+
+                def embed_documents(self, texts):
+                    return self._encode(texts)
+
+            print("Using InLegalBERT embeddings (768d, legal-domain)")
+            return InLegalBERTEmbeddingFunction()
+        except Exception as e:
+            print(f"⚠️ InLegalBERT unavailable ({e}). Falling back to sentence-transformers.")
+            return get_embedding_function("sentence_transformers")
 
     if model_type == "openai":
         try:
@@ -31,19 +72,19 @@ def get_embedding_function(model_type: str = "sentence_transformers"):
             print("⚠️ langchain-openai not installed. Using sentence-transformers.")
             return get_embedding_function("sentence_transformers")
 
-    else:  # sentence_transformers (default, free)
-        try:
-            from langchain_community.embeddings import HuggingFaceEmbeddings
-            return HuggingFaceEmbeddings(
-                model_name="sentence-transformers/all-MiniLM-L6-v2",
-                model_kwargs={'device': 'cpu'},
-                encode_kwargs={'normalize_embeddings': True}
-            )
-        except ImportError:
-            from langchain_community.embeddings import SentenceTransformerEmbeddings
-            return SentenceTransformerEmbeddings(
-                model_name="all-MiniLM-L6-v2"
-            )
+    # sentence_transformers (fallback, free)
+    try:
+        from langchain_community.embeddings import HuggingFaceEmbeddings
+        return HuggingFaceEmbeddings(
+            model_name="sentence-transformers/all-MiniLM-L6-v2",
+            model_kwargs={'device': 'cpu'},
+            encode_kwargs={'normalize_embeddings': True}
+        )
+    except ImportError:
+        from langchain_community.embeddings import SentenceTransformerEmbeddings
+        return SentenceTransformerEmbeddings(
+            model_name="all-MiniLM-L6-v2"
+        )
 
 
 def load_chunks() -> List[Dict[str, Any]]:
@@ -252,9 +293,9 @@ def main():
     parser = argparse.ArgumentParser(description="Build vector store for JurisGPT")
     parser.add_argument(
         "--embedding",
-        choices=["sentence_transformers", "openai"],
-        default="sentence_transformers",
-        help="Embedding model to use (default: sentence_transformers, free)"
+        choices=["inlegalbert", "sentence_transformers", "openai"],
+        default="inlegalbert",
+        help="Embedding model to use (default: inlegalbert, legal-domain)"
     )
     parser.add_argument(
         "--store",

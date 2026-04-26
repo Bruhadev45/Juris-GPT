@@ -1,0 +1,282 @@
+[
+  {
+    "id": "gstr1",
+    "title": "GSTR-1 Filing",
+    "category": "GST",
+    "description": "Monthly return for outward supplies. File details of all sales invoices for the previous month.",
+    "recurring": "monthly",
+    "due_day": 11,
+    "penalty": "Late fee: Rs. 50/day (CGST + SGST) up to Rs. 10,000. Interest: 18% p.a. on tax liability.",
+    "law_reference": "CGST Act 2017, Section 37"
+  },
+  {
+    "id": "gstr3b",
+    "title": "GSTR-3B Filing",
+    "category": "GST",
+    "description": "Monthly summary return with self-assessed tax payment. Reconcile with GSTR-1 and pay net GST liability.",
+    "recurring": "monthly",
+    "due_day": 20,
+    "penalty": "Late fee: Rs. 50/day up to Rs. 10,000. Interest: 18% p.a. on outstanding tax.",
+    "law_reference": "CGST Act 2017, Section 39"
+  },
+  {
+    "id": "tds_deposit",
+    "title": "TDS Payment (Challan 281)",
+    "category": "TDS",
+    "description": "Deposit TDS deducted during the previous month to the government. File Challan 281 through NSDL/bank.",
+    "recurring": "monthly",
+    "due_day": 7,
+    "penalty": "Interest: 1.5% per month from date of deduction. Penalty under Section 234E for late filing.",
+    "law_reference": "Income Tax Act 1961, Section 200"
+  },
+  {
+    "id": "pf_ecr",
+    "title": "PF/ECR Filing & Payment",
+    "category": "PF/ESI",
+    "description": "File Electronic Challan cum Return (ECR) for Provident Fund contributions and make payment on EPFO portal.",
+    "recurring": "monthly",
+    "due_day": 15,
+    "penalty": "Damages: 5% to 25% of arrears. Interest: 12% p.a. Prosecution for willful default.",
+    "law_reference": "EPF Act 1952, Section 7Q & 14B"
+  },
+  {
+    "id": "esi_payment",
+    "title": "ESI Contribution Payment",
+    "category": "PF/ESI",
+    "description": "Pay ESI contributions for employees earning up to Rs. 21,000/month. File through ESIC portal.",
+    "recurring": "monthly",
+    "due_day": 15,
+    "penalty": "Interest: 12% p.a. Damages up to 25% of contribution. Criminal prosecution possible.",
+    "law_reference": "ESI Act 1948, Section 39"
+  },
+  {
+    "id": "tds_quarterly",
+    "title": "TDS Quarterly Return (Form 26Q/24Q)",
+    "category": "TDS",
+    "description": "File quarterly TDS return for non-salary (26Q) and salary (24Q) deductions. Generate Form 16/16A for employees/vendors.",
+    "recurring": "quarterly",
+    "due_month": 7,
+    "due_day": 31,
+    "penalty": "Late fee: Rs. 200/day under Section 234E. Maximum: Amount of TDS. Penalty under Section 271H: Rs. 10,000 to Rs. 1,00,000.",
+    "law_reference": "Income Tax Act 1961, Section 200(3)"
+  },
+  {
+    "id": "gstr9_annual",
+    "title": "GSTR-9 Annual Return",
+    "category": "GST",
+    "description": "Annual return consolidating all monthly/quarterly returns. Reconcile with books of accounts.",
+    "recurring": "annual",
+    "due_month": 12,
+    "due_day": 31,
+    "penalty": "Late fee: Rs. 200/day (CGST + SGST) up to 0.5% of turnover in the State/UT.",
+    "law_reference": "CGST Act 2017, Section 44"
+  },
+  {
+    "id": "aoc4_annual",
+    "title": "ROC Annual Return (AOC-4/MGT-7)",
+    "category": "ROC",
+    "description": "File financial statements (AOC-4) and annual return (MGT-7) with Registrar of Companies within 30/60 days of AGM.",
+    "recurring": "annual",
+    "due_month": 11,
+    "due_day": 30,
+    "penalty": "Additional fee: Rs. 100/day. Maximum: 12x normal fee. Director disqualification risk for persistent default.",
+    "law_reference": "Companies Act 2013, Section 92 & 137"
+  },
+  {
+    "id": "agm",
+    "title": "Annual General Meeting (AGM)",
+    "category": "Board Meetings",
+    "description": "Hold AGM within 6 months from close of financial year. Approve accounts, declare dividends, appoint auditors.",
+    "recurring": "annual",
+    "due_month": 9,
+    "due_day": 30,
+    "penalty": "Fine on company: Rs. 1 lakh extending to Rs. 5 lakhs. Fine on officers: Rs. 25,000 to Rs. 1 lakh.",
+    "law_reference": "Companies Act 2013, Section 96"
+  },
+  {
+    "id": "board_meeting",
+    "title": "Board Meeting (Quarterly)",
+    "category": "Board Meetings",
+    "description": "Hold minimum 4 board meetings per year with gap not exceeding 120 days between meetings.",
+    "recurring": "quarterly",
+    "due_month": 3,
+    "due_day": 31,
+    "penalty": "Fine: Rs. 25,000 on company. Rs. 5,000 on directors. Continuous default: Rs. 1,000/day.",
+    "law_reference": "Companies Act 2013, Section 173"
+  },
+  {
+    "id": "advance_tax_q1",
+    "title": "Advance Tax - Q1 (15%)",
+    "category": "Income Tax",
+    "description": "Pay 15% of estimated annual tax liability as first installment of advance tax.",
+    "recurring": "annual",
+    "due_month": 6,
+    "due_day": 15,
+    "penalty": "Interest under Section 234B & 234C at 1% per month for default/deferment.",
+    "law_reference": "Income Tax Act 1961, Section 211"
+  },
+  {
+    "id": "advance_tax_q2",
+    "title": "Advance Tax - Q2 (45%)",
+    "category": "Income Tax",
+    "description": "Pay cumulative 45% of estimated annual tax liability (including Q1 payment).",
+    "recurring": "annual",
+    "due_month": 9,
+    "due_day": 15,
+    "penalty": "Interest under Section 234B & 234C at 1% per month.",
+    "law_reference": "Income Tax Act 1961, Section 211"
+  },
+  {
+    "id": "advance_tax_q3",
+    "title": "Advance Tax - Q3 (75%)",
+    "category": "Income Tax",
+    "description": "Pay cumulative 75% of estimated annual tax liability.",
+    "recurring": "annual",
+    "due_month": 12,
+    "due_day": 15,
+    "penalty": "Interest under Section 234B & 234C at 1% per month.",
+    "law_reference": "Income Tax Act 1961, Section 211"
+  },
+  {
+    "id": "advance_tax_q4",
+    "title": "Advance Tax - Q4 (100%)",
+    "category": "Income Tax",
+    "description": "Pay remaining advance tax to reach 100% of estimated annual liability before March 15.",
+    "recurring": "annual",
+    "due_month": 3,
+    "due_day": 15,
+    "penalty": "Interest under Section 234B & 234C at 1% per month.",
+    "law_reference": "Income Tax Act 1961, Section 211"
+  },
+  {
+    "id": "itr_company",
+    "title": "Income Tax Return - Company",
+    "category": "Income Tax",
+    "description": "File annual income tax return for companies (ITR-6) with audit report if applicable.",
+    "recurring": "annual",
+    "due_month": 10,
+    "due_day": 31,
+    "penalty": "Late fee under Section 234F: Rs. 5,000 (income > Rs. 5 lakhs) or Rs. 1,000. Interest under 234A: 1% per month.",
+    "law_reference": "Income Tax Act 1961, Section 139"
+  },
+  {
+    "id": "dir3_kyc",
+    "title": "Director KYC (DIR-3 KYC)",
+    "category": "ROC",
+    "description": "Annual KYC update for all directors holding DIN. Verify mobile, email, and personal details.",
+    "recurring": "annual",
+    "due_month": 9,
+    "due_day": 30,
+    "penalty": "DIN deactivation. Restoration fee: Rs. 5,000.",
+    "law_reference": "Companies Act 2013, Rule 12A"
+  },
+  {
+    "id": "msme_form1",
+    "title": "MSME-1 Half-Yearly Return",
+    "category": "ROC",
+    "description": "Report outstanding dues to MSME suppliers exceeding 45 days. File twice yearly (April & October).",
+    "recurring": "annual",
+    "due_month": 4,
+    "due_day": 30,
+    "penalty": "Fine: Rs. 25,000 to Rs. 3 lakhs on company. Rs. 25,000 to Rs. 1 lakh on officers.",
+    "law_reference": "Companies Act 2013, Section 405"
+  },
+  {
+    "id": "pt_return",
+    "title": "Professional Tax Return",
+    "category": "PF/ESI",
+    "description": "File monthly/quarterly professional tax return as per state rules. Deduct from employee salaries and remit.",
+    "recurring": "monthly",
+    "due_day": 20,
+    "penalty": "Penalty and interest as per respective state Professional Tax Acts. Varies by state.",
+    "law_reference": "State Professional Tax Acts"
+  },
+  {
+    "id": "dpt3_annual",
+    "title": "DPT-3 (Deposits Return)",
+    "category": "ROC",
+    "description": "Annual return of deposits or transactions not considered as deposits. File by June 30 every year.",
+    "recurring": "annual",
+    "due_month": 6,
+    "due_day": 30,
+    "penalty": "Fine: Up to Rs. 1 crore on company. Rs. 25 lakhs to Rs. 2 crores on officers.",
+    "law_reference": "Companies Act 2013, Rule 16 of Companies (Acceptance of Deposits) Rules"
+  },
+  {
+    "id": "llp_form11",
+    "title": "LLP Form 11 (Annual Return)",
+    "category": "ROC",
+    "description": "File annual return for LLP within 60 days from end of financial year. Includes partner details and changes.",
+    "recurring": "annual",
+    "due_month": 5,
+    "due_day": 30,
+    "penalty": "Late fee: Rs. 100/day. Additional penalty up to Rs. 5 lakhs.",
+    "law_reference": "LLP Act 2008, Section 25"
+  },
+  {
+    "id": "llp_form8",
+    "title": "LLP Form 8 (Statement of Accounts)",
+    "category": "ROC",
+    "description": "File Statement of Account and Solvency within 30 days from 6 months of financial year end.",
+    "recurring": "annual",
+    "due_month": 10,
+    "due_day": 30,
+    "penalty": "Late fee: Rs. 100/day. Fine up to Rs. 5 lakhs on LLP and Rs. 1 lakh on designated partners.",
+    "law_reference": "LLP Act 2008, Section 34"
+  },
+  {
+    "id": "gstr9c",
+    "title": "GSTR-9C (GST Audit)",
+    "category": "GST",
+    "description": "GST Audit/Reconciliation Statement for turnover exceeding Rs. 5 crores. Self-certified reconciliation.",
+    "recurring": "annual",
+    "due_month": 12,
+    "due_day": 31,
+    "penalty": "Same as GSTR-9. Late fee: Rs. 200/day up to 0.5% of turnover.",
+    "law_reference": "CGST Act 2017, Section 35(5)"
+  },
+  {
+    "id": "tds_q1",
+    "title": "TDS Return Q1 (April-June)",
+    "category": "TDS",
+    "description": "File quarterly TDS return for Q1 (April-June). Due by July 31.",
+    "recurring": "annual",
+    "due_month": 7,
+    "due_day": 31,
+    "penalty": "Late fee: Rs. 200/day. Penalty: Rs. 10,000 to Rs. 1,00,000.",
+    "law_reference": "Income Tax Act 1961, Section 200(3)"
+  },
+  {
+    "id": "tds_q2",
+    "title": "TDS Return Q2 (July-Sept)",
+    "category": "TDS",
+    "description": "File quarterly TDS return for Q2 (July-September). Due by October 31.",
+    "recurring": "annual",
+    "due_month": 10,
+    "due_day": 31,
+    "penalty": "Late fee: Rs. 200/day. Penalty: Rs. 10,000 to Rs. 1,00,000.",
+    "law_reference": "Income Tax Act 1961, Section 200(3)"
+  },
+  {
+    "id": "tds_q3",
+    "title": "TDS Return Q3 (Oct-Dec)",
+    "category": "TDS",
+    "description": "File quarterly TDS return for Q3 (October-December). Due by January 31.",
+    "recurring": "annual",
+    "due_month": 1,
+    "due_day": 31,
+    "penalty": "Late fee: Rs. 200/day. Penalty: Rs. 10,000 to Rs. 1,00,000.",
+    "law_reference": "Income Tax Act 1961, Section 200(3)"
+  },
+  {
+    "id": "tds_q4",
+    "title": "TDS Return Q4 (Jan-March)",
+    "category": "TDS",
+    "description": "File quarterly TDS return for Q4 (January-March). Due by May 31.",
+    "recurring": "annual",
+    "due_month": 5,
+    "due_day": 31,
+    "penalty": "Late fee: Rs. 200/day. Penalty: Rs. 10,000 to Rs. 1,00,000.",
+    "law_reference": "Income Tax Act 1961, Section 200(3)"
+  }
+]

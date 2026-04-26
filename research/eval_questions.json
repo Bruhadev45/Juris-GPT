@@ -1,0 +1,40 @@
+{
+  "version": "1.0",
+  "description": "Evaluation questions for JurisGPT legal research assistant",
+  "questions": [
+    {
+      "id": "q1",
+      "query": "What is Section 7 of the Companies Act, 2013?",
+      "expected_doc_types": ["statute"],
+      "expected_acts": ["Companies Act, 2013"],
+      "category": "company_law"
+    },
+    {
+      "id": "q2",
+      "query": "What are the requirements for incorporating a private limited company?",
+      "expected_doc_types": ["statute", "rule"],
+      "expected_acts": ["Companies Act, 2013"],
+      "category": "company_formation"
+    },
+    {
+      "id": "q3",
+      "query": "What is the punishment for cheating under BNS?",
+      "expected_doc_types": ["statute"],
+      "expected_acts": ["Bharatiya Nyaya Sanhita, 2023"],
+      "category": "criminal_law"
+    },
+    {
+      "id": "q4",
+      "query": "What is the minimum wage for factory workers in Maharashtra?",
+      "expected_doc_types": ["notification", "rule"],
+      "category": "labor_law"
+    },
+    {
+      "id": "q5",
+      "query": "What is the GST registration threshold?",
+      "expected_doc_types": ["statute", "notification"],
+      "expected_acts": ["CGST Act, 2017"],
+      "category": "tax_law"
+    }
+  ]
+}

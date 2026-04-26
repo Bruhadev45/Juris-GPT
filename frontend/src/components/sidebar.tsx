@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -9,21 +8,24 @@ import {
   Scale,
   Search,
   FileText,
-  FileScan,
   ShieldCheck,
   FolderOpen,
   Sparkles,
   Wrench,
   Gavel,
   Users,
-  Puzzle,
   Settings,
   HelpCircle,
   LogOut,
   ChevronLeft,
   ChevronRight,
   Archive,
-  CreditCard,
+  FileSignature,
+  FileSearch,
+  FileQuestion,
+  Newspaper,
+  Puzzle,
+  CalendarDays,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -35,33 +37,35 @@ interface NavItem {
 }
 
 const mainNav: NavItem[] = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
-  { icon: Scale, label: "AI Lawyer", href: "/dashboard/chat" },
-  { icon: Search, label: "Legal Research", href: "/dashboard/search" },
-  { icon: FileText, label: "Document Review", href: "/dashboard/review" },
-  { icon: FileScan, label: "Contract Analyzer", href: "/dashboard/analyzer" },
-  { icon: ShieldCheck, label: "Compliance", href: "/dashboard/compliance" },
-  { icon: FolderOpen, label: "Documents", href: "/dashboard/documents" },
-  { icon: Sparkles, label: "AI Drafting", href: "/dashboard/drafting" },
+  { icon: LayoutDashboard, label: "Workspace", href: "/dashboard" },
+  { icon: Scale, label: "Legal Assistant", href: "/dashboard/chat" },
+  { icon: Search, label: "Source Search", href: "/dashboard/search" },
 ];
 
 const toolsNav: NavItem[] = [
   { icon: Wrench, label: "Tools", href: "/dashboard/tools" },
+  { icon: FileSearch, label: "Analyzer", href: "/dashboard/analyzer" },
+  { icon: FileQuestion, label: "RTI Assistant", href: "/dashboard/rti" },
 ];
 
 const lawyersNav: NavItem[] = [
+  { icon: FileText, label: "Review Queue", href: "/dashboard/review" },
   { icon: Gavel, label: "Lawyer Review", href: "/dashboard/lawyer-review" },
 ];
 
 const managementNav: NavItem[] = [
+  { icon: ShieldCheck, label: "Compliance", href: "/dashboard/compliance" },
+  { icon: CalendarDays, label: "Calendar", href: "/dashboard/calendar" },
+  { icon: FileSignature, label: "Contracts", href: "/dashboard/contracts" },
+  { icon: FolderOpen, label: "Documents", href: "/dashboard/documents" },
   { icon: Archive, label: "Vault", href: "/dashboard/vault" },
   { icon: Users, label: "Team", href: "/dashboard/team" },
-  { icon: Puzzle, label: "Integrations", href: "/dashboard/integrations" },
 ];
 
 const otherNav: NavItem[] = [
+  { icon: Newspaper, label: "Legal News", href: "/dashboard/news" },
+  { icon: Puzzle, label: "Integrations", href: "/dashboard/integrations" },
   { icon: Settings, label: "Settings", href: "/dashboard/settings" },
-  { icon: CreditCard, label: "Billing", href: "/dashboard/billing" },
   { icon: HelpCircle, label: "Support", href: "/dashboard/support" },
 ];
 
@@ -82,7 +86,7 @@ export function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
           </h3>
         </div>
       )}
-      {collapsed && <div className="mb-2 border-t border-border/50 mx-2" />}
+      {collapsed && <div className="mb-2 border-t border-sidebar-border/70 mx-2" />}
       <div className="space-y-0.5 px-2">
         {items.map((item) => {
           const Icon = item.icon;
@@ -96,11 +100,11 @@ export function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
               href={item.href}
               title={collapsed ? item.label : undefined}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                 collapsed && "justify-center px-0 py-2.5",
                 isActive
-                  ? "bg-primary/10 text-primary"
-                  : "text-foreground/70 hover:text-foreground hover:bg-secondary"
+                  ? "bg-secondary text-foreground before:absolute before:left-0 before:h-5 before:w-0.5 before:rounded-full before:bg-primary relative"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/70"
               )}
             >
               <Icon className={cn("h-[18px] w-[18px] flex-shrink-0", collapsed && "h-5 w-5")} />
@@ -115,16 +119,16 @@ export function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
   return (
     <div
       className={cn(
-        "flex h-screen flex-col bg-background border-r border-border transition-all duration-300",
+        "flex h-screen flex-col bg-sidebar border-r border-sidebar-border transition-all duration-300",
         collapsed ? "w-[60px]" : "w-[252px]"
       )}
     >
       {/* Logo and collapse toggle */}
-      <div className="flex items-center justify-between px-4 py-4 border-b border-border flex-shrink-0">
+      <div className="flex items-center justify-between px-4 py-4 border-b border-sidebar-border flex-shrink-0">
         {!collapsed && (
           <Link href="/dashboard" className="flex items-center gap-2">
             <Image src="/logo.png" alt="JurisGPT" width={26} height={26} />
-            <h1 className="text-xl font-bold tracking-tight text-primary">JurisGPT</h1>
+            <h1 className="text-xl font-bold tracking-tight text-foreground">JurisGPT</h1>
           </Link>
         )}
         {collapsed && (
@@ -134,7 +138,7 @@ export function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
         )}
         <button
           onClick={onToggle}
-          className="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-primary transition-colors flex-shrink-0"
+          className="rounded-md p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors flex-shrink-0"
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {collapsed ? (
@@ -147,18 +151,18 @@ export function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
 
       {/* Scrollable nav area */}
       <ScrollArea className="flex-1 py-3 overflow-hidden">
-        <NavSection title="MAIN" items={mainNav} />
-        <NavSection title="TOOLS" items={toolsNav} />
-        <NavSection title="LAWYERS" items={lawyersNav} />
-        <NavSection title="MANAGEMENT" items={managementNav} />
-        <NavSection title="OTHER" items={otherNav} />
+        <NavSection title="Research" items={mainNav} />
+        <NavSection title="Workflows" items={managementNav} />
+        <NavSection title="Review" items={lawyersNav} />
+        <NavSection title="Utilities" items={toolsNav} />
+        <NavSection title="Other" items={otherNav} />
       </ScrollArea>
 
       {/* Bottom logout */}
-      <div className="border-t border-border p-2 flex-shrink-0">
+      <div className="border-t border-sidebar-border p-2 flex-shrink-0">
         <button
           className={cn(
-            "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-foreground/70 hover:text-foreground hover:bg-secondary transition-colors w-full",
+            "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors w-full",
             collapsed && "justify-center px-0 py-2.5"
           )}
         >

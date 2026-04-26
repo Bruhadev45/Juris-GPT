@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { companiesApi, mattersApi } from "@/lib/api";
+import { toast } from "sonner";
 
 const companySchema = z.object({
   name: z.string().min(1, "Company name is required"),
@@ -27,10 +28,10 @@ const founderSchema = z.object({
 });
 
 const preferencesSchema = z.object({
-  non_compete: z.boolean().default(true),
-  non_compete_months: z.number().min(0).max(60).default(12),
-  dispute_resolution: z.enum(["arbitration", "court", "mediation"]).default("arbitration"),
-  governing_law: z.string().default("india"),
+  non_compete: z.boolean(),
+  non_compete_months: z.number().min(0).max(60),
+  dispute_resolution: z.enum(["arbitration", "court", "mediation"]),
+  governing_law: z.string(),
   additional_terms: z.string().optional(),
 });
 
@@ -67,7 +68,8 @@ export default function NewAgreementPage() {
       setStep(2);
     } catch (error) {
       console.error("Failed to create company:", error);
-      alert("Failed to create company. Please try again.");
+      const message = error instanceof Error ? error.message : "Failed to create company. Please try again.";
+      toast.error(message);
     }
   };
 
@@ -76,7 +78,7 @@ export default function NewAgreementPage() {
 
     const totalEquity = founders.reduce((sum, f) => sum + f.equity_percentage, 0);
     if (Math.abs(totalEquity - 100) > 0.01) {
-      alert("Total equity must equal 100%");
+      toast.error("Total equity must equal 100%");
       return;
     }
 
@@ -91,7 +93,8 @@ export default function NewAgreementPage() {
       window.location.href = `/agreements/${matter.id}`;
     } catch (error) {
       console.error("Failed to create matter:", error);
-      alert("Failed to create agreement. Please try again.");
+      const message = error instanceof Error ? error.message : "Failed to create agreement. Please try again.";
+      toast.error(message);
     }
   };
 

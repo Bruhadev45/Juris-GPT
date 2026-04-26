@@ -2,9 +2,28 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Scale } from "lucide-react";
+import { Scale, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { adminApi } from "@/lib/api";
 
 interface Review {
@@ -23,51 +42,100 @@ interface Review {
 export default function AdminReviewsPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Approve confirmation dialog
+  const [approveDialogOpen, setApproveDialogOpen] = useState(false);
+  const [approveReviewId, setApproveReviewId] = useState<string | null>(null);
+
+  // Request changes dialog
+  const [changesDialogOpen, setChangesDialogOpen] = useState(false);
+  const [changesReviewId, setChangesReviewId] = useState<string | null>(null);
+  const [changesText, setChangesText] = useState("");
 
   useEffect(() => {
     loadReviews();
   }, []);
 
+  // Auto-dismiss success messages
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
   const loadReviews = async () => {
     try {
+      setError(null);
       const data = await adminApi.getPendingReviews();
       setReviews(data);
-    } catch (error) {
-      console.error("Failed to load reviews:", error);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load reviews");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleApprove = async (reviewId: string) => {
-    if (!confirm("Approve this document?")) return;
-    
+  const handleApproveClick = (reviewId: string) => {
+    setApproveReviewId(reviewId);
+    setApproveDialogOpen(true);
+  };
+
+  const handleApproveConfirm = async () => {
+    if (!approveReviewId) return;
+    setApproveDialogOpen(false);
+
     try {
-      await adminApi.approveReview(reviewId);
+      setActionLoading(approveReviewId);
+      setError(null);
+      await adminApi.approveReview(approveReviewId);
       await loadReviews();
-      alert("Document approved!");
-    } catch (error) {
-      console.error("Failed to approve:", error);
-      alert("Failed to approve document.");
+      setSuccessMessage("Document approved successfully!");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to approve document.");
+    } finally {
+      setActionLoading(null);
+      setApproveReviewId(null);
     }
   };
 
-  const handleRequestChanges = async (reviewId: string) => {
-    const changes = prompt("Enter the changes requested:");
-    if (!changes) return;
+  const handleRequestChangesClick = (reviewId: string) => {
+    setChangesReviewId(reviewId);
+    setChangesText("");
+    setChangesDialogOpen(true);
+  };
+
+  const handleRequestChangesConfirm = async () => {
+    if (!changesReviewId || !changesText.trim()) return;
+    setChangesDialogOpen(false);
 
     try {
-      await adminApi.requestChanges(reviewId, changes);
+      setActionLoading(changesReviewId);
+      setError(null);
+      await adminApi.requestChanges(changesReviewId, changesText);
       await loadReviews();
-      alert("Changes requested!");
-    } catch (error) {
-      console.error("Failed to request changes:", error);
-      alert("Failed to request changes.");
+      setSuccessMessage("Changes requested successfully!");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to request changes.");
+    } finally {
+      setActionLoading(null);
+      setChangesReviewId(null);
+      setChangesText("");
     }
   };
 
   if (loading) {
-    return <div className="container mx-auto px-4 py-8">Loading...</div>;
+    return (
+      <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-[50vh]">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Loading reviews...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -85,6 +153,22 @@ export default function AdminReviewsPage() {
           <h1 className="text-4xl font-bold mb-2">Pending Reviews</h1>
           <p className="text-muted-foreground">Review and approve Founder Agreements</p>
         </div>
+
+        {/* Success message */}
+        {successMessage && (
+          <div className="mb-6 flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-sm rounded-md p-3">
+            <CheckCircle className="h-4 w-4 flex-shrink-0" />
+            {successMessage}
+          </div>
+        )}
+
+        {/* Error message */}
+        {error && (
+          <div className="mb-6 flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 text-sm rounded-md p-3">
+            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+            {error}
+          </div>
+        )}
 
         {reviews.length === 0 ? (
           <Card className="shadow-sm">
@@ -110,10 +194,21 @@ export default function AdminReviewsPage() {
                     <Link href={`/admin/reviews/${review.id}`}>
                       <Button variant="outline">View Details</Button>
                     </Link>
-                    <Button onClick={() => handleApprove(review.id)}>
-                      Approve
+                    <Button
+                      onClick={() => handleApproveClick(review.id)}
+                      disabled={actionLoading === review.id}
+                    >
+                      {actionLoading === review.id ? (
+                        <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Processing...</>
+                      ) : (
+                        "Approve"
+                      )}
                     </Button>
-                    <Button variant="outline" onClick={() => handleRequestChanges(review.id)}>
+                    <Button
+                      variant="outline"
+                      onClick={() => handleRequestChangesClick(review.id)}
+                      disabled={actionLoading === review.id}
+                    >
                       Request Changes
                     </Button>
                   </div>
@@ -123,6 +218,54 @@ export default function AdminReviewsPage() {
           </div>
         )}
       </div>
+
+      {/* Approve Confirmation Dialog */}
+      <AlertDialog open={approveDialogOpen} onOpenChange={setApproveDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Approve Document</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to approve this document? This action will mark it as reviewed and approved.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleApproveConfirm}>
+              Approve
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Request Changes Dialog */}
+      <Dialog open={changesDialogOpen} onOpenChange={setChangesDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Request Changes</DialogTitle>
+            <DialogDescription>
+              Describe the changes that need to be made to this document.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            value={changesText}
+            onChange={(e) => setChangesText(e.target.value)}
+            placeholder="Enter the changes requested..."
+            rows={4}
+            className="mt-2"
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setChangesDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleRequestChangesConfirm}
+              disabled={!changesText.trim()}
+            >
+              Submit Request
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

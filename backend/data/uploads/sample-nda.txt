@@ -1,0 +1,47 @@
+NON-DISCLOSURE AGREEMENT
+
+This Non-Disclosure Agreement ("Agreement") is entered into as of January 15, 2024 by and between:
+
+Party A: TechStart Innovations Pvt. Ltd., a company incorporated under the Companies Act, 2013, having its registered office at 123 MG Road, Bangalore, Karnataka 560001 ("Disclosing Party")
+
+Party B: Future Ventures LLP, a limited liability partnership registered under the LLP Act, 2008, having its registered office at 456 HSR Layout, Bangalore, Karnataka 560102 ("Receiving Party")
+
+WHEREAS, the Disclosing Party possesses certain confidential and proprietary information relating to its business operations, technology, and strategic plans; and
+
+WHEREAS, the Receiving Party desires to receive certain confidential information for the purpose of evaluating a potential business relationship;
+
+NOW, THEREFORE, in consideration of the mutual covenants contained herein, the parties agree as follows:
+
+1. DEFINITION OF CONFIDENTIAL INFORMATION
+"Confidential Information" means any and all information disclosed by the Disclosing Party, including but not limited to: business plans, financial data, technical specifications, source code, algorithms, customer lists, marketing strategies, and any other proprietary information.
+
+2. OBLIGATIONS OF RECEIVING PARTY
+The Receiving Party agrees to:
+(a) Hold all Confidential Information in strict confidence
+(b) Not disclose any Confidential Information to third parties without prior written consent
+(c) Use the Confidential Information solely for the Purpose
+(d) Take reasonable measures to protect the confidentiality
+
+3. TERM
+This Agreement shall remain in effect for a period of two (2) years from the date of execution.
+
+4. RETURN OF INFORMATION
+Upon termination or upon request, the Receiving Party shall return or destroy all Confidential Information.
+
+5. GOVERNING LAW
+This Agreement shall be governed by and construed in accordance with the laws of India. Any disputes shall be subject to the exclusive jurisdiction of courts in Bangalore, Karnataka.
+
+6. STAMP DUTY
+The applicable stamp duty under the Karnataka Stamp Act shall be borne by the Disclosing Party.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written above.
+
+For TechStart Innovations Pvt. Ltd.
+Name: _______________
+Designation: _______________
+Date: _______________
+
+For Future Ventures LLP
+Name: _______________
+Designation: _______________
+Date: _______________

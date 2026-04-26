@@ -1,0 +1,19 @@
+{
+  "profile": {
+    "name": "Updated Name",
+    "email": "admin@jurisgpt.com",
+    "company": "JurisGPT",
+    "role": "Administrator"
+  },
+  "notifications": {
+    "email_notifications": true,
+    "compliance_alerts": true,
+    "document_updates": true,
+    "weekly_digest": false
+  },
+  "appearance": {
+    "theme": "system",
+    "language": "en",
+    "timezone": "Asia/Kolkata"
+  }
+}

@@ -1,14 +1,14 @@
 <p align="center">
   <h1 align="center">JurisGPT</h1>
   <p align="center">
-    <strong>AI-Powered Legal Services Platform for Indian Startups</strong>
+    <strong>Citation-Grounded Legal Research Assistant for Indian Startup Law</strong>
   </p>
   <p align="center">
-    <a href="#features">Features</a> •
-    <a href="#tech-stack">Tech Stack</a> •
+    <a href="#legal-assistant">Legal Assistant</a> •
+    <a href="#how-it-works">How It Works</a> •
+    <a href="#research">Research</a> •
     <a href="#installation">Installation</a> •
-    <a href="#api-documentation">API Docs</a> •
-    <a href="#contributing">Contributing</a>
+    <a href="#supporting-workflows">Supporting Workflows</a>
   </p>
 </p>
 
@@ -16,299 +16,348 @@
 
 ## Overview
 
-**JurisGPT** is a comprehensive AI-powered legal services platform designed specifically for Indian startups and businesses. It streamlines legal document generation, compliance management, and legal research using advanced AI capabilities powered by GPT-4.
+**JurisGPT** is a Retrieval-Augmented Generation (RAG) legal research assistant that provides citation-grounded answers to legal questions about Indian startup and corporate law.
 
-The platform provides an end-to-end solution for:
-- Automated legal document drafting
-- Founder agreement generation with lawyer review workflow
-- Indian law compliance tracking
-- Legal research and case law analysis
-- RTI (Right to Information) filing assistance
+Unlike generic AI chatbots, JurisGPT:
+- **Retrieves relevant sources** from a curated corpus of Indian legal documents before answering
+- **Cites specific statutes, sections, and case law** when grounded sources are available
+- **Indicates confidence and limitations** when evidence is insufficient
+- **Refuses to hallucinate** — if the corpus doesn't contain relevant information, it says so
 
-## Features
+The assistant is designed for Indian startups, MSMEs, and entrepreneurs navigating company formation, compliance, and corporate governance.
 
-### Document Generation
-- **AI-Powered Drafting** — Generate legal documents using GPT-4 with Indian law context
-- **Founder Agreements** — Multi-step wizard for creating comprehensive founder agreements
-- **Document Templates** — Pre-built templates for common legal documents
-- **Version Control** — Track document revisions and changes
+## Legal Assistant
 
-### Legal Research & Analysis
-- **Case Law Search** — Search through Indian court judgments and case summaries
-- **Document Analyzer** — Upload and analyze legal documents for key clauses
-- **Legal News Feed** — Stay updated with latest legal developments
+The core of JurisGPT is a citation-grounded legal Q&A system:
 
-### Compliance Management
-- **Compliance Calendar** — Track important deadlines and filings
-- **Company Registry** — Manage company information and MCA filings
-- **Automated Reminders** — Never miss a compliance deadline
-
-### Additional Features
-- **Legal Calculator** — Calculate stamp duty, registration fees, and penalties
-- **RTI Filing Assistant** — Draft and track RTI applications
-- **Secure Document Vault** — Encrypted storage for sensitive documents
-- **Team Collaboration** — Invite team members with role-based access
-- **Lawyer Review Workflow** — Built-in review and approval process
-
-## Tech Stack
-
-### Backend
-| Technology | Purpose |
-|------------|---------|
-| **FastAPI** | High-performance Python web framework |
-| **PostgreSQL** | Primary database (via Supabase) |
-| **OpenAI GPT-4** | AI document generation and analysis |
-| **python-docx** | Word document generation |
-| **Resend** | Transactional email service |
-| **Razorpay** | Payment processing |
-
-### Frontend
-| Technology | Purpose |
-|------------|---------|
-| **Next.js 16** | React framework with App Router |
-| **TypeScript** | Type-safe JavaScript |
-| **Tailwind CSS** | Utility-first CSS framework |
-| **shadcn/ui** | Accessible UI component library |
-| **React Hook Form** | Form state management |
-| **Zod** | Schema validation |
-| **Framer Motion** | Animations |
-
-## Project Structure
+### What It Does
 
 ```
-jurisgpt/
-├── backend/                      # FastAPI Python Backend
-│   ├── app/
-│   │   ├── main.py              # Application entry point
-│   │   ├── config.py            # Configuration settings
-│   │   ├── database.py          # Database connection
-│   │   ├── models/              # SQLAlchemy/Pydantic models
-│   │   │   ├── company.py
-│   │   │   ├── document.py
-│   │   │   ├── founder.py
-│   │   │   └── user.py
-│   │   ├── routes/              # API endpoints
-│   │   │   ├── auth.py          # Authentication
-│   │   │   ├── documents.py     # Document management
-│   │   │   ├── companies.py     # Company operations
-│   │   │   ├── chatbot.py       # AI chat interface
-│   │   │   ├── compliance.py    # Compliance tracking
-│   │   │   ├── analyzer.py      # Document analysis
-│   │   │   └── ...
-│   │   ├── schemas/             # Request/Response schemas
-│   │   ├── services/            # Business logic
-│   │   │   ├── ai_generator.py  # GPT-4 integration
-│   │   │   ├── chatbot_service.py
-│   │   │   └── document_service.py
-│   │   └── utils/               # Helper functions
-│   ├── migrations/              # Database migrations
-│   ├── requirements.txt         # Python dependencies
-│   └── Dockerfile
-│
-├── frontend/                     # Next.js React Frontend
-│   ├── src/
-│   │   ├── app/                 # App Router pages
-│   │   │   ├── page.tsx         # Landing page
-│   │   │   ├── dashboard/       # Dashboard pages
-│   │   │   │   ├── page.tsx     # Dashboard home
-│   │   │   │   ├── chat/        # AI chat interface
-│   │   │   │   ├── vault/       # Document vault
-│   │   │   │   ├── compliance/  # Compliance tracker
-│   │   │   │   ├── analyzer/    # Document analyzer
-│   │   │   │   ├── calculator/  # Legal calculator
-│   │   │   │   ├── cases/       # Case management
-│   │   │   │   └── ...
-│   │   │   └── agreements/      # Agreement wizard
-│   │   ├── components/          # Reusable components
-│   │   │   ├── ui/              # shadcn/ui components
-│   │   │   └── sidebar.tsx      # Navigation sidebar
-│   │   ├── lib/                 # Utilities
-│   │   │   ├── api.ts           # API client
-│   │   │   └── utils.ts         # Helper functions
-│   │   └── types/               # TypeScript definitions
-│   ├── package.json
-│   └── tailwind.config.ts
-│
-├── data/                         # Datasets & Resources
-│   ├── datasets/
-│   │   ├── indian_law_json/     # Indian law statutes (IPC, CrPC, etc.)
-│   │   ├── kaggle/              # Company datasets
-│   │   └── samples/             # Sample data
-│   └── processed/               # Processed chunks for RAG
-│
-└── README.md
+User: "What is Section 7 of the Companies Act, 2013?"
+
+JurisGPT:
+┌─────────────────────────────────────────────────────────────────────┐
+│ ANSWER                                                               │
+│ Section 7 of the Companies Act, 2013 deals with the incorporation   │
+│ of a company. It specifies that an application must be filed with   │
+│ the Registrar along with the Memorandum and Articles of Association,│
+│ a declaration by professionals, and other prescribed documents...   │
+├─────────────────────────────────────────────────────────────────────┤
+│ CITATIONS                                                            │
+│ [1] Companies Act, 2013 - Section 7 (Relevance: 94%)                │
+│ [2] Companies (Incorporation) Rules, 2014 (Relevance: 87%)          │
+│ [3] MCA Circular on SPICe+ Form (Relevance: 82%)                    │
+├─────────────────────────────────────────────────────────────────────┤
+│ CONFIDENCE: High (3 relevant sources found)                          │
+│ LIMITATIONS: This covers the statutory requirements; procedural      │
+│ details may vary by state and time of filing.                        │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **Citation-First Answers** | Every response includes specific legal citations with relevance scores |
+| **Confidence Indicators** | Clear signals when evidence is strong, weak, or missing |
+| **Source Deep Links** | Direct references to statutes, sections, and case law |
+| **Uncertainty Awareness** | Explicit acknowledgment of limitations and gaps |
+| **Indian Law Focus** | Specialized for Companies Act, GST, labor laws, and startup regulations |
+
+### What It Covers
+
+- **Company Formation** — Incorporation, Directors, Shareholders, MCA compliance
+- **Corporate Governance** — Board meetings, resolutions, annual filings
+- **Startup Law** — DPIIT recognition, angel tax, ESOP, funding structures
+- **Tax Compliance** — GST, TDS, advance tax, filings
+- **Labor Law** — Employment contracts, PF/ESI, Shops Act
+- **Contracts** — Indian Contract Act, enforceability, dispute resolution
+
+## How It Works
+
+JurisGPT uses a RAG (Retrieval-Augmented Generation) architecture:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                         USER QUERY                                   │
+│              "What is the vesting schedule for ESOP?"               │
+└─────────────────────────────────────────────────────────────────────┘
+                                │
+                                ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                      RETRIEVAL LAYER                                 │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐          │
+│  │ Embed Query  │ → │ Vector Search │ → │ Rank Sources │          │
+│  │ (MiniLM-L6)  │    │ (ChromaDB)    │    │ (Top-K=5)   │          │
+│  └──────────────┘    └──────────────┘    └──────────────┘          │
+│                                                                      │
+│  Legal Corpus: 3,171 indexed documents                              │
+│  - Indian statutes (IPC, CrPC, CPC, Companies Act, etc.)            │
+│  - Supreme Court and High Court judgments                           │
+│  - MCA circulars and notifications                                  │
+└─────────────────────────────────────────────────────────────────────┘
+                                │
+                                ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                      GENERATION LAYER                                │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐          │
+│  │ Build Context│ → │ GPT-4o-mini  │ → │ Structure    │          │
+│  │ from Sources │    │ Generation   │    │ Response     │          │
+│  └──────────────┘    └──────────────┘    └──────────────┘          │
+│                                                                      │
+│  Output: Answer + Citations + Confidence + Limitations              │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### RAG Configuration
+
+| Parameter | Value |
+|-----------|-------|
+| Embedding Model | `sentence-transformers/all-MiniLM-L6-v2` |
+| Vector Store | ChromaDB (persistent) |
+| Chunk Size | 1000 tokens |
+| Chunk Overlap | 200 tokens |
+| Top-K Retrieval | 5 documents |
+| LLM | GPT-4o-mini (temperature: 0.3) |
+| Max Tokens | 4000 |
+
+## Research
+
+JurisGPT is designed as a research system with reproducible configurations and evaluation.
+
+### Research Corpus
+
+| Dataset | Source | Documents | Purpose |
+|---------|--------|-----------|---------|
+| Indian Penal Code (IPC) | Government | 511 sections | Criminal law reference |
+| Code of Criminal Procedure (CrPC) | Government | 484 sections | Criminal procedure |
+| Code of Civil Procedure (CPC) | Government | 158 sections | Civil procedure |
+| Indian Evidence Act (IEA) | Government | 167 sections | Evidence rules |
+| Companies Act, 2013 | Government | 470 sections | Corporate law |
+| Motor Vehicles Act (MVA) | Government | 223 sections | Traffic law |
+| Supreme Court Judgments | OpenNyAI | 1,000+ cases | Case law |
+| High Court Cases | OpenNyAI | 500+ cases | State-level precedents |
+
+**Total**: 3,171 indexed documents, 15.2 GB raw data
+
+### Evaluation Metrics
+
+The system is evaluated on:
+
+| Metric | Description | Target |
+|--------|-------------|--------|
+| **Retrieval Recall@5** | Relevant documents in top 5 | > 80% |
+| **Citation Precision** | Accuracy of cited sources | > 90% |
+| **Hallucination Rate** | Unsupported claims | < 5% |
+| **Response Latency** | P95 response time | < 3s |
+| **Groundedness Score** | Claims supported by sources | > 85% |
+
+### Configuration Files
+
+Research configurations are versioned in `research/configs/`:
+
+```yaml
+# research/configs/legal_assistant_v1.yaml
+corpus_version: "2024-03"
+embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+chunk_size: 1000
+chunk_overlap: 200
+retriever_top_k: 5
+reranker_enabled: false
+llm_model: "gpt-4o-mini"
+llm_temperature: 0.3
+prompt_version: "v2.0"
 ```
 
 ## Installation
 
 ### Prerequisites
 
-- **Node.js** >= 18.x
 - **Python** >= 3.10
-- **PostgreSQL** (or Supabase account)
+- **Node.js** >= 18.x
+- **OpenAI API Key** (for generation)
 
-### Backend Setup
+### Quick Start
 
 ```bash
-# Navigate to backend directory
-cd backend
+# Clone the repository
+git clone https://github.com/your-org/jurisgpt.git
+cd jurisgpt
 
-# Create virtual environment
+# Backend setup
+cd backend
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-pip install email-validator
-
-# Configure environment variables
-cp .env.example .env
-# Edit .env with your API keys (see Environment Variables section)
-
-# Run database migrations (if using Supabase)
-# Execute migrations/001_initial_schema.sql in Supabase SQL editor
-
-# Start the server
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-### Frontend Setup
-
-```bash
-# Navigate to frontend directory
-cd frontend
-
-# Install dependencies
-npm install
-# or
-bun install
-
-# Configure environment variables
-cp .env.example .env.local
-# Edit .env.local with your backend URL
-
-# Start development server
-npm run dev
-# or
-bun dev
-```
-
-### Environment Variables
-
-#### Backend (.env)
-```env
-# Supabase
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_KEY=your-supabase-anon-key
-
-# OpenAI
-OPENAI_API_KEY=sk-your-openai-api-key
-
-# Email (Resend)
-RESEND_API_KEY=re_your-resend-api-key
-
-# Razorpay (optional)
-RAZORPAY_KEY_ID=rzp_test_xxx
-RAZORPAY_KEY_SECRET=your-razorpay-secret
-```
-
-#### Frontend (.env.local)
-```env
-NEXT_PUBLIC_API_URL=http://localhost:8000
-```
-
-## API Documentation
-
-Once the backend is running, access the interactive API documentation:
-
-| Documentation | URL |
-|--------------|-----|
-| **Swagger UI** | http://localhost:8000/docs |
-| **ReDoc** | http://localhost:8000/redoc |
-| **Health Check** | http://localhost:8000/health |
-
-### Key API Endpoints
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/v1/documents` | GET, POST | Document management |
-| `/api/v1/companies` | GET, POST | Company registry |
-| `/api/v1/chat` | POST | AI chatbot |
-| `/api/v1/analyze` | POST | Document analysis |
-| `/api/v1/compliance` | GET | Compliance deadlines |
-| `/api/v1/templates` | GET | Document templates |
-
-## Running the Application
-
-### Development Mode
-
-**Terminal 1 — Backend:**
-```bash
-cd backend
 source venv/bin/activate
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
+pip install -r requirements.txt
 
-**Terminal 2 — Frontend:**
-```bash
+# Configure environment
+cp .env.example .env
+# Edit .env with your OPENAI_API_KEY
+
+# Build vector store (first time only)
+cd ../data
+python setup_rag.py
+
+# Start backend
+cd ../backend
+uvicorn app.main:app --reload --port 8000
+
+# Frontend setup (new terminal)
 cd frontend
+npm install
 npm run dev
 ```
 
-### Access URLs
+### Access Points
+
 | Service | URL |
 |---------|-----|
-| Frontend | http://localhost:3000 |
-| Backend API | http://localhost:8000 |
-| API Docs | http://localhost:8000/docs |
+| **Legal Assistant** | http://localhost:3000/dashboard/chat |
+| **Legal Search** | http://localhost:3000/dashboard/search |
+| **API Docs** | http://localhost:8000/docs |
 
-## Required Services
+## Project Structure
 
-| Service | Purpose | Sign Up |
-|---------|---------|---------|
-| **Supabase** | PostgreSQL database & storage | [supabase.com](https://supabase.com) |
-| **OpenAI** | GPT-4 API for AI features | [platform.openai.com](https://platform.openai.com) |
-| **Resend** | Email notifications | [resend.com](https://resend.com) |
-| **Razorpay** | Payment processing (optional) | [razorpay.com](https://razorpay.com) |
+```
+jurisgpt/
+├── backend/                      # FastAPI Backend
+│   ├── app/
+│   │   ├── main.py              # Application entry
+│   │   ├── routes/
+│   │   │   ├── chatbot.py       # Legal Assistant API
+│   │   │   ├── legal_data.py    # Search & retrieval API
+│   │   │   └── ...
+│   │   └── services/
+│   │       └── chatbot_service.py  # RAG integration
+│   └── requirements.txt
+│
+├── frontend/                     # Next.js Frontend
+│   └── src/app/dashboard/
+│       ├── chat/                # Legal Assistant UI
+│       ├── search/              # Legal Search UI
+│       └── ...
+│
+├── data/                         # RAG Pipeline & Data
+│   ├── rag_pipeline.py          # Core RAG implementation
+│   ├── setup_rag.py             # Vector store builder
+│   ├── datasets/
+│   │   ├── research_corpus/     # Primary legal corpus
+│   │   ├── eval/                # Evaluation datasets
+│   │   └── demo/                # Demo/sample data
+│   └── vectors/                 # ChromaDB vector store
+│
+├── research/                     # Research & Evaluation
+│   ├── configs/                 # Versioned RAG configs
+│   ├── eval_questions.json      # Evaluation question set
+│   ├── run_baselines.py         # Baseline comparisons
+│   └── eval_retrieval.py        # Retrieval metrics
+│
+└── README.md
+```
 
-## Data Sources
+## Supporting Workflows
 
-JurisGPT incorporates multiple Indian legal datasets:
+Beyond the core legal assistant, JurisGPT includes supporting tools for common startup legal tasks:
 
-- **Indian Penal Code (IPC)** — Criminal law sections
-- **Code of Criminal Procedure (CrPC)** — Criminal procedure
-- **Code of Civil Procedure (CPC)** — Civil procedure
-- **Indian Evidence Act (IEA)** — Evidence rules
-- **Motor Vehicles Act (MVA)** — Traffic laws
-- **Companies Act** — Corporate law
-- **Case Summaries** — Indian court judgments
+### Document Generation
+
+Generate legal documents using templates and AI assistance:
+- Founder Agreements
+- NDA / Confidentiality Agreements
+- Employment Contracts
+- Board Resolutions
+
+**Note**: Document generation is a separate workflow from the research assistant. Generated documents should be reviewed by qualified legal professionals.
+
+### Compliance Tracking
+
+Track important regulatory deadlines:
+- MCA/ROC annual filings
+- GST return deadlines
+- Tax compliance dates
+- Board meeting requirements
+
+### Legal Calculator
+
+Calculate common legal fees:
+- Stamp duty by state
+- Court filing fees
+- TDS calculations
+- Gratuity computation
+
+### Document Vault
+
+Secure storage for legal documents with categorization and search.
+
+## API Reference
+
+### Legal Assistant Endpoint
+
+```bash
+POST /api/chat/message
+
+Request:
+{
+  "message": "What is Section 149 of Companies Act about?",
+  "context": {}
+}
+
+Response:
+{
+  "success": true,
+  "answer": "Section 149 of the Companies Act, 2013...",
+  "citations": [
+    {
+      "title": "Companies Act, 2013 - Section 149",
+      "content": "...",
+      "doc_type": "statute",
+      "source": "companies_act",
+      "relevance": 0.94
+    }
+  ],
+  "confidence": "high",
+  "limitations": "This covers the current statutory position...",
+  "follow_up_questions": [
+    "What are the qualifications for independent directors?",
+    "How many directors are required for a private company?"
+  ]
+}
+```
+
+### Legal Search Endpoint
+
+```bash
+GET /api/legal/search?q=director+appointment&types=statute,case
+
+Response:
+{
+  "results": [...],
+  "total": 42,
+  "query": "director appointment",
+  "suggestions": [...]
+}
+```
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| **Backend** | FastAPI (Python 3.14) |
+| **Frontend** | Next.js 16, TypeScript, Tailwind CSS |
+| **Vector Store** | ChromaDB |
+| **Embeddings** | HuggingFace sentence-transformers |
+| **LLM** | OpenAI GPT-4o-mini |
+| **Database** | PostgreSQL (Supabase) |
 
 ## Contributing
 
-We welcome contributions! Please follow these steps:
+We welcome contributions, especially:
+- Expanding the legal corpus with more Indian law sources
+- Improving retrieval quality and relevance ranking
+- Adding evaluation datasets and benchmarks
+- Enhancing citation formatting and source linking
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Development Guidelines
-
-- Follow the existing code style
-- Write meaningful commit messages
-- Add tests for new features
-- Update documentation as needed
-
-## Roadmap
-
-- [ ] User authentication & authorization
-- [ ] Multi-language support (Hindi, regional languages)
-- [ ] Mobile application (React Native)
-- [ ] Integration with DigiLocker
-- [ ] E-signing integration
-- [ ] Advanced analytics dashboard
-- [ ] API rate limiting & usage tracking
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
@@ -317,5 +366,5 @@ This project is proprietary software. All rights reserved.
 ---
 
 <p align="center">
-  Built with ❤️ for Indian Startups
+  <strong>JurisGPT</strong> — Citation-Grounded Legal Research for Indian Startups
 </p>

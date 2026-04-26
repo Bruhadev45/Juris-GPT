@@ -297,6 +297,7 @@ export default function SettingsPage() {
                           type="button"
                           role="switch"
                           aria-checked={notifications[item.key]}
+                          aria-label={item.label}
                           onClick={() =>
                             setNotifications({
                               ...notifications,

@@ -1,237 +1,152 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  FileText,
-  ArrowLeft,
-  ArrowRight,
-  Download,
+  FileQuestion,
   Loader2,
-  CheckCircle,
-  Radio,
-  Home,
-  Landmark,
-  HeartPulse,
-  GraduationCap,
-  Train,
+  AlertCircle,
+  Download,
+  Send,
   Building2,
-  TreePine,
-  Scale,
-  ShoppingCart,
-  Briefcase,
-  Leaf,
-  Microscope,
-  Shield,
-  Wheat,
-  Wifi,
-  Tv,
-  Building,
+  User,
+  MapPin,
+  Phone,
+  Mail,
+  FileText,
+  CheckCircle,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { rtiApi } from "@/lib/api";
 
 interface Department {
   id: string;
   name: string;
-  icon: React.ReactNode;
-  pioAddress: string;
+  description: string;
 }
 
-const DEPARTMENTS: Department[] = [
-  { id: "info-broadcasting", name: "Information & Broadcasting", icon: <Tv className="h-6 w-6" />, pioAddress: "PIO, Ministry of Information & Broadcasting, Shastri Bhawan, New Delhi - 110001" },
-  { id: "home-affairs", name: "Home Affairs", icon: <Home className="h-6 w-6" />, pioAddress: "PIO, Ministry of Home Affairs, North Block, New Delhi - 110001" },
-  { id: "finance", name: "Finance", icon: <Landmark className="h-6 w-6" />, pioAddress: "PIO, Ministry of Finance, North Block, New Delhi - 110001" },
-  { id: "health", name: "Health & Family Welfare", icon: <HeartPulse className="h-6 w-6" />, pioAddress: "PIO, Ministry of Health & Family Welfare, Nirman Bhawan, New Delhi - 110011" },
-  { id: "education", name: "Education", icon: <GraduationCap className="h-6 w-6" />, pioAddress: "PIO, Ministry of Education, Shastri Bhawan, New Delhi - 110001" },
-  { id: "railways", name: "Railways", icon: <Train className="h-6 w-6" />, pioAddress: "PIO, Ministry of Railways, Rail Bhawan, New Delhi - 110001" },
-  { id: "urban-dev", name: "Urban Development", icon: <Building2 className="h-6 w-6" />, pioAddress: "PIO, Ministry of Urban Development, Nirman Bhawan, New Delhi - 110011" },
-  { id: "rural-dev", name: "Rural Development", icon: <TreePine className="h-6 w-6" />, pioAddress: "PIO, Ministry of Rural Development, Krishi Bhawan, New Delhi - 110001" },
-  { id: "law-justice", name: "Law & Justice", icon: <Scale className="h-6 w-6" />, pioAddress: "PIO, Ministry of Law & Justice, Shastri Bhawan, New Delhi - 110001" },
-  { id: "commerce", name: "Commerce & Industry", icon: <ShoppingCart className="h-6 w-6" />, pioAddress: "PIO, Ministry of Commerce & Industry, Udyog Bhawan, New Delhi - 110011" },
-  { id: "labour", name: "Labour & Employment", icon: <Briefcase className="h-6 w-6" />, pioAddress: "PIO, Ministry of Labour & Employment, Shram Shakti Bhawan, New Delhi - 110001" },
-  { id: "environment", name: "Environment", icon: <Leaf className="h-6 w-6" />, pioAddress: "PIO, Ministry of Environment, Forest & Climate Change, Indira Paryavaran Bhawan, New Delhi - 110003" },
-  { id: "science-tech", name: "Science & Technology", icon: <Microscope className="h-6 w-6" />, pioAddress: "PIO, Ministry of Science & Technology, Technology Bhawan, New Delhi - 110016" },
-  { id: "defence", name: "Defence", icon: <Shield className="h-6 w-6" />, pioAddress: "PIO, Ministry of Defence, South Block, New Delhi - 110011" },
-  { id: "agriculture", name: "Agriculture", icon: <Wheat className="h-6 w-6" />, pioAddress: "PIO, Ministry of Agriculture & Farmers Welfare, Krishi Bhawan, New Delhi - 110001" },
-  { id: "telecom", name: "Telecommunications", icon: <Wifi className="h-6 w-6" />, pioAddress: "PIO, Department of Telecommunications, Sanchar Bhawan, New Delhi - 110001" },
-];
-
-interface RTIForm {
+interface RTIApplication {
+  id: string;
   department: string;
   subject: string;
-  informationRequested: string;
-  purpose: string;
-  fullName: string;
-  address: string;
-  phone: string;
-  email: string;
-  pioAddress: string;
-}
-
-const INITIAL_FORM: RTIForm = {
-  department: "",
-  subject: "",
-  informationRequested: "",
-  purpose: "",
-  fullName: "",
-  address: "",
-  phone: "",
-  email: "",
-  pioAddress: "",
-};
-
-function StepIndicator({ current, total }: { current: number; total: number }) {
-  return (
-    <div className="flex items-center gap-2">
-      {Array.from({ length: total }, (_, i) => (
-        <div key={i} className="flex items-center gap-2">
-          <div
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
-              i + 1 < current
-                ? "bg-primary text-primary-foreground"
-                : i + 1 === current
-                ? "bg-primary text-primary-foreground ring-2 ring-primary/30"
-                : "bg-muted text-muted-foreground"
-            }`}
-          >
-            {i + 1 < current ? <CheckCircle className="h-4 w-4" /> : i + 1}
-          </div>
-          {i < total - 1 && (
-            <div
-              className={`w-8 h-0.5 ${
-                i + 1 < current ? "bg-primary" : "bg-muted"
-              }`}
-            />
-          )}
-        </div>
-      ))}
-      <span className="ml-3 text-sm text-muted-foreground">
-        Step {current} of {total}
-      </span>
-    </div>
-  );
+  status: string;
+  created_at: string;
+  content?: string;
 }
 
 export default function RTIPage() {
-  const [step, setStep] = useState(1);
-  const [form, setForm] = useState<RTIForm>(INITIAL_FORM);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [applications, setApplications] = useState<RTIApplication[]>([]);
+  const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
-  const [generatedText, setGeneratedText] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [generatedContent, setGeneratedContent] = useState<string | null>(null);
 
-  const selectedDept = DEPARTMENTS.find((d) => d.id === form.department);
+  // Form state
+  const [department, setDepartment] = useState("");
+  const [subject, setSubject] = useState("");
+  const [informationRequested, setInformationRequested] = useState("");
+  const [purpose, setPurpose] = useState("");
+  const [applicantName, setApplicantName] = useState("");
+  const [applicantAddress, setApplicantAddress] = useState("");
+  const [applicantPhone, setApplicantPhone] = useState("");
+  const [applicantEmail, setApplicantEmail] = useState("");
 
-  function updateForm(partial: Partial<RTIForm>) {
-    setForm((prev) => ({ ...prev, ...partial }));
-  }
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [deptRes, appRes] = await Promise.all([
+          rtiApi.getDepartments(),
+          rtiApi.list(),
+        ]);
+        setDepartments(deptRes.departments || []);
+        setApplications(appRes.applications || []);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load data");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
-  function selectDepartment(deptId: string) {
-    const dept = DEPARTMENTS.find((d) => d.id === deptId);
-    updateForm({
-      department: deptId,
-      pioAddress: dept?.pioAddress || "",
-    });
-  }
-
-  function canProceed(): boolean {
-    switch (step) {
-      case 1:
-        return !!form.department;
-      case 2:
-        return !!form.subject.trim() && !!form.informationRequested.trim();
-      case 3:
-        return !!form.fullName.trim() && !!form.address.trim();
-      case 4:
-        return true;
-      default:
-        return false;
+  const handleGenerate = async () => {
+    if (!department || !subject || !informationRequested || !applicantName || !applicantAddress) {
+      setError("Please fill in all required fields");
+      return;
     }
-  }
 
-  async function handleGenerate() {
-    setGenerating(true);
-    setError(null);
     try {
-      const resp = await rtiApi.generate({
-        department: selectedDept?.name || form.department,
-        subject: form.subject,
-        information_requested: form.informationRequested,
-        purpose: form.purpose || undefined,
-        applicant_name: form.fullName,
-        applicant_address: form.address,
-        applicant_phone: form.phone || undefined,
-        applicant_email: form.email || undefined,
+      setError(null);
+      setSuccess(null);
+      setGenerating(true);
+
+      const result = await rtiApi.generate({
+        department,
+        subject,
+        information_requested: informationRequested,
+        purpose: purpose || undefined,
+        applicant_name: applicantName,
+        applicant_address: applicantAddress,
+        applicant_phone: applicantPhone || undefined,
+        applicant_email: applicantEmail || undefined,
       });
-      setGeneratedText(
-        resp.application ||
-          resp.text ||
-          resp.content ||
-          generateLocalRTI()
-      );
-    } catch {
-      // Fallback: generate locally if API fails
-      setGeneratedText(generateLocalRTI());
+
+      setGeneratedContent(result.content);
+      setSuccess("RTI application generated successfully!");
+
+      // Refresh applications list
+      const appRes = await rtiApi.list();
+      setApplications(appRes.applications || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Generation failed");
     } finally {
       setGenerating(false);
     }
-  }
+  };
 
-  function generateLocalRTI(): string {
-    const today = new Date().toLocaleDateString("en-IN", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-    return `RIGHT TO INFORMATION APPLICATION
-Under Section 6(1) of the RTI Act, 2005
+  const resetForm = () => {
+    setDepartment("");
+    setSubject("");
+    setInformationRequested("");
+    setPurpose("");
+    setApplicantName("");
+    setApplicantAddress("");
+    setApplicantPhone("");
+    setApplicantEmail("");
+    setGeneratedContent(null);
+    setSuccess(null);
+    setError(null);
+  };
 
-Date: ${today}
-
-To,
-The Public Information Officer,
-${selectedDept?.name || form.department}
-${form.pioAddress}
-
-Subject: ${form.subject}
-
-Dear Sir/Madam,
-
-I, ${form.fullName}, am an Indian citizen and I am requesting the following information under the Right to Information Act, 2005:
-
-INFORMATION REQUESTED:
-${form.informationRequested}
-${form.purpose ? `\nPURPOSE/REASON:\n${form.purpose}\n` : ""}
-I am ready to pay the prescribed fees as required under the RTI Act, 2005.
-
-I request that the above information be provided to me within 30 days as stipulated under Section 7(1) of the RTI Act, 2005.
-
-If the information requested is held by or closely connected with the function of another public authority, I request that this application be transferred to the concerned authority under Section 6(3) of the RTI Act, 2005.
-
-Applicant Details:
-Name: ${form.fullName}
-Address: ${form.address}${form.phone ? `\nPhone: ${form.phone}` : ""}${form.email ? `\nEmail: ${form.email}` : ""}
-
-Thanking you,
-
-${form.fullName}
-
-Enclosure: IPO/DD of Rs. 10/- (RTI Application Fee)`;
-  }
-
-  function handleDownload() {
-    if (!generatedText) return;
-    const blob = new Blob([generatedText], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `RTI_Application_${form.subject.replace(/\s+/g, "_").slice(0, 30)}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
+  if (loading) {
+    return (
+      <div className="flex h-screen bg-background">
+        <div className="flex-1 flex flex-col">
+          <header className="bg-card border-b border-border px-6 py-4">
+            <div className="flex items-center gap-3">
+              <FileQuestion className="h-6 w-6 text-primary" />
+              <h1 className="text-xl font-semibold text-foreground">RTI Assistant</h1>
+            </div>
+          </header>
+          <div className="flex-1 flex items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -239,316 +154,215 @@ Enclosure: IPO/DD of Rs. 10/- (RTI Application Fee)`;
       <div className="flex-1 flex flex-col">
         <header className="bg-card border-b border-border px-6 py-4">
           <div className="flex items-center gap-3">
-            <FileText className="h-6 w-6 text-primary" />
+            <FileQuestion className="h-6 w-6 text-primary" />
             <div>
               <h1 className="text-xl font-semibold text-foreground">RTI Assistant</h1>
               <p className="text-sm text-muted-foreground">
-                Generate Right to Information applications
+                Generate Right to Information applications for any government department
               </p>
             </div>
           </div>
         </header>
+
         <div className="flex-1 overflow-y-auto p-6 bg-background">
-          <div className="max-w-5xl mx-auto space-y-6">
-            {/* Step indicator */}
-            {!generatedText && (
-              <Card>
-                <CardContent className="p-4">
-                  <StepIndicator current={step} total={4} />
-                </CardContent>
-              </Card>
+          <div className="max-w-4xl mx-auto space-y-6">
+            {error && (
+              <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm rounded-md p-3 flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                {error}
+              </div>
             )}
 
-            {/* Step 1: Select Department */}
-            {step === 1 && !generatedText && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Select Department</CardTitle>
-                  <CardDescription>
-                    Choose the government department you want to file the RTI application with
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {DEPARTMENTS.map((dept) => (
-                      <button
-                        key={dept.id}
-                        onClick={() => selectDepartment(dept.id)}
-                        className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all hover:shadow-md text-center ${
-                          form.department === dept.id
-                            ? "border-primary bg-primary/5 shadow-sm"
-                            : "border-border hover:border-primary/50"
-                        }`}
-                      >
-                        <div
-                          className={`p-2 rounded-lg ${
-                            form.department === dept.id
-                              ? "bg-primary/10 text-primary"
-                              : "bg-muted text-muted-foreground"
-                          }`}
-                        >
-                          {dept.icon}
-                        </div>
-                        <span className="text-sm font-medium text-foreground">{dept.name}</span>
-                      </button>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+            {success && (
+              <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 text-sm rounded-md p-3 flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 flex-shrink-0" />
+                {success}
+              </div>
             )}
 
-            {/* Step 2: Provide Details */}
-            {step === 2 && !generatedText && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Provide Details</CardTitle>
-                  <CardDescription>
-                    Enter the subject and details of the information you are requesting
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Create RTI Application</CardTitle>
+                <CardDescription>
+                  Fill in the details below to generate an RTI application under the Right to Information Act, 2005
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Department and Subject */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Subject <span className="text-destructive">*</span></Label>
+                    <Label className="flex items-center gap-2">
+                      <Building2 className="h-4 w-4" />
+                      Department *
+                    </Label>
+                    <Select value={department} onValueChange={setDepartment}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select department" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {departments.map((dept) => (
+                          <SelectItem key={dept.id} value={dept.id}>
+                            {dept.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Subject *</Label>
                     <Input
-                      placeholder="e.g., Details of road construction project in XYZ area"
-                      value={form.subject}
-                      onChange={(e) => updateForm({ subject: e.target.value })}
+                      value={subject}
+                      onChange={(e) => setSubject(e.target.value)}
+                      placeholder="Brief subject of your RTI"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label>Information Requested <span className="text-destructive">*</span></Label>
-                    <Textarea
-                      placeholder="Describe in detail the information you are requesting. Be specific about dates, departments, and documents."
-                      value={form.informationRequested}
-                      onChange={(e) => updateForm({ informationRequested: e.target.value })}
-                      className="min-h-[160px]"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Purpose / Reason (optional)</Label>
-                    <Textarea
-                      placeholder="Why are you requesting this information? (optional)"
-                      value={form.purpose}
-                      onChange={(e) => updateForm({ purpose: e.target.value })}
-                      className="min-h-[80px]"
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+                </div>
 
-            {/* Step 3: Applicant Info */}
-            {step === 3 && !generatedText && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Applicant Information</CardTitle>
-                  <CardDescription>
-                    Enter your personal details for the RTI application
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Full Name <span className="text-destructive">*</span></Label>
-                    <Input
-                      placeholder="Enter your full name"
-                      value={form.fullName}
-                      onChange={(e) => updateForm({ fullName: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Address <span className="text-destructive">*</span></Label>
-                    <Textarea
-                      placeholder="Enter your full address"
-                      value={form.address}
-                      onChange={(e) => updateForm({ address: e.target.value })}
-                      className="min-h-[80px]"
-                    />
-                  </div>
+                {/* Information Requested */}
+                <div className="space-y-2">
+                  <Label>Information Requested *</Label>
+                  <Textarea
+                    value={informationRequested}
+                    onChange={(e) => setInformationRequested(e.target.value)}
+                    placeholder="Describe the information you are seeking in detail..."
+                    rows={4}
+                  />
+                </div>
+
+                {/* Purpose */}
+                <div className="space-y-2">
+                  <Label>Purpose (Optional)</Label>
+                  <Input
+                    value={purpose}
+                    onChange={(e) => setPurpose(e.target.value)}
+                    placeholder="Why do you need this information?"
+                  />
+                </div>
+
+                {/* Applicant Details */}
+                <div className="border-t pt-6">
+                  <h3 className="font-medium mb-4">Applicant Details</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>Phone Number</Label>
+                      <Label className="flex items-center gap-2">
+                        <User className="h-4 w-4" />
+                        Full Name *
+                      </Label>
                       <Input
-                        type="tel"
-                        placeholder="Enter phone number"
-                        value={form.phone}
-                        onChange={(e) => updateForm({ phone: e.target.value })}
+                        value={applicantName}
+                        onChange={(e) => setApplicantName(e.target.value)}
+                        placeholder="Your full name"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Email Address</Label>
+                      <Label className="flex items-center gap-2">
+                        <Phone className="h-4 w-4" />
+                        Phone Number
+                      </Label>
+                      <Input
+                        value={applicantPhone}
+                        onChange={(e) => setApplicantPhone(e.target.value)}
+                        placeholder="+91 XXXXX XXXXX"
+                      />
+                    </div>
+                    <div className="space-y-2 md:col-span-2">
+                      <Label className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4" />
+                        Address *
+                      </Label>
+                      <Textarea
+                        value={applicantAddress}
+                        onChange={(e) => setApplicantAddress(e.target.value)}
+                        placeholder="Your complete postal address"
+                        rows={2}
+                      />
+                    </div>
+                    <div className="space-y-2 md:col-span-2">
+                      <Label className="flex items-center gap-2">
+                        <Mail className="h-4 w-4" />
+                        Email Address
+                      </Label>
                       <Input
                         type="email"
-                        placeholder="Enter email address"
-                        value={form.email}
-                        onChange={(e) => updateForm({ email: e.target.value })}
+                        value={applicantEmail}
+                        onChange={(e) => setApplicantEmail(e.target.value)}
+                        placeholder="your.email@example.com"
                       />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label>PIO Address (auto-filled)</Label>
-                    <Textarea
-                      value={form.pioAddress}
-                      onChange={(e) => updateForm({ pioAddress: e.target.value })}
-                      className="min-h-[60px] bg-muted/50"
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+                </div>
 
-            {/* Step 4: Review & Generate */}
-            {step === 4 && !generatedText && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Review & Generate</CardTitle>
-                  <CardDescription>
-                    Review your application details before generating the RTI application
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground">Department</p>
-                        <p className="text-foreground flex items-center gap-2 mt-1">
-                          {selectedDept?.icon}
-                          {selectedDept?.name}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground">Subject</p>
-                        <p className="text-foreground mt-1">{form.subject}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground">Information Requested</p>
-                        <p className="text-foreground mt-1 whitespace-pre-wrap">{form.informationRequested}</p>
-                      </div>
-                      {form.purpose && (
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground">Purpose</p>
-                          <p className="text-foreground mt-1">{form.purpose}</p>
-                        </div>
-                      )}
-                    </div>
-                    <div className="space-y-4">
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground">Applicant Name</p>
-                        <p className="text-foreground mt-1">{form.fullName}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground">Address</p>
-                        <p className="text-foreground mt-1 whitespace-pre-wrap">{form.address}</p>
-                      </div>
-                      {form.phone && (
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground">Phone</p>
-                          <p className="text-foreground mt-1">{form.phone}</p>
-                        </div>
-                      )}
-                      {form.email && (
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground">Email</p>
-                          <p className="text-foreground mt-1">{form.email}</p>
-                        </div>
-                      )}
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground">PIO Address</p>
-                        <p className="text-foreground mt-1 whitespace-pre-wrap">{form.pioAddress}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {error && (
-                    <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm">
-                      {error}
-                    </div>
-                  )}
-
-                  <Button
-                    onClick={handleGenerate}
-                    disabled={generating}
-                    size="lg"
-                    className="w-full"
-                  >
+                <div className="flex gap-3 pt-4">
+                  <Button onClick={handleGenerate} disabled={generating} className="flex-1">
                     {generating ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Generating RTI Application...
+                        Generating...
                       </>
                     ) : (
                       <>
-                        <FileText className="h-4 w-4 mr-2" />
+                        <Send className="h-4 w-4 mr-2" />
                         Generate RTI Application
                       </>
                     )}
                   </Button>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Generated RTI Application */}
-            {generatedText && (
-              <Card className="border-primary/20">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                      <CardTitle>RTI Application Generated</CardTitle>
-                    </div>
-                    <Badge className="bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300">
-                      Ready
-                    </Badge>
-                  </div>
-                  <CardDescription>
-                    Your RTI application has been generated. Review and download below.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="p-6 rounded-lg bg-muted/50 border font-mono text-sm whitespace-pre-wrap leading-relaxed">
-                    {generatedText}
-                  </div>
-                  <div className="flex gap-3">
-                    <Button onClick={handleDownload}>
-                      <Download className="h-4 w-4 mr-2" />
-                      Download Application
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setGeneratedText(null);
-                        setStep(1);
-                        setForm(INITIAL_FORM);
-                      }}
-                    >
-                      <Radio className="h-4 w-4 mr-2" />
-                      Create New Application
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Navigation */}
-            {!generatedText && (
-              <div className="flex justify-between">
-                <Button
-                  variant="outline"
-                  onClick={() => setStep((s) => Math.max(1, s - 1))}
-                  disabled={step === 1}
-                >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back
-                </Button>
-                {step < 4 && (
-                  <Button
-                    onClick={() => setStep((s) => Math.min(4, s + 1))}
-                    disabled={!canProceed()}
-                  >
-                    Next
-                    <ArrowRight className="h-4 w-4 ml-2" />
+                  <Button variant="outline" onClick={resetForm}>
+                    Clear
                   </Button>
-                )}
-              </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Generated Content */}
+            {generatedContent && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Generated RTI Application
+                  </CardTitle>
+                  <CardDescription>Review and download your RTI application</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-muted/50 rounded-lg p-4 mb-4">
+                    <pre className="whitespace-pre-wrap text-sm font-mono">{generatedContent}</pre>
+                  </div>
+                  <Button variant="outline">
+                    <Download className="h-4 w-4 mr-2" />
+                    Download as PDF
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Previous Applications */}
+            {applications.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Previous Applications</CardTitle>
+                  <CardDescription>Your recently generated RTI applications</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {applications.slice(0, 5).map((app) => (
+                      <div
+                        key={app.id}
+                        className="flex items-center justify-between p-3 rounded-lg border border-border"
+                      >
+                        <div>
+                          <p className="font-medium">{app.subject}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {app.department} - {new Date(app.created_at).toLocaleDateString("en-IN")}
+                          </p>
+                        </div>
+                        <Button variant="ghost" size="sm">
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             )}
           </div>
         </div>

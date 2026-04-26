@@ -1,8 +1,14 @@
 from fastapi import APIRouter
 from pathlib import Path
 import json
+import aiofiles
+import aiofiles.os
+import asyncio
 
 router = APIRouter()
+
+# Lock for thread-safe file operations
+_settings_lock = asyncio.Lock()
 
 SETTINGS_FILE = Path(__file__).parent.parent.parent / "data" / "settings.json"
 
@@ -27,43 +33,54 @@ DEFAULT_SETTINGS = {
 }
 
 
-def load_settings():
+async def load_settings():
+    """Load settings from file (async)"""
     if not SETTINGS_FILE.exists():
         return DEFAULT_SETTINGS.copy()
-    with open(SETTINGS_FILE, "r") as f:
-        return json.load(f)
+    async with aiofiles.open(SETTINGS_FILE, "r") as f:
+        content = await f.read()
+        return json.loads(content)
 
 
-def save_settings(settings):
-    SETTINGS_FILE.parent.mkdir(parents=True, exist_ok=True)
-    with open(SETTINGS_FILE, "w") as f:
-        json.dump(settings, f, indent=2)
+async def save_settings(settings):
+    """Save settings to file (async)"""
+    await aiofiles.os.makedirs(SETTINGS_FILE.parent, exist_ok=True)
+    async with aiofiles.open(SETTINGS_FILE, "w") as f:
+        await f.write(json.dumps(settings, indent=2))
 
 
 @router.get("")
 async def get_settings():
-    return load_settings()
+    """Get all settings"""
+    async with _settings_lock:
+        return await load_settings()
 
 
 @router.put("/profile")
 async def update_profile(data: dict):
-    settings = load_settings()
-    settings["profile"].update(data)
-    save_settings(settings)
+    """Update profile settings"""
+    async with _settings_lock:
+        settings = await load_settings()
+        settings["profile"].update(data)
+        await save_settings(settings)
     return {"success": True, "profile": settings["profile"]}
 
 
 @router.put("/notifications")
 async def update_notifications(data: dict):
-    settings = load_settings()
-    settings["notifications"].update(data)
-    save_settings(settings)
+    """Update notification settings"""
+    async with _settings_lock:
+        settings = await load_settings()
+        settings["notifications"].update(data)
+        await save_settings(settings)
     return {"success": True, "notifications": settings["notifications"]}
 
 
 @router.put("/appearance")
 async def update_appearance(data: dict):
-    settings = load_settings()
-    settings["appearance"].update(data)
-    save_settings(settings)
+    """Update appearance settings"""
+    async with _settings_lock:
+        settings = await load_settings()
+        settings["appearance"].update(data)
+        await save_settings(settings)
     return {"success": True, "appearance": settings["appearance"]}

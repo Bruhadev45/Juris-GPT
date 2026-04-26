@@ -4,12 +4,12 @@ import json
 import os
 import uuid
 import shutil
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 router = APIRouter()
 
-DATA_DIR = Path(__file__).parent.parent.parent.parent / "data"
+DATA_DIR = Path(__file__).parent.parent.parent / "data"
 VAULT_META_FILE = DATA_DIR / "vault_documents.json"
 VAULT_FILES_DIR = DATA_DIR / "vault_files"
 
@@ -21,6 +21,7 @@ CATEGORIES = [
     "Employment",
     "Corporate",
     "Court Documents",
+    "HR",
 ]
 
 
@@ -104,7 +105,7 @@ async def upload_document(
         "file_type": file.content_type or "application/octet-stream",
         "category": category,
         "tags": tag_list,
-        "uploaded_at": datetime.utcnow().isoformat(),
+        "uploaded_at": datetime.now(timezone.utc).isoformat(),
         "description": description,
     }
 

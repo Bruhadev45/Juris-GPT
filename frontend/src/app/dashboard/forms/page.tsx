@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Plus, Loader2, AlertCircle, Clock, IndianRupee, FormInput } from "lucide-react";
+import { FileText, Plus, Loader2, AlertCircle, Clock, FormInput } from "lucide-react";
 import { templatesApi, type Template } from "@/lib/api";
 
 function categoryColor(category: string) {
@@ -155,13 +155,12 @@ export default function FormsPage() {
                             <span>{template.estimated_time}</span>
                           </div>
                           <div className="flex items-center gap-1">
-                            <IndianRupee className="h-3.5 w-3.5" />
-                            <span>{template.price.toLocaleString("en-IN")}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
                             <FormInput className="h-3.5 w-3.5" />
                             <span>{template.field_count} fields</span>
                           </div>
+                          <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">
+                            Free
+                          </Badge>
                         </div>
                         <div className="flex items-center justify-end">
                           {template.name === "Founder Agreement" ? (

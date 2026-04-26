@@ -1,27 +1,17 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useEffect, useState } from "react";
 import {
-  Database,
-  Zap,
-  Mail,
-  FolderOpen,
-  MessageSquare,
-  Link2,
+  Puzzle,
+  Loader2,
+  AlertCircle,
   CheckCircle,
   XCircle,
-  Loader2,
-  Plug,
-  Globe,
-  FileText,
-  Shield,
+  ExternalLink,
+  Settings,
+  RefreshCw,
 } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { integrationsApi } from "@/lib/api";
@@ -30,28 +20,65 @@ interface Integration {
   id: string;
   name: string;
   description: string;
-  status: "connected" | "disconnected" | "available";
   category: string;
+  status: "connected" | "disconnected" | "pending" | "error";
+  icon?: string;
+  url?: string;
   last_sync?: string;
 }
 
-const iconMap: Record<string, React.ElementType> = {
-  supabase: Database,
-  openai: Zap,
-  resend: Mail,
-  "google drive": FolderOpen,
-  slack: MessageSquare,
-  stripe: Globe,
-  github: FileText,
-  auth0: Shield,
+const INTEGRATION_ICONS: Record<string, string> = {
+  razorpay: "/integrations/razorpay.svg",
+  digilocker: "/integrations/digilocker.svg",
+  google: "/integrations/google.svg",
+  slack: "/integrations/slack.svg",
+  mca: "/integrations/mca.svg",
 };
 
-function getIcon(name: string) {
-  const key = name.toLowerCase();
-  for (const [match, Icon] of Object.entries(iconMap)) {
-    if (key.includes(match)) return Icon;
+function getStatusBadge(status: string) {
+  switch (status) {
+    case "connected":
+      return (
+        <Badge className="bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300">
+          <CheckCircle className="h-3 w-3 mr-1" />
+          Connected
+        </Badge>
+      );
+    case "disconnected":
+      return (
+        <Badge className="bg-gray-100 text-gray-800 dark:bg-gray-900/40 dark:text-gray-300">
+          <XCircle className="h-3 w-3 mr-1" />
+          Not Connected
+        </Badge>
+      );
+    case "pending":
+      return (
+        <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300">
+          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+          Pending
+        </Badge>
+      );
+    case "error":
+      return (
+        <Badge className="bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300">
+          <AlertCircle className="h-3 w-3 mr-1" />
+          Error
+        </Badge>
+      );
+    default:
+      return null;
   }
-  return Plug;
+}
+
+function getCategoryColor(category: string) {
+  const colors: Record<string, string> = {
+    "Payment": "border-l-green-500",
+    "Government": "border-l-blue-500",
+    "Communication": "border-l-purple-500",
+    "Storage": "border-l-orange-500",
+    "Authentication": "border-l-cyan-500",
+  };
+  return colors[category] || "border-l-gray-500";
 }
 
 export default function IntegrationsPage() {
@@ -59,66 +86,43 @@ export default function IntegrationsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchStatus = useCallback(async () => {
+  const fetchIntegrations = async () => {
     try {
       setError(null);
+      setLoading(true);
       const result = await integrationsApi.getStatus();
-      setIntegrations(result.data || result.integrations || result);
+      setIntegrations(result.integrations || []);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to load integrations"
-      );
+      setError(err instanceof Error ? err.message : "Failed to load integrations");
     } finally {
       setLoading(false);
     }
-  }, []);
-
-  useEffect(() => {
-    fetchStatus();
-  }, [fetchStatus]);
-
-  const statusBadge = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "connected":
-        return (
-          <Badge className="bg-green-100 text-green-800 border-green-200 flex items-center gap-1">
-            <CheckCircle className="h-3 w-3" />
-            Connected
-          </Badge>
-        );
-      case "available":
-        return (
-          <Badge className="bg-blue-100 text-blue-800 border-blue-200 flex items-center gap-1">
-            <Link2 className="h-3 w-3" />
-            Available
-          </Badge>
-        );
-      default:
-        return (
-          <Badge className="bg-gray-100 text-gray-600 border-gray-200 flex items-center gap-1">
-            <XCircle className="h-3 w-3" />
-            Disconnected
-          </Badge>
-        );
-    }
   };
 
-  const connected = integrations.filter(
-    (i) => i.status?.toLowerCase() === "connected"
-  );
-  const notConnected = integrations.filter(
-    (i) => i.status?.toLowerCase() !== "connected"
-  );
+  useEffect(() => {
+    fetchIntegrations();
+  }, []);
+
+  // Group integrations by category
+  const groupedIntegrations = integrations.reduce((acc, integration) => {
+    const category = integration.category || "Other";
+    if (!acc[category]) acc[category] = [];
+    acc[category].push(integration);
+    return acc;
+  }, {} as Record<string, Integration[]>);
 
   if (loading) {
     return (
       <div className="flex h-screen bg-background">
-        <div className="flex-1 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-3">
+        <div className="flex-1 flex flex-col">
+          <header className="bg-card border-b border-border px-6 py-4">
+            <div className="flex items-center gap-3">
+              <Puzzle className="h-6 w-6 text-primary" />
+              <h1 className="text-xl font-semibold text-foreground">Integrations</h1>
+            </div>
+          </header>
+          <div className="flex-1 flex items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-sm text-muted-foreground">
-              Loading integrations...
-            </p>
           </div>
         </div>
       </div>
@@ -130,156 +134,143 @@ export default function IntegrationsPage() {
       <div className="flex-1 flex flex-col">
         <header className="bg-card border-b border-border px-6 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-2">
-                <Plug className="h-5 w-5 text-primary" />
-                <h1 className="text-xl font-semibold text-foreground">
-                  Integrations
-                </h1>
+            <div className="flex items-center gap-3">
+              <Puzzle className="h-6 w-6 text-primary" />
+              <div>
+                <h1 className="text-xl font-semibold text-foreground">Integrations</h1>
+                <p className="text-sm text-muted-foreground">
+                  Connect JurisGPT with third-party services and government portals
+                </p>
               </div>
-              <p className="text-sm text-muted-foreground mt-0.5">Manage external integrations and monitor connection health</p>
             </div>
-            <Badge variant="outline" className="text-muted-foreground">
-              {connected.length} of {integrations.length} connected
-            </Badge>
+            <Button variant="outline" size="sm" onClick={fetchIntegrations}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Refresh Status
+            </Button>
           </div>
         </header>
 
         <div className="flex-1 overflow-y-auto p-6 bg-background">
-          <div className="max-w-6xl mx-auto space-y-6">
-            {/* Error Banner */}
+          <div className="max-w-5xl mx-auto space-y-6">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-md p-3">
+              <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm rounded-md p-3 flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 flex-shrink-0" />
                 {error}
               </div>
             )}
 
-            {/* Connected Integrations */}
-            {connected.length > 0 && (
-              <div className="space-y-4">
-                <h2 className="text-lg font-semibold text-foreground">
-                  Connected Integrations
-                </h2>
+            {/* Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Total Integrations</p>
+                      <p className="text-2xl font-bold">{integrations.length}</p>
+                    </div>
+                    <Puzzle className="h-8 w-8 text-muted-foreground/30" />
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Connected</p>
+                      <p className="text-2xl font-bold text-green-600">
+                        {integrations.filter((i) => i.status === "connected").length}
+                      </p>
+                    </div>
+                    <CheckCircle className="h-8 w-8 text-green-500/30" />
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Available</p>
+                      <p className="text-2xl font-bold text-gray-600">
+                        {integrations.filter((i) => i.status === "disconnected").length}
+                      </p>
+                    </div>
+                    <XCircle className="h-8 w-8 text-gray-500/30" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Integration Categories */}
+            {Object.entries(groupedIntegrations).map(([category, categoryIntegrations]) => (
+              <div key={category}>
+                <h2 className="text-lg font-semibold mb-4">{category}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {connected.map((integration) => {
-                    const Icon = getIcon(integration.name);
-                    return (
-                      <Card
-                        key={integration.id}
-                        className="shadow-sm border-border hover:shadow-md transition-shadow"
-                      >
-                        <CardHeader>
-                          <div className="flex items-start justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                                <Icon className="h-5 w-5 text-green-600" />
-                              </div>
-                              <div>
-                                <CardTitle className="text-lg">
-                                  {integration.name}
-                                </CardTitle>
-                                <p className="text-sm text-muted-foreground">
-                                  {integration.description}
-                                </p>
-                              </div>
-                            </div>
-                            {statusBadge(integration.status)}
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <Badge variant="outline">
-                                {integration.category}
-                              </Badge>
-                              {integration.last_sync && (
-                                <span className="text-xs text-muted-foreground">
-                                  Last sync:{" "}
-                                  {new Date(
-                                    integration.last_sync
-                                  ).toLocaleDateString()}
-                                </span>
+                  {categoryIntegrations.map((integration) => (
+                    <Card
+                      key={integration.id}
+                      className={`border-l-4 ${getCategoryColor(category)}`}
+                    >
+                      <CardContent className="p-5">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-start gap-4">
+                            <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center">
+                              {integration.icon ? (
+                                <img
+                                  src={integration.icon}
+                                  alt={integration.name}
+                                  className="w-8 h-8"
+                                />
+                              ) : (
+                                <Puzzle className="h-6 w-6 text-muted-foreground" />
                               )}
                             </div>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="flex items-center gap-2"
-                            >
-                              Configure
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Available / Disconnected Integrations */}
-            {notConnected.length > 0 && (
-              <div className="space-y-4">
-                <h2 className="text-lg font-semibold text-foreground">
-                  Available Integrations
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {notConnected.map((integration) => {
-                    const Icon = getIcon(integration.name);
-                    return (
-                      <Card
-                        key={integration.id}
-                        className="shadow-sm border-border hover:shadow-md transition-shadow"
-                      >
-                        <CardHeader>
-                          <div className="flex items-start justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
-                                <Icon className="h-5 w-5 text-muted-foreground" />
-                              </div>
-                              <div>
-                                <CardTitle className="text-lg">
-                                  {integration.name}
-                                </CardTitle>
-                                <p className="text-sm text-muted-foreground">
-                                  {integration.description}
+                            <div>
+                              <h3 className="font-semibold text-foreground">{integration.name}</h3>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {integration.description}
+                              </p>
+                              {integration.last_sync && (
+                                <p className="text-xs text-muted-foreground mt-2">
+                                  Last synced: {new Date(integration.last_sync).toLocaleString("en-IN")}
                                 </p>
-                              </div>
+                              )}
                             </div>
-                            {statusBadge(integration.status)}
                           </div>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="flex items-center justify-between">
-                            <Badge variant="outline">
-                              {integration.category}
-                            </Badge>
-                            <Button
-                              size="sm"
-                              className="flex items-center gap-2"
-                            >
-                              <Link2 className="h-4 w-4" />
+                          <div>{getStatusBadge(integration.status)}</div>
+                        </div>
+                        <div className="flex items-center gap-2 mt-4 pt-4 border-t">
+                          {integration.status === "connected" ? (
+                            <>
+                              <Button variant="outline" size="sm" className="flex-1">
+                                <Settings className="h-4 w-4 mr-2" />
+                                Configure
+                              </Button>
+                              <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+                                Disconnect
+                              </Button>
+                            </>
+                          ) : (
+                            <Button size="sm" className="flex-1">
                               Connect
+                              {integration.url && <ExternalLink className="h-3 w-3 ml-2" />}
                             </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               </div>
-            )}
+            ))}
 
-            {/* Empty State */}
             {integrations.length === 0 && !error && (
-              <Card className="shadow-sm border-border">
-                <CardContent className="py-12">
-                  <div className="text-center">
-                    <Plug className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
-                    <p className="text-sm text-muted-foreground">
-                      No integrations found.
-                    </p>
-                  </div>
+              <Card>
+                <CardContent className="p-12 text-center">
+                  <Puzzle className="h-16 w-16 text-muted-foreground/20 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-foreground mb-2">No Integrations Available</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Third-party integrations will be available soon. Check back later.
+                  </p>
                 </CardContent>
               </Card>
             )}

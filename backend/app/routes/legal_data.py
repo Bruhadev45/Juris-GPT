@@ -335,20 +335,20 @@ async def unified_search(
             for sec in sections:
                 score = _calculate_relevance(
                     q, sec,
-                    ["title", "description"],
-                    weights={"title": 2.0, "description": 1.0},
+                    ["section_title", "section_desc"],
+                    weights={"section_title": 2.0, "section_desc": 1.0},
                 )
                 if score > 0.1:
                     all_results.append(SearchResult(
                         type="statute",
-                        title=f"Section {sec.get('section', '?')}: {sec.get('title', '')}",
+                        title=f"Section {sec.get('Section', '?')}: {sec.get('section_title', '')}",
                         subtitle=LAW_DISPLAY_NAMES.get(law_name, law_name.upper()),
-                        content=sec.get("description", ""),
+                        content=sec.get("section_desc", ""),
                         relevance_score=score,
                         source=law_name.upper(),
                         metadata={
                             "law": law_name,
-                            "section": sec.get("section"),
+                            "section": sec.get("Section"),
                             "law_name": LAW_DISPLAY_NAMES.get(law_name, law_name.upper()),
                         },
                     ))
@@ -436,11 +436,11 @@ async def get_law_sections(
 
     # Filter by section number if provided
     if section is not None:
-        sections = [s for s in sections if s.get("section") == section]
+        sections = [s for s in sections if s.get("Section") == section]
 
     # Enhanced search with fuzzy matching
     if search:
-        sections = _search_filter(sections, search, ["title", "description"])
+        sections = _search_filter(sections, search, ["section_title", "section_desc"])
 
     # Pagination
     return sections[offset:offset + limit]

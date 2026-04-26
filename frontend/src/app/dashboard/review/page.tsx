@@ -194,7 +194,7 @@ export default function ReviewPage() {
 
         <div className="flex-1 overflow-hidden flex">
           {/* Left Panel: Upload + Document List */}
-          <div className="w-[400px] border-r border-border flex flex-col overflow-y-auto">
+          <div className="w-full md:w-[340px] lg:w-[400px] border-r border-border flex flex-col overflow-y-auto flex-shrink-0">
             {/* Upload Zone */}
             <div className="p-4">
               <input

@@ -195,33 +195,35 @@ export default function LawyerReviewPage() {
             </CardContent>
           </Card>
         ) : reviews.length === 0 ? (
-          <Card className="border-dashed">
-            <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-              <Gavel className="h-12 w-12 text-muted-foreground/40 mb-3" />
-              <h3 className="font-medium text-foreground">No reviews found</h3>
-              <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-                Submit documents for licensed lawyer review. They will appear here with status tracking.
-              </p>
-            </CardContent>
-          </Card>
-
-          {/* Lawyer Marketplace Teaser */}
-          <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-            <CardContent className="flex items-start gap-4 p-5">
-              <div className="rounded-lg bg-primary/10 p-2.5 flex-shrink-0">
-                <Gavel className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-foreground">Lawyer Marketplace</h3>
-                  <span className="text-[10px] font-medium bg-primary/20 text-primary px-2 py-0.5 rounded-full">Coming Soon</span>
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Connect with verified lawyers for document reviews, legal opinions, and consultations — combining AI speed with professional legal accountability.
+          <>
+            <Card className="border-dashed">
+              <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+                <Gavel className="h-12 w-12 text-muted-foreground/40 mb-3" />
+                <h3 className="font-medium text-foreground">No reviews found</h3>
+                <p className="text-sm text-muted-foreground mt-1 max-w-sm">
+                  Submit documents for licensed lawyer review. They will appear here with status tracking.
                 </p>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+
+            {/* Lawyer Marketplace Teaser */}
+            <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+              <CardContent className="flex items-start gap-4 p-5">
+                <div className="rounded-lg bg-primary/10 p-2.5 flex-shrink-0">
+                  <Gavel className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-foreground">Lawyer Marketplace</h3>
+                    <span className="text-[10px] font-medium bg-primary/20 text-primary px-2 py-0.5 rounded-full">Coming Soon</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Connect with verified lawyers for document reviews, legal opinions, and consultations — combining AI speed with professional legal accountability.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </>
         ) : (
           <div className="space-y-3">
             {reviews.map((review) => {

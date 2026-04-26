@@ -7,10 +7,23 @@ import json
 import io
 from typing import Dict, List, Optional
 from pathlib import Path
-from openai import OpenAI
 from app.config import settings
 
-client = OpenAI(api_key=settings.openai_api_key)
+# Lazy-initialized OpenAI client
+_client = None
+
+def _get_openai_client():
+    """Get or create OpenAI client (lazy initialization to avoid startup errors)"""
+    global _client
+    if _client is None:
+        try:
+            from openai import OpenAI
+            if settings.openai_api_key and not settings.openai_api_key.startswith("sk-placeholder"):
+                _client = OpenAI(api_key=settings.openai_api_key)
+        except Exception as e:
+            print(f"OpenAI client initialization failed: {e}")
+            _client = None
+    return _client
 
 
 def extract_text_from_file(file_path: str, file_content: Optional[bytes] = None) -> str:
@@ -134,7 +147,7 @@ Be specific about what you find in the actual document text — do not hallucina
 If the document text is empty or unreadable, still return the JSON structure with all clauses marked as "Missing"."""
 
     try:
-        response = client.chat.completions.create(
+        response = _get_openai_client().chat.completions.create(
             model="gpt-4o",
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -233,7 +246,7 @@ Provide a thorough review focusing on identifying present/missing clauses,
 risk assessment, and actionable suggestions for improvement."""
 
     try:
-        response = client.chat.completions.create(
+        response = _get_openai_client().chat.completions.create(
             model="gpt-4o",
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -348,7 +361,7 @@ Generate a complete, professional document in markdown format. Include:
 Make it comprehensive and legally sound under Indian law."""
 
     try:
-        response = client.chat.completions.create(
+        response = _get_openai_client().chat.completions.create(
             model="gpt-4o",
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -379,7 +392,7 @@ Make it comprehensive and legally sound under Indian law."""
 def summarize_news_article(title: str, content: str) -> str:
     """Generate a concise AI summary of a legal news article."""
     try:
-        response = client.chat.completions.create(
+        response = _get_openai_client().chat.completions.create(
             model="gpt-4o",
             messages=[
                 {
@@ -402,7 +415,7 @@ def summarize_news_article(title: str, content: str) -> str:
 def assess_compliance_risk(deadline_title: str, category: str, days_remaining: int) -> dict:
     """Generate AI risk assessment for a compliance deadline."""
     try:
-        response = client.chat.completions.create(
+        response = _get_openai_client().chat.completions.create(
             model="gpt-4o",
             messages=[
                 {

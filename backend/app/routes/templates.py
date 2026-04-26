@@ -3,142 +3,87 @@ Legal Document Templates — AI-powered document generation using GPT-4o.
 Generates complete legal documents from template fields.
 """
 
+import json
+import os
+from pathlib import Path
 from fastapi import APIRouter, HTTPException
-from typing import Optional
+from typing import Optional, List, Dict, Any
 from app.services.ai_analyzer import generate_template_document
 
 router = APIRouter()
 
-TEMPLATES = [
-    {
-        "id": "nda",
-        "name": "Non-Disclosure Agreement (NDA)",
-        "description": "Protect confidential information shared between parties",
-        "category": "Contracts",
-        "estimated_time": "5 minutes",
-        "price": 999,
-        "fields": [
-            {"name": "disclosing_party", "label": "Disclosing Party Name", "type": "text", "required": True},
-            {"name": "receiving_party", "label": "Receiving Party Name", "type": "text", "required": True},
-            {"name": "purpose", "label": "Purpose of Disclosure", "type": "textarea", "required": True},
-            {"name": "duration_months", "label": "Duration (months)", "type": "number", "required": True, "default": 24},
-            {"name": "jurisdiction", "label": "Governing Law (State)", "type": "select", "required": True, "options": ["Maharashtra", "Delhi", "Karnataka", "Tamil Nadu", "Telangana", "Gujarat", "Rajasthan", "Uttar Pradesh", "West Bengal", "Other"]},
-            {"name": "mutual", "label": "Mutual NDA?", "type": "boolean", "required": False, "default": False},
-        ],
-    },
-    {
-        "id": "employment",
-        "name": "Employment Contract",
-        "description": "Standard employment agreement compliant with Indian labor laws",
-        "category": "Employment",
-        "estimated_time": "10 minutes",
-        "price": 1499,
-        "fields": [
-            {"name": "employer_name", "label": "Employer / Company Name", "type": "text", "required": True},
-            {"name": "employee_name", "label": "Employee Name", "type": "text", "required": True},
-            {"name": "designation", "label": "Designation / Role", "type": "text", "required": True},
-            {"name": "department", "label": "Department", "type": "text", "required": False},
-            {"name": "salary_monthly", "label": "Monthly Salary (INR)", "type": "number", "required": True},
-            {"name": "joining_date", "label": "Joining Date", "type": "date", "required": True},
-            {"name": "probation_months", "label": "Probation Period (months)", "type": "number", "required": True, "default": 6},
-            {"name": "notice_period_months", "label": "Notice Period (months)", "type": "number", "required": True, "default": 2},
-            {"name": "work_location", "label": "Work Location", "type": "text", "required": True},
-            {"name": "non_compete", "label": "Include Non-Compete Clause?", "type": "boolean", "required": False, "default": False},
-        ],
-    },
-    {
-        "id": "msa",
-        "name": "Master Service Agreement (MSA)",
-        "description": "Framework agreement for ongoing service relationships",
-        "category": "Contracts",
-        "estimated_time": "10 minutes",
-        "price": 1999,
-        "fields": [
-            {"name": "service_provider", "label": "Service Provider Name", "type": "text", "required": True},
-            {"name": "client_name", "label": "Client Name", "type": "text", "required": True},
-            {"name": "services_description", "label": "Description of Services", "type": "textarea", "required": True},
-            {"name": "payment_terms", "label": "Payment Terms", "type": "select", "required": True, "options": ["Net 15", "Net 30", "Net 45", "Net 60", "Milestone-based"]},
-            {"name": "contract_value", "label": "Estimated Contract Value (INR)", "type": "number", "required": False},
-            {"name": "duration_months", "label": "Contract Duration (months)", "type": "number", "required": True, "default": 12},
-            {"name": "auto_renewal", "label": "Auto-Renewal?", "type": "boolean", "required": False, "default": True},
-            {"name": "jurisdiction", "label": "Governing Law (State)", "type": "select", "required": True, "options": ["Maharashtra", "Delhi", "Karnataka", "Tamil Nadu", "Telangana", "Gujarat", "Rajasthan", "Uttar Pradesh", "West Bengal", "Other"]},
-        ],
-    },
-    {
-        "id": "freelancer",
-        "name": "Freelancer Agreement",
-        "description": "Independent contractor agreement with IP assignment and payment terms",
-        "category": "Employment",
-        "estimated_time": "8 minutes",
-        "price": 999,
-        "fields": [
-            {"name": "company_name", "label": "Company Name", "type": "text", "required": True},
-            {"name": "freelancer_name", "label": "Freelancer Name", "type": "text", "required": True},
-            {"name": "scope_of_work", "label": "Scope of Work", "type": "textarea", "required": True},
-            {"name": "deliverables", "label": "Deliverables", "type": "textarea", "required": True},
-            {"name": "total_fee", "label": "Total Fee (INR)", "type": "number", "required": True},
-            {"name": "payment_schedule", "label": "Payment Schedule", "type": "select", "required": True, "options": ["Upfront", "Milestone-based", "On Completion", "Weekly", "Monthly"]},
-            {"name": "deadline", "label": "Project Deadline", "type": "date", "required": True},
-            {"name": "ip_assignment", "label": "IP Assignment to Company?", "type": "boolean", "required": True, "default": True},
-        ],
-    },
-    {
-        "id": "mou",
-        "name": "Memorandum of Understanding (MoU)",
-        "description": "Non-binding agreement outlining terms between parties",
-        "category": "Contracts",
-        "estimated_time": "7 minutes",
-        "price": 799,
-        "fields": [
-            {"name": "party_one", "label": "Party One Name", "type": "text", "required": True},
-            {"name": "party_two", "label": "Party Two Name", "type": "text", "required": True},
-            {"name": "purpose", "label": "Purpose of MoU", "type": "textarea", "required": True},
-            {"name": "terms", "label": "Key Terms", "type": "textarea", "required": True},
-            {"name": "duration_months", "label": "Duration (months)", "type": "number", "required": True, "default": 12},
-            {"name": "binding", "label": "Legally Binding?", "type": "boolean", "required": False, "default": False},
-        ],
-    },
-    {
-        "id": "rental",
-        "name": "Rental / Lease Agreement",
-        "description": "Residential or commercial rental agreement under Indian Transfer of Property Act",
-        "category": "Property",
-        "estimated_time": "10 minutes",
-        "price": 1499,
-        "fields": [
-            {"name": "landlord_name", "label": "Landlord Name", "type": "text", "required": True},
-            {"name": "tenant_name", "label": "Tenant Name", "type": "text", "required": True},
-            {"name": "property_address", "label": "Property Address", "type": "textarea", "required": True},
-            {"name": "property_type", "label": "Property Type", "type": "select", "required": True, "options": ["Residential", "Commercial", "Industrial"]},
-            {"name": "monthly_rent", "label": "Monthly Rent (INR)", "type": "number", "required": True},
-            {"name": "security_deposit", "label": "Security Deposit (INR)", "type": "number", "required": True},
-            {"name": "lease_duration_months", "label": "Lease Duration (months)", "type": "number", "required": True, "default": 11},
-            {"name": "start_date", "label": "Lease Start Date", "type": "date", "required": True},
-            {"name": "state", "label": "State", "type": "select", "required": True, "options": ["Maharashtra", "Delhi", "Karnataka", "Tamil Nadu", "Telangana", "Gujarat", "Rajasthan", "Uttar Pradesh", "West Bengal", "Other"]},
-        ],
-    },
-    {
-        "id": "poa",
-        "name": "Power of Attorney",
-        "description": "Authorize someone to act on your behalf in legal or financial matters",
-        "category": "Legal",
-        "estimated_time": "8 minutes",
-        "price": 1299,
-        "fields": [
-            {"name": "principal_name", "label": "Principal (Grantor) Name", "type": "text", "required": True},
-            {"name": "agent_name", "label": "Agent (Attorney) Name", "type": "text", "required": True},
-            {"name": "powers_granted", "label": "Powers Granted", "type": "textarea", "required": True, "placeholder": "Describe the specific powers being granted"},
-            {"name": "poa_type", "label": "Type of PoA", "type": "select", "required": True, "options": ["General", "Special / Specific", "Durable"]},
-            {"name": "duration", "label": "Duration", "type": "select", "required": True, "options": ["Until Revoked", "6 Months", "1 Year", "2 Years", "5 Years"]},
-            {"name": "purpose", "label": "Purpose", "type": "textarea", "required": True},
-        ],
-    },
-]
+# Load templates from JSON file
+def load_templates() -> List[Dict[str, Any]]:
+    """Load templates from the JSON data file."""
+    # Try multiple possible paths for the templates file
+    possible_paths = [
+        Path(__file__).parent.parent.parent / "data" / "datasets" / "samples" / "templates.json",
+        Path("/Users/bruuu/Desktop/Juris-GPT/Juris-GPT/backend/data/datasets/samples/templates.json"),
+        Path(os.getcwd()) / "data" / "datasets" / "samples" / "templates.json",
+    ]
+
+    for path in possible_paths:
+        if path.exists():
+            with open(path, "r", encoding="utf-8") as f:
+                templates = json.load(f)
+                # Convert JSON boolean values and ensure proper Python types
+                for template in templates:
+                    for field in template.get("fields", []):
+                        if "required" in field:
+                            field["required"] = bool(field["required"])
+                        if "default" in field and isinstance(field["default"], str):
+                            if field["default"].lower() == "true":
+                                field["default"] = True
+                            elif field["default"].lower() == "false":
+                                field["default"] = False
+                return templates
+
+    # Fallback to minimal inline templates if file not found
+    print("WARNING: templates.json not found, using fallback templates")
+    return [
+        {
+            "id": "nda",
+            "name": "Non-Disclosure Agreement (NDA)",
+            "description": "Protect confidential information shared between parties",
+            "category": "Startup",
+            "estimated_time": "5 minutes",
+            "field_count": 6,
+            "price": 999,
+            "fields": [
+                {"name": "disclosing_party", "label": "Disclosing Party Name", "type": "text", "required": True},
+                {"name": "receiving_party", "label": "Receiving Party Name", "type": "text", "required": True},
+                {"name": "purpose", "label": "Purpose of Disclosure", "type": "textarea", "required": True},
+                {"name": "duration_months", "label": "Duration (months)", "type": "number", "required": True, "default": 24},
+                {"name": "jurisdiction", "label": "Governing Law (State)", "type": "select", "required": True, "options": ["Maharashtra", "Delhi", "Karnataka", "Tamil Nadu", "Other"]},
+                {"name": "mutual", "label": "Mutual NDA?", "type": "boolean", "required": False, "default": False},
+            ],
+        }
+    ]
+
+
+# Load templates on module initialization
+TEMPLATES = load_templates()
 
 
 @router.get("/api/templates")
-async def list_templates():
-    """List all available document templates."""
+async def list_templates(category: Optional[str] = None, search: Optional[str] = None):
+    """List all available document templates with optional filtering."""
+    filtered_templates = TEMPLATES
+
+    # Filter by category if provided
+    if category:
+        filtered_templates = [t for t in filtered_templates if t["category"].lower() == category.lower()]
+
+    # Filter by search term if provided
+    if search:
+        search_lower = search.lower()
+        filtered_templates = [
+            t for t in filtered_templates
+            if search_lower in t["name"].lower()
+            or search_lower in t["description"].lower()
+            or search_lower in t["category"].lower()
+        ]
+
     return {
         "templates": [
             {
@@ -147,11 +92,31 @@ async def list_templates():
                 "description": t["description"],
                 "category": t["category"],
                 "estimated_time": t["estimated_time"],
-                "price": t["price"],
-                "field_count": len(t["fields"]),
+                "price": t.get("price", 999),
+                "field_count": t.get("field_count", len(t["fields"])),
+                "law_reference": t.get("law_reference", ""),
             }
-            for t in TEMPLATES
-        ]
+            for t in filtered_templates
+        ],
+        "total": len(filtered_templates),
+        "categories": list(set(t["category"] for t in TEMPLATES)),
+    }
+
+
+@router.get("/api/templates/categories")
+async def get_categories():
+    """Get all available template categories with counts."""
+    categories = {}
+    for t in TEMPLATES:
+        cat = t["category"]
+        if cat not in categories:
+            categories[cat] = {"name": cat, "count": 0, "templates": []}
+        categories[cat]["count"] += 1
+        categories[cat]["templates"].append(t["id"])
+
+    return {
+        "categories": list(categories.values()),
+        "total_templates": len(TEMPLATES),
     }
 
 

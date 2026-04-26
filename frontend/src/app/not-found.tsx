@@ -33,7 +33,7 @@ export default function NotFound() {
             This page could not be found.
           </h2>
           <p className="text-muted-foreground mb-8">
-            The legal document you're looking for doesn't exist or has been moved.
+            The legal document you&apos;re looking for doesn&apos;t exist or has been moved.
           </p>
         </motion.div>
 

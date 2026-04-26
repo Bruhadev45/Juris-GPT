@@ -1,44 +1,54 @@
-from fastapi import APIRouter, HTTPException
+import logging
+
+from fastapi import APIRouter, HTTPException, Depends
 from uuid import UUID
 from app.database import supabase
 from app.schemas.document import DocumentGenerateRequest, DocumentResponse
 from app.services.ai_generator import generate_founder_agreement
 from app.services.document_service import create_document_version, get_latest_document
 from app.services.email_service import send_document_ready_email, send_admin_notification_email
+from app.routes.auth import require_auth
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 @router.post("/generate", response_model=DocumentResponse)
-async def generate_document(request: DocumentGenerateRequest):
+async def generate_document(
+    request: DocumentGenerateRequest,
+    user: dict = Depends(require_auth),
+):
     """Generate AI document for a matter"""
-    # Auth removed - no user check for now
-    
     # Get matter
     matter_response = supabase.table("legal_matters").select("*").eq("id", str(request.matter_id)).execute()
     if not matter_response.data:
         raise HTTPException(status_code=404, detail="Matter not found")
-    
+
     matter = matter_response.data[0]
-    
-    # Auth removed - no access check for now
-    
+
+    # Verify ownership via company
+    company_response = supabase.table("companies").select("user_id").eq("id", matter["company_id"]).execute()
+    if not company_response.data or (
+        company_response.data[0]["user_id"] != user["id"] and user.get("role") != "admin"
+    ):
+        raise HTTPException(status_code=403, detail="Access denied")
+
     # Update matter status
     supabase.table("legal_matters").update({"status": "ai_generating"}).eq("id", str(request.matter_id)).execute()
-    
+
     try:
         # Get company details
-        company_response = supabase.table("companies").select("*").eq("id", matter["company_id"]).execute()
-        company = company_response.data[0]
-        
+        company_full = supabase.table("companies").select("*").eq("id", matter["company_id"]).execute()
+        company = company_full.data[0]
+
         # Get founders
         founders_response = supabase.table("founders").select("*").eq("company_id", matter["company_id"]).execute()
         founders = founders_response.data
-        
+
         # Get preferences
         pref_response = supabase.table("legal_preferences").select("*").eq("matter_id", str(request.matter_id)).execute()
         preferences = pref_response.data[0] if pref_response.data else {}
-        
+
         # Generate document
         document_content = generate_founder_agreement(
             company_name=company["name"],
@@ -48,74 +58,89 @@ async def generate_document(request: DocumentGenerateRequest):
             founders=founders,
             preferences=preferences,
         )
-        
+
         # Get latest version number
         latest_doc = await get_latest_document(request.matter_id)
         version = (latest_doc["version"] + 1) if latest_doc else 1
-        
+
         # Create document version
         document = await create_document_version(
             matter_id=request.matter_id,
             content=document_content,
             version=version,
-            is_final=False
+            is_final=False,
         )
-        
+
         # Update matter status
         supabase.table("legal_matters").update({"status": "lawyer_review"}).eq("id", str(request.matter_id)).execute()
-        
+
         # Create lawyer review entry
         supabase.table("lawyer_reviews").insert({
             "matter_id": str(request.matter_id),
-            "status": "pending"
+            "status": "pending",
         }).execute()
-        
-        # Send emails (user email removed since auth is disabled)
-        # TODO: Get user email from matter/company when auth is added back
-        # await send_document_ready_email(user.email, str(request.matter_id))
+
+        # Send emails
+        await send_document_ready_email(user["email"], str(request.matter_id))
         await send_admin_notification_email("admin@jurisgpt.com", str(request.matter_id))
-        
+
         return DocumentResponse(**document)
-        
+
     except Exception as e:
         # Update matter status on error
         supabase.table("legal_matters").update({"status": "draft"}).eq("id", str(request.matter_id)).execute()
-        raise HTTPException(status_code=500, detail=f"Failed to generate document: {str(e)}")
+        logger.exception("Document generation failed for matter %s", request.matter_id)
+        raise HTTPException(status_code=500, detail="Document generation failed. Please contact support.")
 
 
 @router.get("/{document_id}", response_model=DocumentResponse)
-async def get_document(document_id: UUID):
+async def get_document(
+    document_id: UUID,
+    user: dict = Depends(require_auth),
+):
     """Get document by ID"""
-    # Auth removed - no user check for now
-    
-    response = supabase.table("documents").select("*").eq("id", str(document_id)).execute()
+    response = supabase.table("documents").select("*, legal_matters(company_id, companies(user_id))").eq("id", str(document_id)).execute()
     if not response.data:
         raise HTTPException(status_code=404, detail="Document not found")
-    
+
     document = response.data[0]
-    
-    # Auth removed - no access check for now
-    return DocumentResponse(**document)
+
+    # Verify ownership
+    try:
+        owner_id = document["legal_matters"]["companies"]["user_id"]
+        if owner_id != user["id"] and user.get("role") != "admin":
+            raise HTTPException(status_code=403, detail="Access denied")
+    except (KeyError, TypeError):
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    return DocumentResponse(**{k: v for k, v in document.items() if k != "legal_matters"})
 
 
 @router.get("/{document_id}/download")
-async def download_document(document_id: UUID):
+async def download_document(
+    document_id: UUID,
+    user: dict = Depends(require_auth),
+):
     """Download document file"""
-    # Auth removed - no user check for now
-    
-    response = supabase.table("documents").select("*").eq("id", str(document_id)).execute()
+    response = supabase.table("documents").select("*, legal_matters(company_id, companies(user_id))").eq("id", str(document_id)).execute()
     if not response.data:
         raise HTTPException(status_code=404, detail="Document not found")
-    
+
     document = response.data[0]
-    
-    # Auth removed - no access check for now
-    
+
+    # Verify ownership
+    try:
+        owner_id = document["legal_matters"]["companies"]["user_id"]
+        if owner_id != user["id"] and user.get("role") != "admin":
+            raise HTTPException(status_code=403, detail="Access denied")
+    except (KeyError, TypeError):
+        raise HTTPException(status_code=403, detail="Access denied")
+
     # Only allow download if final
     if not document.get("is_final"):
         raise HTTPException(status_code=400, detail="Document not yet finalized")
-    
+
     if not document.get("storage_url"):
         raise HTTPException(status_code=404, detail="Document file not found")
-    
+
     return {"url": document["storage_url"], "filename": document.get("file_name", "document.docx")}

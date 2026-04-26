@@ -1,11 +1,15 @@
 """
 JurisGPT Chatbot Service
+Citation-Grounded Legal Research Assistant for Indian Law
+
 Integrates RAG pipeline with FastAPI backend.
 Falls back to direct OpenAI when RAG is unavailable.
 """
 
 import sys
+import importlib.util
 import json
+import os
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 from pydantic import BaseModel
@@ -14,7 +18,15 @@ from app.config import settings
 
 # Add data directory to path for RAG imports
 DATA_DIR = Path(__file__).parent.parent.parent.parent / "data"
-sys.path.insert(0, str(DATA_DIR))
+SAMPLE_FAQS_PATH = DATA_DIR / "datasets" / "samples" / "legal_faqs.json"
+FAQ_STOPWORDS = {
+    "what", "when", "where", "which", "who", "whom", "whose", "why", "how",
+    "the", "and", "for", "with", "from", "into", "your", "their", "them",
+    "this", "that", "these", "those", "there", "here", "about", "under",
+    "after", "before", "shall", "would", "could", "should", "can", "does",
+    "is", "are", "was", "were", "have", "has", "had", "get", "make", "need",
+    "india", "indian", "startup", "company", "legal",
+}
 
 
 class ChatMessage(BaseModel):
@@ -30,32 +42,90 @@ class ChatRequest(BaseModel):
     context: Optional[Dict[str, Any]] = None
 
 
+class CitationModel(BaseModel):
+    """Citation from the legal corpus"""
+    title: str
+    content: str
+    doc_type: str
+    source: str
+    relevance: float
+    section: Optional[str] = None
+    act: Optional[str] = None
+    url: Optional[str] = None
+
+
 class ChatResponse(BaseModel):
-    """Chat response model"""
+    """
+    Citation-grounded chat response model.
+
+    This is the core response structure for JurisGPT legal Q&A.
+    """
     success: bool
-    message: str
-    sources: List[Dict[str, Any]] = []
-    suggestions: List[str] = []
+    answer: str  # Main answer text
+    citations: List[CitationModel] = []  # Legal citations supporting the answer
+    confidence: str = "medium"  # "high", "medium", "low", "insufficient"
+    limitations: str = ""  # Caveats about the answer
+    follow_up_questions: List[str] = []  # Suggested follow-ups
+    grounded: bool = True  # Whether answer is supported by citations
     error: Optional[str] = None
+
+    # Legacy fields for backwards compatibility
+    message: str = ""  # Alias for answer
+    sources: List[Dict[str, Any]] = []  # Alias for citations (old format)
+    suggestions: List[str] = []  # Alias for follow_up_questions
+
+    # Model provenance
+    model_used: Optional[str] = None  # Which model generated the answer
+
+    # Document generation (separate workflow)
+    is_document: bool = False
+    document_type: Optional[str] = None
 
 
 class JurisGPTChatbotService:
-    """Chatbot service for legal assistance — uses RAG or direct OpenAI."""
+    """
+    Chatbot service for citation-grounded legal assistance.
+
+    Uses RAG (Retrieval-Augmented Generation) for answering legal questions
+    with proper citations from the indexed legal corpus.
+    Falls back to direct OpenAI or hardcoded responses when RAG unavailable.
+    """
 
     def __init__(self):
         self.rag = None
         self._initialized = False
+        self._init_attempted = False
         self._initialization_error = None
         self._openai_client = None
+        self._sample_faqs = None
 
     def _lazy_init(self):
         """Lazy initialization of RAG pipeline"""
-        if self._initialized:
+        if self._initialized or self._init_attempted:
             return
 
+        self._init_attempted = True
+
         try:
-            from rag_pipeline import JurisGPTRAG
-            self.rag = JurisGPTRAG()
+            # Dynamic import without sys.path pollution
+            rag_pipeline_path = DATA_DIR / "rag_pipeline.py"
+            spec = importlib.util.spec_from_file_location("rag_pipeline", rag_pipeline_path)
+            if spec is None or spec.loader is None:
+                raise ImportError(f"RAG pipeline not found at {rag_pipeline_path}")
+
+            rag_module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(rag_module)
+            JurisGPTRAG = rag_module.JurisGPTRAG
+            vector_store_type = os.getenv("JURISGPT_VECTOR_STORE", "lexical")
+            llm_type = os.getenv("JURISGPT_LLM_TYPE", "local_legal_llama")
+            hybrid_search = os.getenv("RAG_HYBRID_SEARCH", "false").lower() == "true"
+            use_reranker = os.getenv("RAG_USE_RERANKER", "false").lower() == "true"
+            self.rag = JurisGPTRAG(
+                vector_store_type=vector_store_type,
+                llm_type=llm_type,
+                hybrid_search=hybrid_search,
+                use_reranker=use_reranker,
+            )
             self._initialized = True
             print("JurisGPT RAG Pipeline initialized")
         except ImportError as e:
@@ -73,103 +143,338 @@ class JurisGPTChatbotService:
         if self._openai_client is None:
             try:
                 from openai import OpenAI
-                self._openai_client = OpenAI(api_key=settings.openai_api_key)
-            except Exception:
+                api_key = settings.openai_api_key
+                if api_key and not api_key.startswith("sk-placeholder"):
+                    self._openai_client = OpenAI(api_key=api_key)
+                    print("OpenAI client initialized successfully")
+                else:
+                    print("OpenAI API key not configured or is placeholder")
+            except Exception as e:
+                print(f"OpenAI client initialization failed: {e}")
                 self._openai_client = None
         return self._openai_client
 
-    def get_legal_response(self, request: ChatRequest) -> ChatResponse:
-        """Get legal assistance response — tries RAG first, then OpenAI, then fallback."""
-        self._lazy_init()
+    def _load_sample_faqs(self) -> List[Dict[str, Any]]:
+        """Load local sample FAQs for offline fallback responses."""
+        if self._sample_faqs is not None:
+            return self._sample_faqs
 
-        # Try RAG first
+        try:
+            with SAMPLE_FAQS_PATH.open("r", encoding="utf-8") as handle:
+                data = json.load(handle)
+                self._sample_faqs = data if isinstance(data, list) else []
+        except Exception:
+            self._sample_faqs = []
+
+        return self._sample_faqs
+
+    def _tokenize_query(self, text: str) -> List[str]:
+        """Tokenize text for lightweight FAQ matching."""
+        normalized = "".join(char.lower() if char.isalnum() else " " for char in text)
+        return [
+            token for token in normalized.split()
+            if len(token) > 2 and token not in FAQ_STOPWORDS
+        ]
+
+    def _get_sample_faq_response(self, query: str) -> Optional[ChatResponse]:
+        """Return the best local FAQ answer for offline use."""
+        faqs = self._load_sample_faqs()
+        if not faqs:
+            return None
+
+        query_tokens = set(self._tokenize_query(query))
+        best_match = None
+        best_score = 0
+
+        for faq in faqs:
+            question = faq.get("question", "")
+            question_tokens = set(self._tokenize_query(question))
+            overlap = len(query_tokens & question_tokens)
+            if overlap > best_score:
+                best_score = overlap
+                best_match = faq
+
+        if not best_match or best_score < 3:
+            return None
+
+        related_laws = best_match.get("related_laws", [])
+        suggestions = self._generate_suggestions(query, [])
+        answer = best_match.get("answer", "I found a related sample legal answer.")
+
+        if related_laws:
+            answer = (
+                f"{answer}\n\n"
+                f"**Related laws:** {', '.join(related_laws[:3])}\n\n"
+                "> *This response comes from local sample legal data, not live corpus retrieval.*"
+            )
+        else:
+            answer = (
+                f"{answer}\n\n"
+                "> *This response comes from local sample legal data, not live corpus retrieval.*"
+            )
+
+        return ChatResponse(
+            success=True,
+            answer=answer,
+            citations=[],
+            confidence="low",
+            limitations="The live RAG/OpenAI path is unavailable, so this answer was served from local sample legal FAQs. Verify against current primary sources.",
+            follow_up_questions=suggestions,
+            grounded=False,
+            message=answer,
+            sources=[],
+            suggestions=suggestions,
+        )
+
+    def _is_greeting(self, message: str) -> bool:
+        """Check if the message is a greeting or casual conversation."""
+        greetings = [
+            "hi", "hello", "hey", "hii", "hiii", "yo", "sup",
+            "good morning", "good afternoon", "good evening", "good night",
+            "howdy", "greetings", "namaste", "namaskar",
+            "what's up", "whats up", "wassup", "how are you",
+            "how r u", "how do you do", "nice to meet you"
+        ]
+        message_lower = message.lower().strip()
+        # Check exact match or if message starts with greeting
+        return message_lower in greetings or any(message_lower.startswith(g) for g in greetings)
+
+    def _get_greeting_response(self) -> ChatResponse:
+        """Return a friendly greeting response."""
+        import random
+        greetings = [
+            "Hello! I'm JurisGPT, your AI legal assistant for Indian startup and corporate law. How can I help you today?",
+            "Hi there! I'm JurisGPT, ready to assist you with legal questions about Indian business law, compliance, and more. What would you like to know?",
+            "Hey! Welcome to JurisGPT. I can help you with company formation, legal agreements, compliance requirements, and other legal matters. What's on your mind?",
+        ]
+        answer = random.choice(greetings)
+        suggestions = [
+            "How do I incorporate a company in India?",
+            "What is founder equity vesting?",
+            "What are the compliance requirements for startups?",
+            "Draft an NDA for my business",
+        ]
+        return ChatResponse(
+            success=True,
+            answer=answer,
+            citations=[],
+            confidence="high",
+            limitations="",
+            follow_up_questions=suggestions,
+            grounded=False,
+            model_used="greeting",
+            message=answer,
+            sources=[],
+            suggestions=suggestions,
+        )
+
+    def get_legal_response(self, request: ChatRequest) -> ChatResponse:
+        """
+        Get citation-grounded legal response.
+
+        Priority: Greetings → RAG+LocalLLM (primary) → RAG+OpenAI → OpenAI-only → Fallback
+        """
+        # Handle greetings first
+        if self._is_greeting(request.message):
+            return self._get_greeting_response()
+
+        # Document drafting is a generation workflow, not a RAG Q&A workflow.
+        # Detect it before RAG so an initialized retriever does not swallow
+        # drafting requests.
+        if self._is_document_generation_request(request.message):
+            return self._generate_document_response(request)
+
+        # 1. Primary: RAG pipeline (uses local LLM or OpenAI internally)
+        self._lazy_init()
         if self._initialized and self.rag:
             return self._get_rag_response(request)
 
-        # Try direct OpenAI
+        # 2. Fallback: Direct OpenAI (no RAG citations)
         client = self._get_openai_client()
         if client and settings.openai_api_key and not settings.openai_api_key.startswith("sk-placeholder"):
             return self._get_openai_response(request)
 
-        # Fallback to hardcoded responses
+        # 3. Final fallback to hardcoded responses
         return self._get_fallback_response(request.message)
 
     def _get_rag_response(self, request: ChatRequest) -> ChatResponse:
-        """Get response using RAG pipeline."""
+        """Get response using RAG pipeline with structured citations."""
         try:
-            context_info = ""
-            if request.context:
-                if request.context.get("company_name"):
-                    context_info += f"\nCompany: {request.context['company_name']}"
-                if request.context.get("founders"):
-                    context_info += f"\nFounders: {len(request.context['founders'])} founders"
-                if request.context.get("matter_type"):
-                    context_info += f"\nDocument Type: {request.context['matter_type']}"
+            # Build enhanced query with context
+            enhanced_query = self._build_enhanced_query(request)
 
-            enhanced_query = request.message
-            if context_info:
-                enhanced_query = f"{request.message}\n\nContext:{context_info}"
-
+            # Get RAG response
             rag_response = self.rag.query(enhanced_query)
 
-            sources = [
-                {
-                    "title": s.title,
-                    "content": s.content[:300] + "..." if len(s.content) > 300 else s.content,
-                    "doc_type": s.doc_type,
-                    "source": s.source,
-                    "relevance": f"{s.score:.0%}"
-                }
-                for s in rag_response.sources[:5]
+            # Convert citations to response format
+            citations = [
+                CitationModel(
+                    title=c.title,
+                    content=c.content[:300] + "..." if len(c.content) > 300 else c.content,
+                    doc_type=c.doc_type,
+                    source=c.source,
+                    relevance=c.relevance,
+                    section=c.section,
+                    act=c.act,
+                    url=c.url
+                )
+                for c in rag_response.citations[:5]
             ]
 
-            suggestions = self._generate_suggestions(request.message, rag_response.sources)
+            # Legacy sources format
+            sources = [
+                {
+                    "title": c.title,
+                    "content": c.content,
+                    "doc_type": c.doc_type,
+                    "source": c.source,
+                    "relevance": f"{c.relevance:.0%}"
+                }
+                for c in citations
+            ]
 
             return ChatResponse(
                 success=True,
+                answer=rag_response.answer,
+                citations=citations,
+                confidence=rag_response.confidence,
+                limitations=rag_response.limitations,
+                follow_up_questions=rag_response.follow_up_questions,
+                grounded=rag_response.grounded,
+                model_used=getattr(rag_response, "model_used", None),
+                # Legacy fields
                 message=rag_response.answer,
                 sources=sources,
-                suggestions=suggestions
+                suggestions=rag_response.follow_up_questions
             )
         except Exception as e:
             return ChatResponse(
                 success=False,
+                answer="I encountered an error processing your request.",
                 message="I encountered an error processing your request.",
+                confidence="insufficient",
+                limitations="An error occurred during processing.",
+                grounded=False,
                 error=str(e)
             )
 
+    def _build_enhanced_query(self, request: ChatRequest) -> str:
+        """Build query with context information."""
+        context_info = ""
+        if request.context:
+            if request.context.get("company_name"):
+                context_info += f"\nCompany: {request.context['company_name']}"
+            if request.context.get("founders"):
+                context_info += f"\nFounders: {len(request.context['founders'])} founders"
+            if request.context.get("matter_type"):
+                context_info += f"\nDocument Type: {request.context['matter_type']}"
+
+        enhanced_query = request.message
+        if context_info:
+            enhanced_query = f"{request.message}\n\nContext:{context_info}"
+
+        return enhanced_query
+
+    def _is_document_generation_request(self, message: str) -> bool:
+        """Detect if the user is asking to generate/draft a legal document."""
+        message_lower = message.lower()
+
+        # Document generation trigger words
+        generation_triggers = [
+            "draft", "generate", "create", "write", "prepare", "make",
+            "template", "sample", "format"
+        ]
+
+        # Document types
+        document_types = [
+            "nda", "non-disclosure", "confidentiality agreement",
+            "contract", "agreement", "mou", "memorandum",
+            "employment", "offer letter", "appointment letter",
+            "founder agreement", "shareholders agreement",
+            "term sheet", "investment agreement",
+            "service agreement", "consulting agreement",
+            "partnership deed", "lease agreement", "rental agreement",
+            "power of attorney", "affidavit", "undertaking",
+            "notice", "legal notice", "demand notice",
+            "will", "trademark", "ip assignment",
+            "privacy policy", "terms of service", "terms and conditions",
+            "gdpr", "dpdpa", "data processing"
+        ]
+
+        has_trigger = any(trigger in message_lower for trigger in generation_triggers)
+        has_doc_type = any(doc_type in message_lower for doc_type in document_types)
+
+        return has_trigger and has_doc_type
+
+    def _detect_document_type(self, message: str) -> str:
+        """Detect the type of document being requested."""
+        message_lower = message.lower()
+
+        document_type_map = {
+            "nda": ["nda", "non-disclosure", "confidentiality agreement"],
+            "employment_letter": ["employment", "offer letter", "appointment letter", "job offer"],
+            "service_agreement": ["service agreement", "service contract"],
+            "consulting_agreement": ["consulting agreement", "consultant contract"],
+            "founder_agreement": ["founder agreement", "co-founder agreement", "founders agreement"],
+            "shareholders_agreement": ["shareholders agreement", "shareholder agreement"],
+            "mou": ["mou", "memorandum of understanding"],
+            "partnership_deed": ["partnership deed", "partnership agreement"],
+            "legal_notice": ["legal notice", "demand notice", "cease and desist"],
+            "power_of_attorney": ["power of attorney", "poa"],
+            "privacy_policy": ["privacy policy", "data privacy"],
+            "terms_of_service": ["terms of service", "terms and conditions", "tos"],
+            "ip_assignment": ["ip assignment", "intellectual property assignment"],
+            "lease_agreement": ["lease agreement", "rental agreement", "rent agreement"],
+            "investment_agreement": ["investment agreement", "term sheet", "safe", "convertible note"],
+            "affidavit": ["affidavit", "sworn statement"],
+        }
+
+        for doc_type, keywords in document_type_map.items():
+            if any(keyword in message_lower for keyword in keywords):
+                return doc_type
+
+        return "legal_document"
+
     def _get_openai_response(self, request: ChatRequest) -> ChatResponse:
-        """Get response using direct OpenAI GPT-4o."""
+        """
+        Get response using direct OpenAI GPT-4o.
+
+        Note: This path doesn't have RAG citations, so confidence is downgraded.
+        Document generation requests are handled separately with a specialized prompt.
+        """
         client = self._get_openai_client()
         if not client:
             return self._get_fallback_response(request.message)
 
-        system_prompt = """You are JurisGPT, an expert AI legal assistant specializing in Indian law.
-You help Indian startups, MSMEs, and entrepreneurs with legal questions.
+        is_document_request = self._is_document_generation_request(request.message)
 
-Your expertise covers:
-- Indian Companies Act, 2013
-- Indian Contract Act, 1872
-- Indian Penal Code (IPC / BNS)
-- Code of Civil Procedure (CPC)
-- Code of Criminal Procedure (CrPC / BNSS)
-- Arbitration and Conciliation Act, 1996
-- Information Technology Act, 2000
-- Digital Personal Data Protection Act (DPDPA), 2023
-- Labour laws, GST, TDS, and compliance requirements
-- Startup India policies and DPIIT registration
-- Founder agreements, NDAs, employment contracts
+        if is_document_request:
+            return self._generate_document_response(request)
 
-Guidelines:
-1. Always cite relevant Indian laws and sections when applicable
-2. Provide practical, actionable advice
-3. Mention important caveats and when to consult a lawyer
-4. Use clear formatting with bullet points and headers
-5. Be concise but comprehensive
-6. If you're unsure about something, say so clearly
-7. Always note that your advice is informational and not a substitute for professional legal counsel
+        # Legal QA system prompt (citation-focused when possible)
+        system_prompt = """You are JurisGPT, an AI legal research assistant specializing in Indian law for startups and corporate matters.
 
-Format your responses in markdown for readability."""
+IMPORTANT: You are currently operating WITHOUT access to the indexed legal corpus. Your answers are based on general legal knowledge, not retrieved citations.
+
+YOUR ROLE:
+- Answer legal research questions about Indian law
+- Focus on Companies Act, Contract Act, labor laws, and startup regulations
+- Be precise about legal terminology, sections, and acts
+- Highlight when professional legal advice is needed
+
+RESPONSE GUIDELINES:
+1. Provide accurate information based on Indian law
+2. Mention specific acts, sections, and legal provisions when relevant
+3. Use clear formatting with bullet points
+4. Note that this answer lacks RAG citations
+5. Recommend consulting primary sources for important decisions
+
+DO NOT:
+- Draft legal documents in this mode (separate workflow)
+- Provide definitive advice on complex matters
+- Guarantee completeness without corpus access
+
+Format responses in markdown for readability."""
 
         try:
             # Build conversation messages
@@ -205,8 +510,17 @@ Format your responses in markdown for readability."""
             answer = response.choices[0].message.content
             suggestions = self._generate_smart_suggestions(request.message, answer)
 
+            # Confidence is "low" without RAG citations
             return ChatResponse(
                 success=True,
+                answer=answer,
+                citations=[],
+                confidence="low",  # Downgraded since no RAG
+                limitations="This response is based on general legal knowledge without corpus citations. Please verify with primary legal sources.",
+                follow_up_questions=suggestions,
+                grounded=False,  # Not grounded without citations
+                model_used="openai-gpt4o",
+                # Legacy fields
                 message=answer,
                 sources=[],
                 suggestions=suggestions,
@@ -214,12 +528,121 @@ Format your responses in markdown for readability."""
 
         except Exception as e:
             error_msg = str(e)
-            if "api_key" in error_msg.lower() or "authentication" in error_msg.lower():
-                return self._get_fallback_response(request.message)
+            lower_error = error_msg.lower()
+            if (
+                "api_key" in lower_error
+                or "authentication" in lower_error
+                or "connection" in lower_error
+                or "timeout" in lower_error
+                or "dns" in lower_error
+                or "nodename" in lower_error
+            ):
+                fallback = self._get_fallback_response(request.message)
+                fallback.error = error_msg
+                return fallback
+
+            fallback = self._get_fallback_response(request.message)
+            fallback.error = error_msg
+            if "sample legal faqs" in fallback.limitations.lower():
+                fallback.limitations = (
+                    "The live OpenAI path failed, so this answer was served from local sample legal FAQs. "
+                    "Verify against current primary sources."
+                )
+            return fallback
+
+    def _generate_document_response(self, request: ChatRequest) -> ChatResponse:
+        """
+        Generate a legal document using OpenAI.
+
+        This is a SEPARATE workflow from legal Q&A.
+        Documents are clearly marked and should be reviewed by professionals.
+        """
+        client = self._get_openai_client()
+        if not client:
+            return self._get_fallback_response(request.message)
+
+        system_prompt = """You are JurisGPT, a legal document generation assistant for Indian law.
+
+DOCUMENT GENERATION GUIDELINES:
+1. Generate complete, professional legal documents compliant with Indian law
+2. Use proper legal formatting with numbered clauses and sections
+3. Include all standard clauses appropriate for the document type
+4. Use placeholders like [PARTY A NAME], [DATE], [ADDRESS] for user-specific info
+5. Follow Indian legal standards, conventions, and stamp duty requirements
+6. Include appropriate recitals, definitions, and boilerplate clauses
+7. Reference relevant Indian laws and acts in the document
+
+FORMATTING RULES:
+- Use PLAIN TEXT only with simple markdown formatting
+- Use **bold** for headings
+- Use numbered lists (1. 2. 3.) for clauses
+- Use ALL CAPS for document titles
+- Keep formatting clean and readable
+
+IMPORTANT: Wrap the document between these markers:
+---DOCUMENT_START---
+[Document content here]
+---DOCUMENT_END---
+
+After the document, briefly explain key clauses, relevant law, and stamp duty requirements."""
+
+        try:
+            messages = [{"role": "system", "content": system_prompt}]
+
+            if request.context:
+                context_parts = []
+                if request.context.get("company_name"):
+                    context_parts.append(f"Company: {request.context['company_name']}")
+                if request.context.get("founders"):
+                    context_parts.append(f"Founders: {len(request.context['founders'])} founders")
+                if context_parts:
+                    messages.append({
+                        "role": "system",
+                        "content": f"Context: {', '.join(context_parts)}"
+                    })
+
+            messages.append({"role": "user", "content": request.message})
+
+            response = client.chat.completions.create(
+                model="gpt-4o",
+                messages=messages,
+                temperature=0.3,
+                max_tokens=4000,
+            )
+
+            answer = response.choices[0].message.content
+            doc_type = self._detect_document_type(request.message)
+
+            return ChatResponse(
+                success=True,
+                answer=answer,
+                citations=[],
+                confidence="medium",  # Documents are generated, not retrieved
+                limitations="This document is AI-generated and should be reviewed by a qualified legal professional before use.",
+                follow_up_questions=[
+                    "Would you like me to modify any clauses?",
+                    "Do you need a different type of document?",
+                    "Should I explain any specific clause in detail?"
+                ],
+                grounded=False,  # Documents are generated
+                model_used="openai-gpt4o",
+                # Legacy fields
+                message=answer,
+                sources=[],
+                suggestions=[],
+                is_document=True,
+                document_type=doc_type,
+            )
+
+        except Exception as e:
             return ChatResponse(
                 success=False,
-                message="I encountered an error. Please try again.",
-                error=error_msg,
+                answer="I encountered an error generating the document.",
+                message="I encountered an error generating the document.",
+                confidence="insufficient",
+                limitations="Document generation failed.",
+                grounded=False,
+                error=str(e),
             )
 
     def _generate_smart_suggestions(self, query: str, answer: str) -> List[str]:
@@ -261,7 +684,7 @@ Format your responses in markdown for readability."""
 
         fallback_responses = {
             "vesting": {
-                "message": """**Founder Equity Vesting** typically follows a 4-year schedule with 1-year cliff:
+                "answer": """**Founder Equity Vesting** typically follows a 4-year schedule with 1-year cliff:
 
 - **Vesting Period:** 48 months (4 years)
 - **Cliff Period:** 12 months (1 year)
@@ -270,11 +693,11 @@ Format your responses in markdown for readability."""
 
 This protects the company if a founder leaves early. The cliff ensures minimum commitment before any equity vests.
 
-> *Note: Configure your OpenAI API key for comprehensive AI-powered legal responses.*""",
+> *Note: Live AI retrieval is unavailable in the current environment. Verify against current primary legal sources.*""",
                 "suggestions": ["What is reverse vesting?", "How does accelerated vesting work?", "What happens to unvested shares?"],
             },
             "incorporate": {
-                "message": """**Company Incorporation in India** under Companies Act, 2013:
+                "answer": """**Company Incorporation in India** under Companies Act, 2013:
 
 **Steps:**
 1. Obtain Digital Signature Certificate (DSC)
@@ -288,21 +711,21 @@ This protects the company if a founder leaves early. The cliff ensures minimum c
 - Minimum 1 shareholder
 - Registered office address in India
 
-> *Note: Configure your OpenAI API key for comprehensive AI-powered legal responses.*""",
+> *Note: Live AI retrieval is unavailable in the current environment. Verify against current primary legal sources.*""",
                 "suggestions": ["What documents are needed?", "What is authorized capital?", "Pvt Ltd vs LLP?"],
             },
             "non-compete": {
-                "message": """**Non-Compete Clauses in India:**
+                "answer": """**Non-Compete Clauses in India:**
 
 Non-compete agreements during employment are generally enforceable. However, **post-employment non-compete** clauses have limited enforceability under **Section 27 of the Indian Contract Act, 1872**, which voids agreements in restraint of trade.
 
 **Tip:** Focus on non-solicitation and confidentiality clauses which are more enforceable.
 
-> *Note: Configure your OpenAI API key for comprehensive AI-powered legal responses.*""",
+> *Note: Live AI retrieval is unavailable in the current environment. Verify against current primary legal sources.*""",
                 "suggestions": ["Are non-solicitation clauses enforceable?", "What about confidentiality clauses?", "Garden leave provisions?"],
             },
             "founder agreement": {
-                "message": """**Key Clauses in a Founder Agreement:**
+                "answer": """**Key Clauses in a Founder Agreement:**
 
 1. **Equity Split** — Clear percentage allocation
 2. **Vesting Schedule** — 4-year with 1-year cliff
@@ -313,7 +736,7 @@ Non-compete agreements during employment are generally enforceable. However, **p
 7. **Exit Provisions** — Good leaver / bad leaver
 8. **Dispute Resolution** — Arbitration preferred
 
-> *Note: Configure your OpenAI API key for comprehensive AI-powered legal responses.*""",
+> *Note: Live AI retrieval is unavailable in the current environment. Verify against current primary legal sources.*""",
                 "suggestions": ["How should founders split equity?", "What is a shotgun clause?", "How to handle founder disputes?"],
             },
         }
@@ -322,16 +745,29 @@ Non-compete agreements during employment are generally enforceable. However, **p
             if keyword in query_lower:
                 return ChatResponse(
                     success=True,
-                    message=response["message"],
-                    suggestions=response["suggestions"],
+                    answer=response["answer"],
+                    citations=[],
+                    confidence="low",
+                    limitations="This is a pre-configured response. Set up the RAG pipeline for citation-grounded answers.",
+                    follow_up_questions=response["suggestions"],
+                    grounded=False,
+                    model_used="hardcoded-fallback",
+                    # Legacy fields
+                    message=response["answer"],
                     sources=[],
+                    suggestions=response["suggestions"],
                 )
 
+        sample_faq_response = self._get_sample_faq_response(query)
+        if sample_faq_response:
+            return sample_faq_response
+
+        # Generic fallback
         return ChatResponse(
             success=True,
-            message=f"""I understand you're asking about: **{query}**
+            answer=f"""I understand you're asking about: **{query}**
 
-I'm JurisGPT, your AI legal assistant for Indian startup law. I can help with:
+I'm JurisGPT, your AI legal research assistant for Indian startup law. I can help with:
 
 - **Company Formation** — Incorporation, compliance, MCA filings
 - **Founder Agreements** — Equity split, vesting, roles
@@ -339,7 +775,19 @@ I'm JurisGPT, your AI legal assistant for Indian startup law. I can help with:
 - **Indian Law** — Companies Act, Contract Act, relevant case law
 - **Compliance** — GST, TDS, ROC filings, PF/ESI
 
-> *For comprehensive AI-powered responses, please configure your OpenAI API key in the backend `.env` file.*""",
+> *For citation-grounded responses, restore the RAG/OpenAI runtime and verify against current primary legal sources.*""",
+            citations=[],
+            confidence="insufficient",
+            limitations="RAG pipeline not available. Run setup scripts for full functionality.",
+            follow_up_questions=[
+                "How do I incorporate a company in India?",
+                "What is a typical founder vesting schedule?",
+                "What should be in a founder agreement?",
+            ],
+            grounded=False,
+            # Legacy fields
+            message=f"I understand you're asking about: **{query}**...",
+            sources=[],
             suggestions=[
                 "How do I incorporate a company in India?",
                 "What is a typical founder vesting schedule?",
@@ -424,7 +872,15 @@ Please provide guidance on key clauses, important considerations, and common pit
 
         return ChatResponse(
             success=True,
+            answer=f"Document assistance for {matter_type} is available.",
+            citations=[],
+            confidence="medium",
+            limitations="Document generation is a separate workflow from legal Q&A.",
+            follow_up_questions=["What clauses should I include?", "What are common mistakes to avoid?"],
+            grounded=False,
+            # Legacy fields
             message=f"Document assistance for {matter_type} is available.",
+            sources=[],
             suggestions=["What clauses should I include?", "What are common mistakes to avoid?"],
         )
 

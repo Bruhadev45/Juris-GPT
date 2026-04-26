@@ -1,155 +1,345 @@
 [
   {
     "id": "gst-gstr1-monthly",
-    "title": "GSTR-1 Filing",
+    "title": "GSTR-1 (Outward Supplies)",
     "category": "GST",
-    "description": "Monthly return for outward supplies",
+    "description": "Monthly return for outward supplies - details of all sales transactions",
     "due_day": 11,
     "recurring": "monthly",
-    "penalty": "Rs. 50/day (max Rs. 10,000)",
+    "penalty": "Rs. 50/day for CGST + Rs. 50/day for SGST (max Rs. 10,000 total)",
     "applicable_to": ["all_businesses"],
-    "priority": "high"
+    "priority": "high",
+    "law_reference": "Section 37 of CGST Act, 2017"
   },
   {
     "id": "gst-gstr3b-monthly",
-    "title": "GSTR-3B Filing",
+    "title": "GSTR-3B (Summary Return)",
     "category": "GST",
     "description": "Monthly summary return with self-assessed tax payment",
     "due_day": 20,
     "recurring": "monthly",
-    "penalty": "Rs. 50/day (max Rs. 10,000) + 18% interest on tax due",
+    "penalty": "Rs. 50/day for CGST + Rs. 50/day for SGST (max Rs. 10,000) + 18% p.a. interest on tax due",
     "applicable_to": ["all_businesses"],
-    "priority": "high"
+    "priority": "high",
+    "law_reference": "Section 39 of CGST Act, 2017"
+  },
+  {
+    "id": "gst-payment-monthly",
+    "title": "GST Payment",
+    "category": "GST",
+    "description": "Monthly GST liability payment through Electronic Cash/Credit Ledger",
+    "due_day": 20,
+    "recurring": "monthly",
+    "penalty": "18% p.a. interest on delayed payment; additional penalty up to 10% of tax under Section 73/74",
+    "applicable_to": ["all_businesses"],
+    "priority": "high",
+    "law_reference": "Section 49 of CGST Act, 2017"
   },
   {
     "id": "gst-gstr9-annual",
-    "title": "GSTR-9 Annual Return",
+    "title": "GSTR-9 (Annual Return)",
     "category": "GST",
-    "description": "Annual consolidated return for all GST registered taxpayers",
+    "description": "Annual consolidated return for all GST registered taxpayers (turnover > Rs. 2 crore)",
     "due_month": 12,
     "due_day": 31,
     "recurring": "annual",
-    "penalty": "Rs. 200/day (max 0.50% of turnover)",
+    "penalty": "Rs. 200/day (Rs. 100 CGST + Rs. 100 SGST) subject to max 0.50% of turnover",
     "applicable_to": ["all_businesses"],
-    "priority": "high"
+    "priority": "high",
+    "law_reference": "Section 44 of CGST Act, 2017"
+  },
+  {
+    "id": "gst-gstr9c-annual",
+    "title": "GSTR-9C (Reconciliation Statement)",
+    "category": "GST",
+    "description": "Self-certified reconciliation statement for taxpayers with turnover exceeding Rs. 5 crore",
+    "due_month": 12,
+    "due_day": 31,
+    "recurring": "annual",
+    "penalty": "Rs. 200/day subject to max 0.50% of turnover in the State/UT",
+    "applicable_to": ["large_businesses"],
+    "priority": "high",
+    "law_reference": "Section 44 read with Rule 80 of CGST Rules"
+  },
+  {
+    "id": "gst-tds-monthly",
+    "title": "GST TDS Payment & Return (GSTR-7)",
+    "category": "GST",
+    "description": "Monthly GST TDS deduction payment and return for government entities and specified persons",
+    "due_day": 10,
+    "recurring": "monthly",
+    "penalty": "Rs. 50/day (max Rs. 10,000) + 18% interest + late fee Rs. 200/day",
+    "applicable_to": ["government_entities", "specified_persons"],
+    "priority": "medium",
+    "law_reference": "Section 51 of CGST Act, 2017"
   },
   {
     "id": "roc-aoc4-annual",
-    "title": "AOC-4 Filing (Financial Statements)",
+    "title": "AOC-4 (Financial Statements)",
     "category": "ROC",
-    "description": "Filing of financial statements with the Registrar of Companies",
+    "description": "Filing of financial statements with Registrar - within 30 days from AGM",
     "due_month": 10,
     "due_day": 30,
     "recurring": "annual",
-    "penalty": "Rs. 100/day for each day of default",
+    "penalty": "Rs. 100/day per default (company) + Rs. 100/day per default (director); max Rs. 10 lakh for company",
     "applicable_to": ["companies"],
-    "priority": "high"
+    "priority": "high",
+    "law_reference": "Section 137 of Companies Act, 2013"
   },
   {
     "id": "roc-mgt7-annual",
-    "title": "MGT-7 Annual Return",
+    "title": "MGT-7/MGT-7A (Annual Return)",
     "category": "ROC",
-    "description": "Annual return filing with Registrar of Companies",
+    "description": "Annual return filing - within 60 days from AGM. MGT-7A for small companies/OPC",
     "due_month": 11,
     "due_day": 28,
     "recurring": "annual",
-    "penalty": "Rs. 100/day for each day of default",
+    "penalty": "Rs. 100/day per default (company) + Rs. 100/day per default (director); prosecution possible",
     "applicable_to": ["companies"],
-    "priority": "high"
+    "priority": "high",
+    "law_reference": "Section 92 of Companies Act, 2013"
   },
   {
     "id": "roc-adt1-annual",
     "title": "ADT-1 (Auditor Appointment)",
     "category": "ROC",
-    "description": "Intimation of auditor appointment within 15 days of AGM",
-    "due_month": 9,
-    "due_day": 30,
+    "description": "Intimation of auditor appointment to ROC within 15 days of AGM",
+    "due_month": 10,
+    "due_day": 15,
     "recurring": "annual",
-    "penalty": "Rs. 300/day (max Rs. 12,00,000 for company)",
+    "penalty": "Company: Rs. 25,000 to Rs. 5 lakh; Every officer in default: Rs. 10,000 to Rs. 1 lakh",
     "applicable_to": ["companies"],
-    "priority": "medium"
+    "priority": "medium",
+    "law_reference": "Section 139(1) of Companies Act, 2013"
   },
   {
     "id": "roc-dir3kyc-annual",
     "title": "DIR-3 KYC (Director KYC)",
     "category": "ROC",
-    "description": "Annual KYC verification for all directors holding DIN",
+    "description": "Annual KYC verification for all directors holding DIN - due 30th September yearly",
     "due_month": 9,
     "due_day": 30,
     "recurring": "annual",
-    "penalty": "Rs. 5,000 for late filing; DIN deactivation",
+    "penalty": "Rs. 5,000 for late filing; DIN marked as 'Deactivated due to non-filing of DIR-3 KYC'",
     "applicable_to": ["directors"],
-    "priority": "high"
+    "priority": "high",
+    "law_reference": "Rule 12A of Companies (Appointment and Qualification of Directors) Rules, 2014"
+  },
+  {
+    "id": "roc-inc20a-once",
+    "title": "INC-20A (Business Commencement)",
+    "category": "ROC",
+    "description": "Declaration for commencement of business - within 180 days from incorporation",
+    "due_month": 6,
+    "due_day": 30,
+    "recurring": "annual",
+    "penalty": "Rs. 50,000 for company; Rs. 1,000/day for every officer (max Rs. 1 lakh); Company may be struck off",
+    "applicable_to": ["new_companies"],
+    "priority": "critical",
+    "law_reference": "Section 10A of Companies Act, 2013"
+  },
+  {
+    "id": "roc-msme1-halfyearly",
+    "title": "MSME Form-1 (MSME Outstanding)",
+    "category": "ROC",
+    "description": "Half-yearly return of outstanding payments to MSME suppliers",
+    "due_month": 4,
+    "due_day": 30,
+    "recurring": "annual",
+    "penalty": "Rs. 20,000 + Rs. 1,000/day of continuing default (max Rs. 3 lakh)",
+    "applicable_to": ["companies"],
+    "priority": "medium",
+    "law_reference": "Section 405 of Companies Act, 2013 read with MSMED Act"
+  },
+  {
+    "id": "roc-dpt3-annual",
+    "title": "DPT-3 (Return of Deposits)",
+    "category": "ROC",
+    "description": "Annual return of deposits/outstanding loans not considered deposits",
+    "due_month": 6,
+    "due_day": 30,
+    "recurring": "annual",
+    "penalty": "Company: Rs. 1 crore to Rs. 10 crore or twice the deposit; Officer: Rs. 25 lakh to Rs. 2 crore + imprisonment up to 7 years",
+    "applicable_to": ["companies"],
+    "priority": "high",
+    "law_reference": "Section 73 of Companies Act, 2013"
+  },
+  {
+    "id": "tds-payment-monthly",
+    "title": "TDS Payment",
+    "category": "TDS",
+    "description": "Monthly TDS payment for tax deducted - 7th of next month (30th April for March)",
+    "due_day": 7,
+    "recurring": "monthly",
+    "penalty": "Interest: 1% per month from date of deduction to deposit; 1.5% per month from due date of deposit",
+    "applicable_to": ["all_businesses"],
+    "priority": "high",
+    "law_reference": "Section 200 of Income Tax Act, 1961"
   },
   {
     "id": "tds-q1-return",
-    "title": "TDS Return - Q1 (Apr-Jun)",
+    "title": "TDS Return Q1 (Form 24Q/26Q)",
     "category": "TDS",
     "description": "Quarterly TDS return for deductions made during April to June",
     "due_month": 7,
     "due_day": 31,
     "recurring": "annual",
-    "penalty": "Rs. 200/day under Section 234E; penalty up to Rs. 1,00,000 under Section 271H",
+    "penalty": "Late fee: Rs. 200/day under Section 234E (max = TDS amount); Penalty: Rs. 10,000 to Rs. 1,00,000 under Section 271H",
     "applicable_to": ["all_businesses"],
-    "priority": "high"
+    "priority": "high",
+    "law_reference": "Section 200(3) of Income Tax Act, 1961"
   },
   {
     "id": "tds-q2-return",
-    "title": "TDS Return - Q2 (Jul-Sep)",
+    "title": "TDS Return Q2 (Form 24Q/26Q)",
     "category": "TDS",
     "description": "Quarterly TDS return for deductions made during July to September",
     "due_month": 10,
     "due_day": 31,
     "recurring": "annual",
-    "penalty": "Rs. 200/day under Section 234E; penalty up to Rs. 1,00,000 under Section 271H",
+    "penalty": "Late fee: Rs. 200/day under Section 234E (max = TDS amount); Penalty: Rs. 10,000 to Rs. 1,00,000 under Section 271H",
     "applicable_to": ["all_businesses"],
-    "priority": "high"
+    "priority": "high",
+    "law_reference": "Section 200(3) of Income Tax Act, 1961"
   },
   {
     "id": "tds-q3-return",
-    "title": "TDS Return - Q3 (Oct-Dec)",
+    "title": "TDS Return Q3 (Form 24Q/26Q)",
     "category": "TDS",
     "description": "Quarterly TDS return for deductions made during October to December",
     "due_month": 1,
     "due_day": 31,
     "recurring": "annual",
-    "penalty": "Rs. 200/day under Section 234E; penalty up to Rs. 1,00,000 under Section 271H",
+    "penalty": "Late fee: Rs. 200/day under Section 234E (max = TDS amount); Penalty: Rs. 10,000 to Rs. 1,00,000 under Section 271H",
     "applicable_to": ["all_businesses"],
-    "priority": "high"
+    "priority": "high",
+    "law_reference": "Section 200(3) of Income Tax Act, 1961"
   },
   {
     "id": "tds-q4-return",
-    "title": "TDS Return - Q4 (Jan-Mar)",
+    "title": "TDS Return Q4 (Form 24Q/26Q)",
     "category": "TDS",
     "description": "Quarterly TDS return for deductions made during January to March",
     "due_month": 5,
     "due_day": 31,
     "recurring": "annual",
-    "penalty": "Rs. 200/day under Section 234E; penalty up to Rs. 1,00,000 under Section 271H",
+    "penalty": "Late fee: Rs. 200/day under Section 234E (max = TDS amount); Penalty: Rs. 10,000 to Rs. 1,00,000 under Section 271H",
     "applicable_to": ["all_businesses"],
-    "priority": "high"
+    "priority": "high",
+    "law_reference": "Section 200(3) of Income Tax Act, 1961"
+  },
+  {
+    "id": "tds-form16-q1",
+    "title": "Form 16/16A Q1 (TDS Certificate)",
+    "category": "TDS",
+    "description": "TDS Certificate to deductees for Q1 - within 15 days from filing due date",
+    "due_month": 8,
+    "due_day": 15,
+    "recurring": "annual",
+    "penalty": "Rs. 100/day per certificate per deductee (max = TDS amount on that certificate)",
+    "applicable_to": ["all_businesses"],
+    "priority": "medium",
+    "law_reference": "Section 203 of Income Tax Act, 1961"
+  },
+  {
+    "id": "tds-form16-annual",
+    "title": "Form 16 (Annual TDS Certificate)",
+    "category": "TDS",
+    "description": "Annual TDS certificate for salary deductions - due 15th June",
+    "due_month": 6,
+    "due_day": 15,
+    "recurring": "annual",
+    "penalty": "Rs. 100/day per certificate per employee; Director can be prosecuted",
+    "applicable_to": ["all_employers"],
+    "priority": "high",
+    "law_reference": "Section 203 of Income Tax Act, 1961"
   },
   {
     "id": "pf-monthly",
-    "title": "PF (Provident Fund) Payment",
+    "title": "PF Payment",
     "category": "PF/ESI",
-    "description": "Monthly provident fund contribution remittance to EPFO",
+    "description": "Monthly Provident Fund contribution remittance to EPFO - due 15th of next month",
     "due_day": 15,
     "recurring": "monthly",
-    "penalty": "12% interest per annum + damages up to 100% of arrears",
+    "penalty": "Interest: 12% p.a. for 0-2 months, 5% additional for 2-4 months, 25% additional for 4-6 months; Damages up to 100% of arrears",
     "applicable_to": ["employers_20_plus"],
-    "priority": "high"
+    "priority": "high",
+    "law_reference": "Section 38 & 39 of EPF Act, 1952"
+  },
+  {
+    "id": "pf-ecr-monthly",
+    "title": "PF ECR Filing",
+    "category": "PF/ESI",
+    "description": "Monthly Electronic Challan cum Return filing for PF contributions",
+    "due_day": 15,
+    "recurring": "monthly",
+    "penalty": "Damages as per EPFO damage schedule; Criminal prosecution possible under Section 14",
+    "applicable_to": ["employers_20_plus"],
+    "priority": "high",
+    "law_reference": "Para 38 of EPF Scheme, 1952"
   },
   {
     "id": "esi-monthly",
-    "title": "ESI Contribution Payment",
+    "title": "ESI Payment",
     "category": "PF/ESI",
-    "description": "Monthly ESI contribution remittance to ESIC",
+    "description": "Monthly ESI contribution remittance to ESIC - due 15th of next month",
     "due_day": 15,
     "recurring": "monthly",
-    "penalty": "12% interest per annum + damages",
+    "penalty": "Simple interest @ 12% p.a.; Damages up to 25% of arrears; Prosecution and imprisonment possible",
     "applicable_to": ["employers_10_plus"],
-    "priority": "high"
+    "priority": "high",
+    "law_reference": "Section 39 of ESI Act, 1948"
+  },
+  {
+    "id": "esi-return-halfyearly",
+    "title": "ESI Half-Yearly Return",
+    "category": "PF/ESI",
+    "description": "Half-yearly return of ESI contributions (Apr-Sep: Nov 12, Oct-Mar: May 12)",
+    "due_month": 5,
+    "due_day": 12,
+    "recurring": "annual",
+    "penalty": "Fine up to Rs. 5,000; Imprisonment up to 1 year for repeated default",
+    "applicable_to": ["employers_10_plus"],
+    "priority": "medium",
+    "law_reference": "Regulation 26 of ESI (General) Regulations, 1950"
+  },
+  {
+    "id": "pt-monthly",
+    "title": "Professional Tax Payment",
+    "category": "PF/ESI",
+    "description": "Monthly Professional Tax payment (varies by state - typically due by 20th/30th)",
+    "due_day": 20,
+    "recurring": "monthly",
+    "penalty": "Varies by state: typically 10-25% of tax due as penalty + interest @ 1-2% per month",
+    "applicable_to": ["all_employers"],
+    "priority": "medium",
+    "law_reference": "State Professional Tax Acts (varies by state)"
+  },
+  {
+    "id": "pt-return-annual",
+    "title": "Professional Tax Annual Return",
+    "category": "PF/ESI",
+    "description": "Annual Professional Tax return (varies by state)",
+    "due_month": 4,
+    "due_day": 30,
+    "recurring": "annual",
+    "penalty": "Varies by state; Late filing fee + penalty for incorrect returns",
+    "applicable_to": ["all_employers"],
+    "priority": "medium",
+    "law_reference": "State Professional Tax Acts (varies by state)"
+  },
+  {
+    "id": "lwf-halfyearly",
+    "title": "Labour Welfare Fund",
+    "category": "PF/ESI",
+    "description": "Half-yearly Labour Welfare Fund contribution (varies by state)",
+    "due_month": 7,
+    "due_day": 31,
+    "recurring": "annual",
+    "penalty": "Varies by state: Rs. 500 to Rs. 5,000 + interest",
+    "applicable_to": ["employers"],
+    "priority": "low",
+    "law_reference": "State Labour Welfare Fund Acts"
   },
   {
     "id": "it-advance-q1",
@@ -159,9 +349,10 @@
     "due_month": 6,
     "due_day": 15,
     "recurring": "annual",
-    "penalty": "Interest under Section 234B and 234C",
+    "penalty": "Interest @ 1% per month under Section 234B (shortfall) and 234C (deferment)",
     "applicable_to": ["all_taxpayers"],
-    "priority": "high"
+    "priority": "high",
+    "law_reference": "Section 211 of Income Tax Act, 1961"
   },
   {
     "id": "it-advance-q2",
@@ -171,9 +362,10 @@
     "due_month": 9,
     "due_day": 15,
     "recurring": "annual",
-    "penalty": "Interest under Section 234B and 234C",
+    "penalty": "Interest @ 1% per month under Section 234B (shortfall) and 234C (deferment)",
     "applicable_to": ["all_taxpayers"],
-    "priority": "high"
+    "priority": "high",
+    "law_reference": "Section 211 of Income Tax Act, 1961"
   },
   {
     "id": "it-advance-q3",
@@ -183,9 +375,10 @@
     "due_month": 12,
     "due_day": 15,
     "recurring": "annual",
-    "penalty": "Interest under Section 234B and 234C",
+    "penalty": "Interest @ 1% per month under Section 234B (shortfall) and 234C (deferment)",
     "applicable_to": ["all_taxpayers"],
-    "priority": "high"
+    "priority": "high",
+    "law_reference": "Section 211 of Income Tax Act, 1961"
   },
   {
     "id": "it-advance-q4",
@@ -195,21 +388,23 @@
     "due_month": 3,
     "due_day": 15,
     "recurring": "annual",
-    "penalty": "Interest under Section 234B and 234C",
+    "penalty": "Interest @ 1% per month under Section 234B (shortfall) and 234C (deferment)",
     "applicable_to": ["all_taxpayers"],
-    "priority": "high"
+    "priority": "high",
+    "law_reference": "Section 211 of Income Tax Act, 1961"
   },
   {
     "id": "it-itr-individual",
-    "title": "ITR Filing (Individuals / Non-Audit)",
+    "title": "ITR Filing (Non-Audit Cases)",
     "category": "Income Tax",
     "description": "Income tax return filing for individuals and entities not requiring audit",
     "due_month": 7,
     "due_day": 31,
     "recurring": "annual",
-    "penalty": "Rs. 5,000 (Rs. 1,000 if income below Rs. 5 lakh) under Section 234F",
+    "penalty": "Late fee: Rs. 5,000 (Rs. 1,000 if income below Rs. 5 lakh) under Section 234F; Interest under 234A",
     "applicable_to": ["individuals", "non_audit_entities"],
-    "priority": "high"
+    "priority": "high",
+    "law_reference": "Section 139 of Income Tax Act, 1961"
   },
   {
     "id": "it-itr-audit",
@@ -219,9 +414,36 @@
     "due_month": 10,
     "due_day": 31,
     "recurring": "annual",
-    "penalty": "Rs. 5,000 under Section 234F + penalty for non-audit",
+    "penalty": "Late fee: Rs. 5,000 under Section 234F; Interest under 234A; Penalty for non-audit under 271B",
     "applicable_to": ["companies", "audit_entities"],
-    "priority": "high"
+    "priority": "high",
+    "law_reference": "Section 139 of Income Tax Act, 1961"
+  },
+  {
+    "id": "it-tax-audit",
+    "title": "Tax Audit Report (Form 3CA/3CB-3CD)",
+    "category": "Income Tax",
+    "description": "Tax audit report to be filed before ITR due date",
+    "due_month": 9,
+    "due_day": 30,
+    "recurring": "annual",
+    "penalty": "Penalty: 0.5% of turnover or Rs. 1,50,000, whichever is less, under Section 271B",
+    "applicable_to": ["audit_required_entities"],
+    "priority": "high",
+    "law_reference": "Section 44AB of Income Tax Act, 1961"
+  },
+  {
+    "id": "it-transfer-pricing",
+    "title": "Transfer Pricing Report (Form 3CEB)",
+    "category": "Income Tax",
+    "description": "Transfer pricing audit report for international/specified domestic transactions",
+    "due_month": 11,
+    "due_day": 30,
+    "recurring": "annual",
+    "penalty": "Penalty: Rs. 1,00,000 for non-compliance under Section 271BA",
+    "applicable_to": ["entities_with_related_party_transactions"],
+    "priority": "high",
+    "law_reference": "Section 92E of Income Tax Act, 1961"
   },
   {
     "id": "board-meeting-q1",
@@ -231,9 +453,10 @@
     "due_month": 6,
     "due_day": 30,
     "recurring": "annual",
-    "penalty": "Rs. 25,000 per director; officer in default: Rs. 1,00,000",
+    "penalty": "Company: Rs. 25,000 min; Officer in default: Rs. 5,000 to Rs. 1,00,000 under Section 173(4)",
     "applicable_to": ["companies"],
-    "priority": "medium"
+    "priority": "medium",
+    "law_reference": "Section 173 of Companies Act, 2013"
   },
   {
     "id": "board-meeting-q2",
@@ -243,9 +466,10 @@
     "due_month": 9,
     "due_day": 30,
     "recurring": "annual",
-    "penalty": "Rs. 25,000 per director; officer in default: Rs. 1,00,000",
+    "penalty": "Company: Rs. 25,000 min; Officer in default: Rs. 5,000 to Rs. 1,00,000 under Section 173(4)",
     "applicable_to": ["companies"],
-    "priority": "medium"
+    "priority": "medium",
+    "law_reference": "Section 173 of Companies Act, 2013"
   },
   {
     "id": "board-meeting-q3",
@@ -255,9 +479,10 @@
     "due_month": 12,
     "due_day": 31,
     "recurring": "annual",
-    "penalty": "Rs. 25,000 per director; officer in default: Rs. 1,00,000",
+    "penalty": "Company: Rs. 25,000 min; Officer in default: Rs. 5,000 to Rs. 1,00,000 under Section 173(4)",
     "applicable_to": ["companies"],
-    "priority": "medium"
+    "priority": "medium",
+    "law_reference": "Section 173 of Companies Act, 2013"
   },
   {
     "id": "board-meeting-q4",
@@ -267,30 +492,35 @@
     "due_month": 3,
     "due_day": 31,
     "recurring": "annual",
-    "penalty": "Rs. 25,000 per director; officer in default: Rs. 1,00,000",
+    "penalty": "Company: Rs. 25,000 min; Officer in default: Rs. 5,000 to Rs. 1,00,000 under Section 173(4)",
     "applicable_to": ["companies"],
-    "priority": "medium"
+    "priority": "medium",
+    "law_reference": "Section 173 of Companies Act, 2013"
   },
   {
-    "id": "gst-tds-monthly",
-    "title": "GST TDS Payment & Return (GSTR-7)",
-    "category": "GST",
-    "description": "Monthly GST TDS deduction payment and return for government entities and specified persons",
-    "due_day": 10,
-    "recurring": "monthly",
-    "penalty": "Rs. 50/day (max Rs. 10,000) + 18% interest",
-    "applicable_to": ["government_entities", "specified_persons"],
-    "priority": "medium"
+    "id": "agm-annual",
+    "title": "Annual General Meeting (AGM)",
+    "category": "Board Meetings",
+    "description": "AGM must be held within 6 months from end of financial year (by 30th September)",
+    "due_month": 9,
+    "due_day": 30,
+    "recurring": "annual",
+    "penalty": "Company: Rs. 1 lakh (Rs. 5 lakh for continuing default); Every officer: Rs. 50,000 (Rs. 2.5 lakh for continuing)",
+    "applicable_to": ["companies"],
+    "priority": "high",
+    "law_reference": "Section 96 of Companies Act, 2013"
   },
   {
-    "id": "pf-ecr-monthly",
-    "title": "PF ECR Filing",
-    "category": "PF/ESI",
-    "description": "Monthly Electronic Challan cum Return filing for PF contributions",
-    "due_day": 15,
-    "recurring": "monthly",
-    "penalty": "Damages as per EPFO damage schedule",
-    "applicable_to": ["employers_20_plus"],
-    "priority": "high"
+    "id": "statutory-audit-annual",
+    "title": "Statutory Audit Completion",
+    "category": "Board Meetings",
+    "description": "Completion of statutory audit and adoption of accounts in board meeting before AGM",
+    "due_month": 8,
+    "due_day": 31,
+    "recurring": "annual",
+    "penalty": "Non-adoption leads to filing issues; Qualification/adverse opinion affects company reputation",
+    "applicable_to": ["companies"],
+    "priority": "high",
+    "law_reference": "Section 134 of Companies Act, 2013"
   }
 ]

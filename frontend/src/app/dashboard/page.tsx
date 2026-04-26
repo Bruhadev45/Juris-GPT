@@ -1,45 +1,117 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
-  Search,
-  Plus,
-  Bell,
-  User,
-  TrendingUp,
-  FileText,
-  BookOpen,
-  Scale,
-  Loader2,
-  Shield,
-  Calendar,
-  Gavel,
   ArrowRight,
-  Clock,
+  BookOpen,
+  CalendarDays,
   CheckCircle2,
-  XCircle,
-  BarChart3,
+  Clock,
+  Database,
+  FileSignature,
+  FileText,
+  Gavel,
+  Loader2,
+  Scale,
+  Search,
+  Shield,
   Sparkles,
-  MessageSquare,
-  FileScan,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
 import {
   apiClient,
   complianceApi,
   reviewsApi,
-  CaseSummary,
-  CompaniesActSection,
-  LegalDataStats,
-  ComplianceDeadline,
-  DocumentReview,
+  type CaseSummary,
+  type CompaniesActSection,
+  type LegalDataStats,
+  type ComplianceDeadline,
+  type DocumentReview,
 } from "@/lib/api";
 
+const starterPrompts = [
+  "What are the annual compliance requirements for a private limited company in India?",
+  "What clauses should be included in a founder agreement?",
+  "What does Section 149 of the Companies Act say about directors?",
+  "Are non-compete clauses enforceable in India for startup employees?",
+];
+
+const workspaceActions = [
+  {
+    label: "Ask JurisGPT",
+    description: "Start with natural-language legal research and grounded answers",
+    href: "/dashboard/chat",
+    icon: Scale,
+    color: "text-primary bg-primary/10",
+  },
+  {
+    label: "Search Sources",
+    description: "Inspect statutes, case law, and source snippets directly",
+    href: "/dashboard/search",
+    icon: Search,
+    color: "text-[#7B1E2E] bg-[#FCE8EA] dark:bg-primary/10 dark:text-primary",
+  },
+  {
+    label: "Draft Contract",
+    description: "Move from research into drafting workflows",
+    href: "/dashboard/contracts",
+    icon: FileSignature,
+    color: "text-emerald-700 bg-emerald-50 dark:bg-emerald-900/20 dark:text-emerald-300",
+  },
+  {
+    label: "Track Compliance",
+    description: "Check deadlines and statutory tasks",
+    href: "/dashboard/compliance",
+    icon: Shield,
+    color: "text-amber-700 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-300",
+  },
+  {
+    label: "Calendar",
+    description: "See filing events and upcoming due dates by month",
+    href: "/dashboard/calendar",
+    icon: CalendarDays,
+    color: "text-rose-800 bg-rose-50 dark:bg-rose-900/20 dark:text-rose-300",
+  },
+  {
+    label: "Analyze Document",
+    description: "Upload agreements and inspect flagged clauses",
+    href: "/dashboard/analyzer",
+    icon: FileText,
+    color: "text-stone-900 bg-stone-100 dark:bg-stone-800 dark:text-stone-100",
+  },
+];
+
+const workflowSteps = [
+  {
+    step: "01",
+    title: "Ask the assistant",
+    description: "Begin with a legal question in plain English about startup, corporate, or compliance law.",
+  },
+  {
+    step: "02",
+    title: "Inspect citations",
+    description: "Review confidence, limitations, and the supporting sections or case summaries.",
+  },
+  {
+    step: "03",
+    title: "Deepen with search",
+    description: "Open source search when you need manual verification or broader legal context.",
+  },
+  {
+    step: "04",
+    title: "Move into workflows",
+    description: "Only after research, continue into contracts, compliance tracking, or document review.",
+  },
+];
+
 export default function DashboardPage() {
+  const router = useRouter();
+  const [query, setQuery] = useState("");
   const [cases, setCases] = useState<CaseSummary[]>([]);
   const [companiesActSections, setCompaniesActSections] = useState<CompaniesActSection[]>([]);
   const [stats, setStats] = useState<LegalDataStats | null>(null);
@@ -48,355 +120,287 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    async function loadDashboardData() {
+      try {
+        setLoading(true);
+        const [casesData, companiesActData, statsData, deadlinesData, reviewsData] =
+          await Promise.allSettled([
+            apiClient.getCaseSummaries({ limit: 4 }),
+            apiClient.getCompaniesActSections({ limit: 4 }),
+            apiClient.getLegalDataStats(),
+            complianceApi.getUpcoming(14),
+            reviewsApi.list(),
+          ]);
+
+        if (casesData.status === "fulfilled") setCases(casesData.value);
+        if (companiesActData.status === "fulfilled") setCompaniesActSections(companiesActData.value);
+        if (statsData.status === "fulfilled") setStats(statsData.value);
+        if (deadlinesData.status === "fulfilled") setDeadlines(deadlinesData.value.data?.slice(0, 4) || []);
+        if (reviewsData.status === "fulfilled") setReviews(reviewsData.value.data?.slice(0, 3) || []);
+      } catch (error) {
+        console.error("Error loading dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
     loadDashboardData();
   }, []);
 
-  const loadDashboardData = async () => {
-    try {
-      setLoading(true);
-      const [casesData, companiesActData, statsData, deadlinesData, reviewsData] =
-        await Promise.allSettled([
-          apiClient.getCaseSummaries({ limit: 5 }),
-          apiClient.getCompaniesActSections({ limit: 5 }),
-          apiClient.getLegalDataStats(),
-          complianceApi.getUpcoming(14),
-          reviewsApi.list(),
-        ]);
+  const assistantMetrics = useMemo(() => {
+    const statutesCovered = stats ? Object.keys(stats.laws).length : 0;
+    const totalSections = stats
+      ? Object.values(stats.laws).reduce((acc, value) => acc + value, 0)
+      : 0;
 
-      if (casesData.status === "fulfilled") setCases(casesData.value);
-      if (companiesActData.status === "fulfilled") setCompaniesActSections(companiesActData.value);
-      if (statsData.status === "fulfilled") setStats(statsData.value);
-      if (deadlinesData.status === "fulfilled") setDeadlines(deadlinesData.value.data?.slice(0, 5) || []);
-      if (reviewsData.status === "fulfilled") setReviews(reviewsData.value.data?.slice(0, 3) || []);
-    } catch (error) {
-      console.error("Error loading dashboard data:", error);
-    } finally {
-      setLoading(false);
-    }
+    return [
+      {
+        label: "Case Law Indexed",
+        value: stats?.cases || 0,
+        sublabel: "Research-ready judgments",
+        icon: Gavel,
+        color: "text-[#7B1E2E] bg-[#FCE8EA] dark:bg-primary/10 dark:text-primary",
+      },
+      {
+        label: "Statutes Covered",
+        value: statutesCovered,
+        sublabel: "Acts available for retrieval",
+        icon: Scale,
+        color: "text-amber-800 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-300",
+      },
+      {
+        label: "Legal Sections",
+        value: totalSections.toLocaleString(),
+        sublabel: "Section-level source coverage",
+        icon: BookOpen,
+        color: "text-emerald-700 bg-emerald-50 dark:bg-emerald-900/20 dark:text-emerald-300",
+      },
+      {
+        label: "Due Soon",
+        value: deadlines.length,
+        sublabel: "Upcoming compliance items",
+        icon: Clock,
+        color: "text-amber-700 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-300",
+      },
+    ];
+  }, [deadlines.length, stats]);
+
+  const handleResearchSubmit = (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    router.push(`/dashboard/chat?q=${encodeURIComponent(trimmed)}`);
   };
 
-  const overdueCount = deadlines.filter((d) => d.status === "overdue").length;
-  const upcomingCount = deadlines.filter((d) => d.status === "upcoming").length;
-  const completedReviews = reviews.filter((r) => r.status === "completed").length;
-  const pendingReviews = reviews.filter((r) => r.status === "pending").length;
-
-  const quickActions = [
-    { label: "AI Lawyer", icon: Scale, href: "/dashboard/chat", color: "text-green-600 bg-green-50 dark:bg-green-900/20" },
-    { label: "New Agreement", icon: FileText, href: "/agreements/new", color: "text-blue-600 bg-blue-50 dark:bg-blue-900/20" },
-    { label: "Contract Analyzer", icon: FileScan, href: "/dashboard/analyzer", color: "text-purple-600 bg-purple-50 dark:bg-purple-900/20" },
-    { label: "Legal Research", icon: Search, href: "/dashboard/search", color: "text-amber-600 bg-amber-50 dark:bg-amber-900/20" },
-    { label: "Documents", icon: FileText, href: "/dashboard/documents", color: "text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20" },
-    { label: "Tools", icon: Gavel, href: "/dashboard/tools", color: "text-red-600 bg-red-50 dark:bg-red-900/20" },
-  ];
+  const completedReviews = reviews.filter((review) => review.status === "completed").length;
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      {/* Header */}
-      <header className="bg-card border-b border-border px-6 py-3 flex-shrink-0">
+    <div className="flex h-full flex-col bg-background">
+      <header className="border-b border-border bg-card px-6 py-4">
         <div className="flex items-center justify-between gap-4">
-          <div className="flex-1 max-w-md">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search cases, laws, documents..." className="pl-10 bg-background border-border" />
+          <div>
+            <div className="mb-1 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
+              <Database className="h-3.5 w-3.5" />
+              Citation-grounded workspace
             </div>
+            <h1 className="text-xl font-semibold text-foreground">JurisGPT Dashboard</h1>
+            <p className="mt-0.5 text-sm text-muted-foreground">
+              Legal Q&A first, with source search, compliance, contracts, analyzer, and calendar in reach.
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <Link href="/dashboard/chat">
-              <Button variant="outline" size="sm" className="gap-1.5">
+              <Button className="gap-1.5">
                 <Scale className="h-4 w-4" />
-                <span className="hidden sm:inline">AI Lawyer</span>
+                Ask JurisGPT
               </Button>
             </Link>
-            <Link href="/agreements/new">
-              <Button size="sm" className="gap-1.5">
-                <Plus className="h-4 w-4" />
-                <span className="hidden sm:inline">New Agreement</span>
+            <Link href="/dashboard/search">
+              <Button variant="outline" className="gap-1.5">
+                <Search className="h-4 w-4" />
+                Search Sources
               </Button>
             </Link>
-            <button className="p-2 hover:bg-secondary rounded-lg transition-all relative group ml-1">
-              <Bell className="h-5 w-5 text-foreground group-hover:text-primary transition-colors" />
-              {overdueCount > 0 && (
-                <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full" />
-              )}
-            </button>
-            <button className="p-2 hover:bg-secondary rounded-lg transition-all group">
-              <User className="h-5 w-5 text-foreground group-hover:text-primary transition-colors" />
-            </button>
           </div>
         </div>
       </header>
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto p-5">
-        <div className="max-w-[1400px] mx-auto space-y-5">
-          {/* Welcome */}
-          <div className="flex items-end justify-between">
-            <div>
-              <h2 className="text-2xl font-bold text-foreground">Dashboard</h2>
-              <p className="text-sm text-muted-foreground mt-0.5">Your legal health at a glance</p>
-            </div>
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <Sparkles className="h-3.5 w-3.5 text-primary" />
-              <span>AI-powered insights</span>
-            </div>
-          </div>
-
-          {/* ═══════════ BENTO GRID ═══════════ */}
-          <div className="grid grid-cols-12 gap-4">
-
-            {/* ── Row 1: Four metric cards ── */}
-            {[
-              { label: "Legal Cases", value: stats?.cases || 0, icon: Gavel, color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-900/20", sub: "Case summaries", subIcon: TrendingUp },
-              { label: "Companies Act", value: stats?.companies_act_sections || 0, icon: BookOpen, color: "text-green-600", bg: "bg-green-50 dark:bg-green-900/20", sub: "Sections indexed", subIcon: BookOpen },
-              { label: "Indian Laws", value: stats ? Object.keys(stats.laws).length : 0, icon: Scale, color: "text-purple-600", bg: "bg-purple-50 dark:bg-purple-900/20", sub: "Statutes available", subIcon: Scale },
-              { label: "Total Sections", value: stats ? Object.values(stats.laws).reduce((a, b) => a + b, 0).toLocaleString() : 0, icon: BarChart3, color: "text-amber-600", bg: "bg-amber-50 dark:bg-amber-900/20", sub: "Legal provisions", subIcon: TrendingUp },
-            ].map((metric, i) => (
-              <Card key={i} className="col-span-6 md:col-span-3 shadow-sm border-border hover:shadow-md transition-all duration-300">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2.5 mb-3">
-                    <div className={`w-8 h-8 rounded-lg ${metric.bg} flex items-center justify-center`}>
-                      <metric.icon className={`h-4 w-4 ${metric.color}`} />
-                    </div>
-                    <p className="text-xs font-medium text-muted-foreground">{metric.label}</p>
-                  </div>
-                  <p className="text-2xl font-bold text-foreground">
-                    {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : metric.value}
-                  </p>
-                  <p className={`text-[11px] ${metric.color} flex items-center gap-1 mt-1.5`}>
-                    <metric.subIcon className="h-3 w-3" />
-                    {metric.sub}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-
-            {/* ── Row 2: Compliance (7col) + Quick Actions (5col) ── */}
-
-            {/* Compliance Deadlines — wide left */}
-            <Card className="col-span-12 lg:col-span-7 shadow-sm border-border">
-              <CardHeader className="flex flex-row items-center justify-between pb-2 pt-4 px-5">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-primary" />
-                  <CardTitle className="text-sm font-semibold">Compliance Deadlines</CardTitle>
+      <div className="flex-1 overflow-y-auto p-6">
+        <div className="mx-auto max-w-[1400px] space-y-6">
+          <section className="grid grid-cols-12 gap-4">
+            <Card className="col-span-12 overflow-hidden border-border bg-card shadow-sm lg:col-span-8">
+              <CardContent className="p-6">
+                <div className="mb-5 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-primary">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Research first
                 </div>
-                <Link href="/dashboard/compliance">
-                  <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 px-2">
-                    View All <ArrowRight className="h-3 w-3" />
-                  </Button>
-                </Link>
-              </CardHeader>
-              <CardContent className="px-5 pb-4">
-                {loading ? (
-                  <div className="py-8 text-center">
-                    <Loader2 className="h-5 w-5 animate-spin mx-auto text-muted-foreground" />
-                  </div>
-                ) : deadlines.length === 0 ? (
-                  <div className="py-8 text-center">
-                    <CheckCircle2 className="h-7 w-7 text-green-500 mx-auto mb-2" />
-                    <p className="text-sm text-muted-foreground">No upcoming deadlines</p>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {deadlines.map((deadline, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-2.5 border border-border rounded-lg hover:bg-muted/30 transition-colors">
-                        <div className="flex items-center gap-2.5">
-                          <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-                            deadline.urgency === "critical" ? "bg-red-500"
-                            : deadline.urgency === "high" ? "bg-orange-500"
-                            : deadline.urgency === "medium" ? "bg-yellow-500"
-                            : "bg-green-500"
-                          }`} />
-                          <div>
-                            <p className="text-sm font-medium text-foreground">{deadline.title}</p>
-                            <p className="text-[11px] text-muted-foreground">
-                              {deadline.category} &middot; Due: {new Date(deadline.due_date).toLocaleDateString()}
-                            </p>
-                          </div>
-                        </div>
-                        <Badge className={`text-[10px] px-2 py-0.5 ${
-                          deadline.status === "overdue"
-                            ? "bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400"
-                            : deadline.status === "upcoming"
-                            ? "bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-400"
-                            : "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400"
-                        }`}>
-                          {deadline.status === "overdue"
-                            ? `${Math.abs(deadline.days_remaining)}d overdue`
-                            : `${deadline.days_remaining}d left`}
-                        </Badge>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {(overdueCount > 0 || upcomingCount > 0) && (
-                  <div className="flex items-center gap-4 mt-3 pt-2.5 border-t border-border">
-                    {overdueCount > 0 && (
-                      <div className="flex items-center gap-1 text-xs">
-                        <XCircle className="h-3.5 w-3.5 text-red-500" />
-                        <span className="text-red-600 font-medium">{overdueCount} overdue</span>
-                      </div>
-                    )}
-                    {upcomingCount > 0 && (
-                      <div className="flex items-center gap-1 text-xs">
-                        <Clock className="h-3.5 w-3.5 text-orange-500" />
-                        <span className="text-orange-600 font-medium">{upcomingCount} due soon</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                <h2 className="max-w-3xl text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+                  Ask a legal question, verify the citations, then move into the right workflow.
+                </h2>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+                  The converted dashboard mirrors the prototype priority: Legal Q&A is the hub, while source search,
+                  compliance tracking, contract drafting, document analysis, and the filing calendar support it.
+                </p>
 
-            {/* Quick Actions — right */}
-            <Card className="col-span-12 lg:col-span-5 shadow-sm border-border">
-              <CardHeader className="pb-2 pt-4 px-5">
-                <CardTitle className="text-sm font-semibold">Quick Actions</CardTitle>
-              </CardHeader>
-              <CardContent className="px-5 pb-4">
-                <div className="grid grid-cols-2 gap-2.5">
-                  {quickActions.map((action) => (
-                    <Link key={action.label} href={action.href}>
-                      <div className="flex items-center gap-2.5 p-3 border border-border rounded-lg hover:bg-muted/50 hover:border-primary/20 hover:shadow-sm transition-all cursor-pointer group">
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${action.color}`}>
-                          <action.icon className="h-3.5 w-3.5" />
-                        </div>
-                        <span className="text-xs font-medium text-foreground group-hover:text-primary transition-colors truncate">
-                          {action.label}
-                        </span>
-                      </div>
-                    </Link>
+                <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                  <div className="relative flex-1">
+                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      value={query}
+                      onChange={(event) => setQuery(event.target.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                          handleResearchSubmit(query);
+                        }
+                      }}
+                      placeholder="Ask about director duties, founder agreements, annual filings, or section-level compliance..."
+                    className="h-11 rounded-md border-border bg-background pl-10"
+                  />
+                  </div>
+                  <Button className="h-11 gap-1.5 px-5" onClick={() => handleResearchSubmit(query)}>
+                    Ask Question
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {starterPrompts.map((prompt) => (
+                    <button
+                      key={prompt}
+                      type="button"
+                      onClick={() => handleResearchSubmit(prompt)}
+                      className="rounded-full border border-border bg-background px-3 py-1.5 text-left text-xs text-muted-foreground transition-colors hover:border-primary/30 hover:bg-accent hover:text-primary"
+                    >
+                      {prompt}
+                    </button>
                   ))}
                 </div>
               </CardContent>
             </Card>
 
-            {/* ── Row 3: Document Reviews (5col) + Cases (4col) + Companies Act (3col) ── */}
-
-            {/* Document Reviews */}
-            <Card className="col-span-12 md:col-span-5 shadow-sm border-border overflow-hidden">
-              <CardHeader className="flex flex-row items-center justify-between pb-2 pt-4 px-5">
-                <div className="flex items-center gap-2">
-                  <Shield className="h-4 w-4 text-primary" />
-                  <CardTitle className="text-sm font-semibold">Document Reviews</CardTitle>
-                </div>
-                <Link href="/dashboard/review">
-                  <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 px-2">
-                    View All <ArrowRight className="h-3 w-3" />
-                  </Button>
-                </Link>
+            <Card className="col-span-12 border-border bg-card shadow-sm lg:col-span-4">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-semibold">Dashboard Modules</CardTitle>
               </CardHeader>
-              <CardContent className="px-5 pb-4">
-                {loading ? (
-                  <div className="py-8 text-center">
-                    <Loader2 className="h-5 w-5 animate-spin mx-auto text-muted-foreground" />
-                  </div>
-                ) : reviews.length === 0 ? (
-                  <div className="py-8 text-center">
-                    <FileText className="h-7 w-7 text-muted-foreground/30 mx-auto mb-2" />
-                    <p className="text-sm text-muted-foreground">No documents reviewed yet</p>
-                    <Link href="/dashboard/review">
-                      <Button variant="outline" size="sm" className="mt-3 text-xs h-7">
-                        Upload a Document
-                      </Button>
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {reviews.map((review) => (
-                      <div key={review.id} className="flex items-center justify-between p-2.5 border border-border rounded-lg hover:bg-muted/30 transition-colors">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <FileText className="h-4 w-4 text-primary flex-shrink-0" />
-                          <div className="min-w-0">
-                            <p className="text-sm font-medium text-foreground truncate">{review.file_name}</p>
-                            <p className="text-[11px] text-muted-foreground">{new Date(review.created_at).toLocaleDateString()}</p>
-                          </div>
+              <CardContent className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                {workspaceActions.map((action) => (
+                  <Link key={action.label} href={action.href} className="block">
+                    <div className="rounded-lg border border-border bg-background p-3 transition-all hover:border-primary/30 hover:bg-accent/70">
+                      <div className="flex items-start gap-3">
+                        <div className={`mt-0.5 flex h-10 w-10 items-center justify-center rounded-md ${action.color}`}>
+                          <action.icon className="h-4 w-4" />
                         </div>
-                        <Badge className={`text-[10px] px-2 py-0.5 flex-shrink-0 ${
-                          review.status === "completed" ? "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400"
-                          : review.status === "pending" ? "bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300"
-                          : review.status === "failed" ? "bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400"
-                          : "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400"
-                        }`}>
-                          {review.status}
-                        </Badge>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="text-sm font-medium text-foreground">{action.label}</p>
+                            <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+                          </div>
+                          <p className="mt-1 text-xs leading-5 text-muted-foreground">{action.description}</p>
+                        </div>
                       </div>
-                    ))}
+                    </div>
+                  </Link>
+                ))}
+              </CardContent>
+            </Card>
+          </section>
+
+          <section className="grid grid-cols-12 gap-4">
+            {assistantMetrics.map((metric) => (
+              <Card key={metric.label} className="col-span-12 sm:col-span-6 xl:col-span-3 border-border shadow-sm">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-3">
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${metric.color}`}>
+                      <metric.icon className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{metric.label}</p>
+                      <p className="mt-1 text-2xl font-bold text-foreground">
+                        {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : metric.value}
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">{metric.sublabel}</p>
+                    </div>
                   </div>
-                )}
-                {reviews.length > 0 && (
-                  <div className="flex items-center gap-3 mt-3 pt-2.5 border-t border-border text-[11px] text-muted-foreground">
-                    <span>{completedReviews} completed</span>
-                    <span>{pendingReviews} pending</span>
+                </CardContent>
+              </Card>
+            ))}
+          </section>
+
+          <section className="grid grid-cols-12 gap-4">
+            <Card className="col-span-12 border-border bg-card shadow-sm">
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-primary">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Research Workflow
+                </div>
+                <CardTitle className="text-sm font-semibold">How the research-paper flow works inside the app</CardTitle>
+              </CardHeader>
+              <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                {workflowSteps.map((item) => (
+                  <div key={item.step} className="rounded-xl border border-border p-4">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">{item.step}</p>
+                    <p className="mt-2 text-sm font-medium text-foreground">{item.title}</p>
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">{item.description}</p>
                   </div>
-                )}
+                ))}
               </CardContent>
             </Card>
 
-            {/* Recent Cases */}
-            <Card className="col-span-12 md:col-span-4 shadow-sm border-border overflow-hidden">
-              <CardHeader className="flex flex-row items-center justify-between pb-2 pt-4 px-5">
-                <CardTitle className="text-sm font-semibold">Recent Cases</CardTitle>
-                <Link href="/dashboard/cases">
-                  <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 px-2">
-                    All <ArrowRight className="h-3 w-3" />
+          </section>
+
+          <section className="grid grid-cols-12 gap-4">
+            <Card className="col-span-12 border-border bg-card shadow-sm xl:col-span-6">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-semibold">Research Sources Snapshot</CardTitle>
+                <Link href="/dashboard/search">
+                  <Button variant="ghost" size="sm" className="gap-1 text-xs">
+                    Open Search
+                    <ArrowRight className="h-3 w-3" />
                   </Button>
                 </Link>
               </CardHeader>
-              <CardContent className="px-5 pb-4">
+              <CardContent className="grid gap-3 md:grid-cols-2">
                 <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    <Gavel className="h-3.5 w-3.5" />
+                    Recent Cases
+                  </div>
                   {loading ? (
                     <div className="py-8 text-center">
-                      <Loader2 className="h-5 w-5 animate-spin mx-auto text-muted-foreground" />
+                      <Loader2 className="mx-auto h-5 w-5 animate-spin text-muted-foreground" />
                     </div>
                   ) : cases.length === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center py-6">No cases found</p>
+                    <p className="py-6 text-sm text-muted-foreground">No case summaries available.</p>
                   ) : (
-                    cases.map((case_, idx) => (
-                      <div key={idx} className="p-2.5 border border-border rounded-lg hover:bg-muted/30 transition-all cursor-pointer overflow-hidden">
-                        <p className="font-medium text-sm text-foreground truncate">{case_.case_name}</p>
-                        <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
-                          {case_.court} &middot; {case_.citation}
+                    cases.map((caseItem, index) => (
+                      <div key={`${caseItem.case_name}-${index}`} className="rounded-lg border border-border p-3">
+                        <p className="truncate text-sm font-medium text-foreground">{caseItem.case_name}</p>
+                        <p className="mt-1 truncate text-[11px] text-muted-foreground">
+                          {caseItem.court} · {caseItem.citation}
                         </p>
-                        <p className="text-[11px] text-muted-foreground mt-1 line-clamp-1">
-                          {case_.relevance}
-                        </p>
+                        <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">{caseItem.relevance}</p>
                       </div>
                     ))
                   )}
                 </div>
-                <p className="text-[11px] text-muted-foreground mt-3">
-                  Showing {cases.length} of {stats?.cases || 0} cases
-                </p>
-              </CardContent>
-            </Card>
 
-            {/* Companies Act Sections */}
-            <Card className="col-span-12 md:col-span-3 shadow-sm border-border overflow-hidden">
-              <CardHeader className="flex flex-row items-center justify-between pb-2 pt-4 px-5">
-                <CardTitle className="text-sm font-semibold">Companies Act</CardTitle>
-                <Link href="/dashboard/search">
-                  <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 px-2">
-                    <Search className="h-3 w-3" />
-                  </Button>
-                </Link>
-              </CardHeader>
-              <CardContent className="px-5 pb-4">
                 <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    <BookOpen className="h-3.5 w-3.5" />
+                    Companies Act Sections
+                  </div>
                   {loading ? (
                     <div className="py-8 text-center">
-                      <Loader2 className="h-5 w-5 animate-spin mx-auto text-muted-foreground" />
+                      <Loader2 className="mx-auto h-5 w-5 animate-spin text-muted-foreground" />
                     </div>
                   ) : companiesActSections.length === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center py-6">No sections</p>
+                    <p className="py-6 text-sm text-muted-foreground">No statutory sections available.</p>
                   ) : (
-                    companiesActSections.map((section, idx) => (
-                      <div key={idx} className="p-2.5 border border-border rounded-lg hover:bg-muted/30 transition-all cursor-pointer overflow-hidden">
-                        <p className="font-medium text-xs text-foreground truncate">
-                          §{section.section}: {section.title}
+                    companiesActSections.map((section, index) => (
+                      <div key={`${section.section}-${index}`} className="rounded-lg border border-border p-3">
+                        <p className="truncate text-sm font-medium text-foreground">
+                          Section {section.section}: {section.title}
                         </p>
-                        <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2 break-words">
-                          {section.content.substring(0, 100)}...
-                        </p>
+                        <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">{section.content}</p>
                       </div>
                     ))
                   )}
@@ -404,7 +408,104 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
 
-          </div>
+            <Card className="col-span-12 border-border bg-card shadow-sm xl:col-span-6">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-semibold">Supporting Workflows</CardTitle>
+                <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
+                  Secondary Modules
+                </Badge>
+              </CardHeader>
+              <CardContent className="grid gap-4 lg:grid-cols-2">
+                <div className="rounded-xl border border-border p-4">
+                  <div className="flex items-center gap-2">
+                    <Shield className="h-4 w-4 text-primary" />
+                    <p className="text-sm font-medium text-foreground">Compliance Monitor</p>
+                  </div>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                    Track due-soon obligations after completing your legal research.
+                  </p>
+                  <div className="mt-3 space-y-2">
+                    {loading ? (
+                      <div className="py-6 text-center">
+                        <Loader2 className="mx-auto h-4 w-4 animate-spin text-muted-foreground" />
+                      </div>
+                    ) : deadlines.length === 0 ? (
+                      <p className="text-xs text-muted-foreground">No upcoming deadlines.</p>
+                    ) : (
+                      deadlines.map((deadline) => (
+                        <div key={`${deadline.id}-${deadline.due_date}`} className="flex items-start justify-between gap-3 rounded-lg border border-border p-2.5">
+                          <div className="min-w-0">
+                            <p className="truncate text-xs font-medium text-foreground">{deadline.title}</p>
+                            <p className="mt-1 text-[11px] text-muted-foreground">
+                              {deadline.category} · Due {new Date(deadline.due_date).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <Badge
+                            className={
+                              deadline.status === "overdue"
+                                ? "bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400"
+                                : deadline.status === "upcoming"
+                                  ? "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400"
+                                  : "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400"
+                            }
+                          >
+                            {deadline.days_remaining}d
+                          </Badge>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-border p-4">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-primary" />
+                    <p className="text-sm font-medium text-foreground">Document Review Queue</p>
+                  </div>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                    Review and drafting stay accessible, but they no longer dominate the main dashboard.
+                  </p>
+                  <div className="mt-3 space-y-2">
+                    {loading ? (
+                      <div className="py-6 text-center">
+                        <Loader2 className="mx-auto h-4 w-4 animate-spin text-muted-foreground" />
+                      </div>
+                    ) : reviews.length === 0 ? (
+                      <p className="text-xs text-muted-foreground">No reviews have been created yet.</p>
+                    ) : (
+                      reviews.map((review) => (
+                        <div key={review.id} className="rounded-lg border border-border p-2.5">
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="truncate text-xs font-medium text-foreground">{review.file_name}</p>
+                            <Badge
+                              className={
+                                review.status === "completed"
+                                  ? "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400"
+                                  : review.status === "failed"
+                                    ? "bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400"
+                                    : review.status === "analyzing"
+                                      ? "bg-[#E6ECF0] text-[#5C7A8A] border-[#D8E1E6] dark:bg-secondary dark:text-muted-foreground"
+                                      : "bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300"
+                              }
+                            >
+                              {review.status}
+                            </Badge>
+                          </div>
+                          <p className="mt-1 text-[11px] text-muted-foreground">
+                            Created {new Date(review.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  <div className="mt-3 flex items-center gap-2 text-[11px] text-muted-foreground">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+                    <span>{completedReviews} completed reviews</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </section>
         </div>
       </div>
     </div>

@@ -40,7 +40,15 @@ export interface SearchResult {
   content: string;
   relevance_score: number;
   source: string;
-  metadata: Record<string, unknown>;
+  url?: string;
+  metadata: {
+    court?: string;
+    date?: string;
+    citation?: string;
+    section?: string;
+    act?: string;
+    [key: string]: string | number | boolean | undefined;
+  };
 }
 
 export interface UnifiedSearchResponse {
@@ -146,6 +154,21 @@ export const apiClient = new ApiClient();
 // Chat API
 export interface ChatMessageResponse {
   success: boolean;
+  answer: string;
+  confidence?: "high" | "medium" | "low" | "insufficient";
+  limitations?: string;
+  grounded?: boolean;
+  follow_up_questions?: string[];
+  citations?: Array<{
+    title: string;
+    content: string;
+    doc_type: string;
+    source: string;
+    relevance: number;
+    section?: string;
+    act?: string;
+    url?: string;
+  }>;
   message: string;
   sources: Array<{
     title: string;
@@ -155,6 +178,9 @@ export interface ChatMessageResponse {
     relevance: string;
   }>;
   suggestions: string[];
+  model_used?: string;
+  is_document?: boolean;
+  document_type?: string;
   error?: string;
 }
 
@@ -163,15 +189,139 @@ export interface ChatSuggestionCategory {
   questions: string[];
 }
 
+// SSE stream event types
+export interface StreamTokenEvent {
+  token: string;
+}
+
+export interface StreamCitationsEvent {
+  title: string;
+  content: string;
+  doc_type: string;
+  source: string;
+  relevance: number;
+  section?: string;
+  act?: string;
+  url?: string;
+}
+
+export interface StreamMetadataEvent {
+  confidence: string;
+  limitations: string;
+  grounded: boolean;
+  follow_up_questions: string[];
+  model_used?: string;
+  is_document?: boolean;
+  document_type?: string;
+}
+
+export interface StreamCallbacks {
+  onToken: (token: string) => void;
+  onCitations: (citations: StreamCitationsEvent[]) => void;
+  onMetadata: (metadata: StreamMetadataEvent) => void;
+  onDone: () => void;
+  onError: (error: string) => void;
+}
+
 export const chatApi = {
-  async sendMessage(message: string, context?: Record<string, unknown>): Promise<ChatMessageResponse> {
+  async sendMessage(
+    message: string,
+    context?: Record<string, unknown>,
+    conversationHistory?: Array<{ role: string; content: string }>
+  ): Promise<ChatMessageResponse> {
     const response = await fetch(`${API_URL}/api/chat/message`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message, context }),
+      body: JSON.stringify({ message, context, conversation_history: conversationHistory }),
     });
     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
     return response.json();
+  },
+
+  /**
+   * Stream a chat response via Server-Sent Events.
+   * Tokens arrive incrementally for progressive rendering.
+   * Returns an AbortController to allow cancellation.
+   */
+  streamMessage(
+    message: string,
+    callbacks: StreamCallbacks,
+    context?: Record<string, unknown>,
+    conversationHistory?: Array<{ role: string; content: string }>
+  ): AbortController {
+    const controller = new AbortController();
+
+    (async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/chat/stream`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message, context, conversation_history: conversationHistory }),
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          callbacks.onError(`API error: ${response.statusText}`);
+          return;
+        }
+
+        const reader = response.body?.getReader();
+        if (!reader) {
+          callbacks.onError("No response body");
+          return;
+        }
+
+        const decoder = new TextDecoder();
+        let buffer = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() || "";
+
+          let currentEvent = "";
+          for (const line of lines) {
+            if (line.startsWith("event: ")) {
+              currentEvent = line.slice(7).trim();
+            } else if (line.startsWith("data: ") && currentEvent) {
+              const data = line.slice(6);
+              try {
+                const parsed = JSON.parse(data);
+                switch (currentEvent) {
+                  case "token":
+                    callbacks.onToken(parsed.token);
+                    break;
+                  case "citations":
+                    callbacks.onCitations(parsed);
+                    break;
+                  case "metadata":
+                    callbacks.onMetadata(parsed);
+                    break;
+                  case "done":
+                    callbacks.onDone();
+                    break;
+                  case "error":
+                    callbacks.onError(parsed.error || "Unknown error");
+                    break;
+                }
+              } catch (parseErr) {
+                console.warn("Skipping malformed SSE JSON chunk:", parseErr);
+              }
+              currentEvent = "";
+            }
+          }
+        }
+      } catch (err) {
+        if ((err as Error).name !== "AbortError") {
+          callbacks.onError((err as Error).message || "Stream failed");
+        }
+      }
+    })();
+
+    return controller;
   },
 
   async getSuggestions(): Promise<{ suggestions: ChatSuggestionCategory[] }> {
@@ -286,18 +436,66 @@ export interface ComplianceDeadline {
   urgency: "low" | "medium" | "high" | "critical";
   recurring: string;
   penalty?: string;
+  applicable_to?: string[];
+  law_reference?: string;
+}
+
+export interface IndianCalendarSummary {
+  total_deadlines: number;
+  overdue_count: number;
+  due_this_week: number;
+  due_this_month: number;
+  by_category: Record<string, number>;
+  applicable_categories: {
+    category: string;
+    description: string;
+    count: number;
+  }[];
+}
+
+export interface IndianCalendarResponse {
+  company_type: string;
+  generated_date: string;
+  deadlines: ComplianceDeadline[];
+  summary: IndianCalendarSummary;
+}
+
+export interface CompanyTypeInfo {
+  id: string;
+  name: string;
+  description: string;
+  applicable_compliances: string[];
+}
+
+export interface PenaltyInfo {
+  category: string;
+  governing_law: string;
+  penalties: {
+    filing: string;
+    penalty: string;
+    max_penalty?: string;
+    interest?: string;
+    consequence?: string;
+    damages?: string;
+    prosecution?: string;
+    additional?: string;
+    additional_penalty?: string;
+    reduced_penalty?: string;
+  }[];
 }
 
 export const complianceApi = {
   async getDeadlines(options?: {
     category?: string;
     status?: string;
+    company_type?: string;
     limit?: number;
     offset?: number;
   }): Promise<{ data: ComplianceDeadline[]; total: number }> {
     const params = new URLSearchParams();
     if (options?.category) params.append("category", options.category);
     if (options?.status) params.append("status", options.status);
+    if (options?.company_type) params.append("company_type", options.company_type);
     if (options?.limit) params.append("limit", options.limit.toString());
     if (options?.offset) params.append("offset", options.offset.toString());
     const query = params.toString();
@@ -325,6 +523,79 @@ export const complianceApi = {
     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
     return response.json();
   },
+
+  async getIndianCalendar(options?: {
+    company_type?: string;
+    months_ahead?: number;
+  }): Promise<IndianCalendarResponse> {
+    const params = new URLSearchParams();
+    if (options?.company_type) params.append("company_type", options.company_type);
+    if (options?.months_ahead) params.append("months_ahead", options.months_ahead.toString());
+    const query = params.toString();
+    const response = await fetch(
+      `${API_URL}/api/compliance/indian-calendar${query ? `?${query}` : ""}`
+    );
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.json();
+  },
+
+  async getIndianCategories(): Promise<{
+    categories: {
+      id: string;
+      name: string;
+      description: string;
+      applicable_to: string[];
+    }[];
+  }> {
+    const response = await fetch(`${API_URL}/api/compliance/indian-categories`);
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.json();
+  },
+
+  async getCompanyTypes(): Promise<{ company_types: CompanyTypeInfo[] }> {
+    const response = await fetch(`${API_URL}/api/compliance/company-types`);
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.json();
+  },
+
+  async markComplete(
+    deadline_id: string,
+    due_date: string
+  ): Promise<{ success: boolean; message: string; completed_at: string }> {
+    const response = await fetch(
+      `${API_URL}/api/compliance/mark-complete?deadline_id=${deadline_id}&due_date=${due_date}`,
+      { method: "POST" }
+    );
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.json();
+  },
+
+  async getPenalties(category?: string): Promise<{ penalties?: PenaltyInfo[]; penalty_info?: PenaltyInfo }> {
+    const url = category
+      ? `${API_URL}/api/compliance/penalties?category=${category}`
+      : `${API_URL}/api/compliance/penalties`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.json();
+  },
+
+  async getRiskAssessment(deadline_id: string): Promise<{
+    deadline_id: string;
+    title: string;
+    category?: string;
+    days_remaining?: number;
+    assessment: {
+      risk_note: string;
+      penalty_info: string;
+      action_items: string[];
+    };
+  }> {
+    const response = await fetch(
+      `${API_URL}/api/compliance/risk-assessment/${deadline_id}`
+    );
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.json();
+  },
 };
 
 // Templates API
@@ -334,8 +605,8 @@ export interface Template {
   description: string;
   category: string;
   estimated_time: string;
-  price: number;
   field_count: number;
+  fields_count?: number;
 }
 
 export interface TemplateDetail extends Template {
@@ -363,7 +634,15 @@ export const templatesApi = {
     return response.json();
   },
 
-  async generate(templateId: string, data: Record<string, unknown>) {
+  async generate(templateId: string, data: Record<string, unknown>): Promise<{
+    success: boolean;
+    message: string;
+    template_id: string;
+    data: Record<string, unknown>;
+    status: string;
+    document_content?: string;
+    download_url?: string;
+  }> {
     const response = await fetch(
       `${API_URL}/api/templates/${templateId}/generate`,
       {
@@ -437,7 +716,7 @@ export const settingsApi = {
     return response.json();
   },
 
-  async updateProfile(data: Record<string, unknown>) {
+  async updateProfile<T extends object>(data: T) {
     const response = await fetch(`${API_URL}/api/settings/profile`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -447,7 +726,7 @@ export const settingsApi = {
     return response.json();
   },
 
-  async updateNotifications(data: Record<string, unknown>) {
+  async updateNotifications<T extends object>(data: T) {
     const response = await fetch(`${API_URL}/api/settings/notifications`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -457,7 +736,7 @@ export const settingsApi = {
     return response.json();
   },
 
-  async updateAppearance(data: Record<string, unknown>) {
+  async updateAppearance<T extends object>(data: T) {
     const response = await fetch(`${API_URL}/api/settings/appearance`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -577,8 +856,19 @@ export const adminApi = {
 };
 
 // Vault API
+export interface VaultDocument {
+  id: string;
+  file_name: string;
+  file_size: number;
+  file_type: string;
+  category: string;
+  tags: string[];
+  uploaded_at: string;
+  url?: string;
+}
+
 export const vaultApi = {
-  async list(options?: { category?: string; tag?: string }): Promise<{ data: any[]; total: number }> {
+  async list(options?: { category?: string; tag?: string }): Promise<{ data: VaultDocument[]; total: number }> {
     const params = new URLSearchParams();
     if (options?.category) params.append("category", options.category);
     if (options?.tag) params.append("tag", options.tag);
@@ -695,6 +985,111 @@ export const newsApi = {
   },
   async getCategories() {
     const response = await fetch(`${API_URL}/api/news/categories`);
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.json();
+  },
+};
+
+// Contracts API
+export interface ContractType {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  lawReference: string;
+  fields: ContractField[];
+  estimatedTime: string;
+}
+
+export interface ContractField {
+  name: string;
+  label: string;
+  type: "text" | "textarea" | "number" | "date" | "select" | "boolean" | "pan" | "gstin" | "email" | "phone";
+  required: boolean;
+  placeholder?: string;
+  options?: string[];
+  validation?: string;
+  helpText?: string;
+  step?: number;
+}
+
+export interface GeneratedContract {
+  id: string;
+  type: string;
+  content: string;
+  createdAt: string;
+  status: "draft" | "final";
+  metadata: Record<string, unknown>;
+}
+
+export const contractsApi = {
+  async getContractTypes(): Promise<{ data: ContractType[] }> {
+    const response = await fetch(`${API_URL}/api/contracts/types`);
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.json();
+  },
+
+  async getContractType(typeId: string): Promise<ContractType> {
+    const response = await fetch(`${API_URL}/api/contracts/types/${typeId}`);
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.json();
+  },
+
+  async generateContract(
+    type: string,
+    data: Record<string, unknown>
+  ): Promise<{ success: boolean; contract: GeneratedContract }> {
+    const response = await fetch(`${API_URL}/api/contracts/generate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contract_type: type, form_data: data }),
+    });
+    if (!response.ok) {
+      // Try to get detailed error from response body
+      try {
+        const errorData = await response.json();
+        const errorMessage = errorData.detail || errorData.message || response.statusText;
+        throw new Error(errorMessage);
+      } catch (parseError) {
+        // If we can't parse the error, use statusText
+        throw new Error(`API error: ${response.statusText}`);
+      }
+    }
+    return response.json();
+  },
+
+  async getContract(contractId: string): Promise<GeneratedContract> {
+    const response = await fetch(`${API_URL}/api/contracts/${contractId}`);
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.json();
+  },
+
+  async downloadContract(
+    contractId: string,
+    format: "pdf" | "docx"
+  ): Promise<Blob> {
+    const response = await fetch(
+      `${API_URL}/api/contracts/${contractId}/download?format=${format}`
+    );
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.blob();
+  },
+
+  async listContracts(options?: {
+    type?: string;
+    status?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<{ data: GeneratedContract[]; total: number }> {
+    const params = new URLSearchParams();
+    if (options?.type) params.append("type", options.type);
+    if (options?.status) params.append("status", options.status);
+    if (options?.limit) params.append("limit", options.limit.toString());
+    if (options?.offset) params.append("offset", options.offset.toString());
+    const query = params.toString();
+    const response = await fetch(
+      `${API_URL}/api/contracts${query ? `?${query}` : ""}`
+    );
     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
     return response.json();
   },

@@ -1,26 +1,622 @@
 [
   {
-    "case_name": "Salomon v. Salomon & Co. Ltd",
-    "citation": "(1897) AC 22",
-    "court": "House of Lords (UK, but followed in India)",
-    "principle": "Separate Legal Entity",
-    "summary": "A company is a separate legal entity distinct from its members. The corporate veil separates the company from its shareholders.",
-    "relevance": "Foundation of company law - companies have independent legal personality"
+    "case_name": "Kesavananda Bharati v. State of Kerala",
+    "citation": "AIR 1973 SC 1461",
+    "court": "Supreme Court of India",
+    "year": 1973,
+    "principle": "Basic Structure Doctrine",
+    "summary": "Parliament has wide powers to amend the Constitution under Article 368, but it cannot alter the 'basic structure' of the Constitution. The basic structure includes supremacy of the Constitution, republican and democratic form of government, secular character, separation of powers, and federal character.",
+    "relevance": "This is the most significant constitutional law case in India. It limits Parliament's amending power and has been applied to strike down constitutional amendments that violate basic structure.",
+    "category": "constitutional"
   },
   {
-    "case_name": "Tata Consultancy Services v. State of Andhra Pradesh",
-    "citation": "(2005) 1 SCC 308",
+    "case_name": "Maneka Gandhi v. Union of India",
+    "citation": "AIR 1978 SC 597",
     "court": "Supreme Court of India",
-    "principle": "Software as Goods",
-    "summary": "Computer software, when put on a medium and sold, is goods liable to sales tax.",
-    "relevance": "Important for tech companies and taxation"
+    "year": 1978,
+    "principle": "Expanded interpretation of Article 21 - Right to Life",
+    "summary": "Article 21 protection of life and personal liberty must be read with Articles 14 and 19. Any law depriving a person of personal liberty must be just, fair, and reasonable, not merely a valid enacted procedure.",
+    "relevance": "Revolutionized fundamental rights jurisprudence by expanding the scope of Article 21 to include right to travel abroad and establishing the 'procedure established by law' must be fair and reasonable.",
+    "category": "constitutional"
   },
   {
-    "case_name": "Life Insurance Corporation of India v. Escorts Ltd",
-    "citation": "(1986) 1 SCC 264",
+    "case_name": "Minerva Mills Ltd. v. Union of India",
+    "citation": "AIR 1980 SC 1789",
     "court": "Supreme Court of India",
-    "principle": "Lifting Corporate Veil",
-    "summary": "The court can lift the corporate veil when the company is used as a device for tax evasion or circumventing tax obligations.",
-    "relevance": "Important for understanding when separate entity principle can be disregarded"
+    "year": 1980,
+    "principle": "Harmony between Fundamental Rights and Directive Principles",
+    "summary": "The Constitution is founded on the bedrock of balance between Fundamental Rights and Directive Principles. Article 31C as amended by 42nd Amendment was struck down as it destroyed the basic structure by giving primacy to Directive Principles over Fundamental Rights.",
+    "relevance": "Reaffirmed the basic structure doctrine and established that judicial review is part of the basic structure. Limited Parliament's power to amend the Constitution.",
+    "category": "constitutional"
+  },
+  {
+    "case_name": "S.R. Bommai v. Union of India",
+    "citation": "AIR 1994 SC 1918",
+    "court": "Supreme Court of India",
+    "year": 1994,
+    "principle": "Judicial review of President's Rule under Article 356",
+    "summary": "President's satisfaction under Article 356 is subject to judicial review. Secularism is part of the basic structure. The proclamation imposing President's Rule can be struck down if found to be based on irrelevant or extraneous grounds.",
+    "relevance": "Landmark case on federalism and secularism. Established clear guidelines for invoking Article 356 and strengthened federal structure.",
+    "category": "constitutional"
+  },
+  {
+    "case_name": "I.R. Coelho v. State of Tamil Nadu",
+    "citation": "(2007) 2 SCC 1",
+    "court": "Supreme Court of India",
+    "year": 2007,
+    "principle": "Ninth Schedule laws subject to basic structure review",
+    "summary": "Laws placed in the Ninth Schedule after April 24, 1973 are open to judicial review if they violate fundamental rights forming part of the basic structure. The protection of Ninth Schedule is not absolute.",
+    "relevance": "Expanded the scope of judicial review over constitutional amendments and protected fundamental rights from legislative overreach through Ninth Schedule placements.",
+    "category": "constitutional"
+  },
+  {
+    "case_name": "Golaknath v. State of Punjab",
+    "citation": "AIR 1967 SC 1643",
+    "court": "Supreme Court of India",
+    "year": 1967,
+    "principle": "Fundamental Rights cannot be amended",
+    "summary": "Parliament has no power to amend Fundamental Rights under Article 368. Constitutional amendments are 'law' under Article 13, and therefore cannot take away or abridge Fundamental Rights.",
+    "relevance": "Though partially overruled by Kesavananda Bharati, this case was significant in the evolution of constitutional interpretation regarding amendment powers.",
+    "category": "constitutional"
+  },
+  {
+    "case_name": "Indra Sawhney v. Union of India",
+    "citation": "AIR 1993 SC 477",
+    "court": "Supreme Court of India",
+    "year": 1992,
+    "principle": "50% ceiling on reservations; Creamy Layer exclusion",
+    "summary": "Reservation should not exceed 50% except in extraordinary circumstances. The 'creamy layer' among backward classes must be excluded from reservation benefits. Economic criterion alone cannot be the basis for backward class identification.",
+    "relevance": "The Mandal Commission case that defined the constitutional framework for reservations in India. The 50% ceiling and creamy layer concepts remain fundamental to reservation policy.",
+    "category": "constitutional"
+  },
+  {
+    "case_name": "Vishaka v. State of Rajasthan",
+    "citation": "AIR 1997 SC 3011",
+    "court": "Supreme Court of India",
+    "year": 1997,
+    "principle": "Guidelines against sexual harassment at workplace",
+    "summary": "In absence of enacted law, the Supreme Court laid down detailed guidelines to prevent sexual harassment of women at workplace. These guidelines were binding on all employers until legislation was enacted.",
+    "relevance": "Created binding guidelines that remained in force until the Sexual Harassment of Women at Workplace Act, 2013. Demonstrated judicial activism in protecting women's rights.",
+    "category": "constitutional"
+  },
+  {
+    "case_name": "NALSA v. Union of India",
+    "citation": "(2014) 5 SCC 438",
+    "court": "Supreme Court of India",
+    "year": 2014,
+    "principle": "Recognition of transgender rights as third gender",
+    "summary": "Transgender persons have the right to decide their self-identified gender and are entitled to recognition as 'third gender'. They are entitled to fundamental rights under Part III and must be treated as socially and educationally backward classes.",
+    "relevance": "Landmark judgment recognizing transgender rights and directing the government to provide reservations and welfare measures for transgender persons.",
+    "category": "constitutional"
+  },
+  {
+    "case_name": "K.S. Puttaswamy v. Union of India",
+    "citation": "(2017) 10 SCC 1",
+    "court": "Supreme Court of India",
+    "year": 2017,
+    "principle": "Right to Privacy as Fundamental Right",
+    "summary": "Right to privacy is a fundamental right protected under Article 21 of the Constitution. It includes informational privacy, privacy of choice, and bodily integrity. Any invasion of privacy must meet the tests of legality, necessity, and proportionality.",
+    "relevance": "Nine-judge bench overruled previous judgments and established privacy as fundamental right. Foundation for subsequent judgments on Aadhaar, decriminalization of homosexuality, and data protection laws.",
+    "category": "constitutional"
+  },
+  {
+    "case_name": "Navtej Singh Johar v. Union of India",
+    "citation": "(2018) 10 SCC 1",
+    "court": "Supreme Court of India",
+    "year": 2018,
+    "principle": "Decriminalization of consensual homosexual acts",
+    "summary": "Section 377 IPC was read down to decriminalize consensual sexual acts between adults in private. Criminalizing consensual homosexual conduct violates Articles 14, 15, 19, and 21 of the Constitution.",
+    "relevance": "Historic judgment advancing LGBTQ+ rights in India. Overruled the regressive Suresh Kumar Koushal judgment and recognized sexual orientation as protected under Article 15.",
+    "category": "constitutional"
+  },
+  {
+    "case_name": "Bachan Singh v. State of Punjab",
+    "citation": "AIR 1980 SC 898",
+    "court": "Supreme Court of India",
+    "year": 1980,
+    "principle": "Death penalty constitutional; 'Rarest of rare' doctrine",
+    "summary": "Death penalty under Section 302 IPC is constitutional and does not violate Articles 14, 19, and 21. However, it should be imposed only in the 'rarest of rare' cases when the alternative option of life imprisonment is unquestionably foreclosed.",
+    "relevance": "Established the 'rarest of rare' doctrine for death penalty. Courts must consider both aggravating and mitigating circumstances before imposing capital punishment.",
+    "category": "criminal"
+  },
+  {
+    "case_name": "Machhi Singh v. State of Punjab",
+    "citation": "AIR 1983 SC 957",
+    "court": "Supreme Court of India",
+    "year": 1983,
+    "principle": "Guidelines for 'rarest of rare' cases",
+    "summary": "Elaborated categories where death sentence may be warranted: when murder is committed in extremely brutal manner, when victim belongs to vulnerable class, when murder is committed for a motive showing depravity, or when murder of large number of persons.",
+    "relevance": "Provided clearer guidelines for application of death penalty post Bachan Singh. These categories continue to guide courts in death penalty cases.",
+    "category": "criminal"
+  },
+  {
+    "case_name": "Rupa Ashok Hurra v. Ashok Hurra",
+    "citation": "(2002) 4 SCC 388",
+    "court": "Supreme Court of India",
+    "year": 2002,
+    "principle": "Curative petition to correct gross miscarriage of justice",
+    "summary": "In exceptional cases where there is gross miscarriage of justice or violation of principles of natural justice after dismissal of review petition, a curative petition can be filed. It must be certified by a senior advocate and placed before the three senior-most judges.",
+    "relevance": "Created the curative petition remedy to prevent abuse of process and gross miscarriage of justice even after exhaustion of review remedy.",
+    "category": "criminal"
+  },
+  {
+    "case_name": "D.K. Basu v. State of West Bengal",
+    "citation": "AIR 1997 SC 610",
+    "court": "Supreme Court of India",
+    "year": 1997,
+    "principle": "Guidelines to prevent custodial violence",
+    "summary": "Laid down 11 specific requirements to be followed during arrest and detention to prevent custodial violence and torture. These include displaying name tags, preparing memo of arrest, medical examination, and informing relatives.",
+    "relevance": "Mandatory guidelines for arrest procedures followed by all police forces. Violation can lead to departmental action and contempt proceedings.",
+    "category": "criminal"
+  },
+  {
+    "case_name": "Hussainara Khatoon v. State of Bihar",
+    "citation": "AIR 1979 SC 1369",
+    "court": "Supreme Court of India",
+    "year": 1979,
+    "principle": "Right to speedy trial; Free legal aid",
+    "summary": "Right to speedy trial is implicit in Article 21. Undertrial prisoners who have been in jail for periods longer than the maximum sentence for their alleged offense must be released. Free legal services is a constitutional right of the poor.",
+    "relevance": "Led to release of thousands of undertrial prisoners. Foundation for legal aid services and emphasis on speedy disposal of criminal cases.",
+    "category": "criminal"
+  },
+  {
+    "case_name": "Nilabati Behera v. State of Orissa",
+    "citation": "AIR 1993 SC 1960",
+    "court": "Supreme Court of India",
+    "year": 1993,
+    "principle": "Compensation for custodial death under Article 21",
+    "summary": "The State is liable to pay compensation for custodial death under Article 21 even without establishing fault. The defense of sovereign immunity is not available in cases of violation of fundamental rights.",
+    "relevance": "Established state liability for custodial deaths and the right to compensation under public law remedy independent of civil suit for damages.",
+    "category": "criminal"
+  },
+  {
+    "case_name": "Lalita Kumari v. Government of U.P.",
+    "citation": "(2014) 2 SCC 1",
+    "court": "Supreme Court of India",
+    "year": 2014,
+    "principle": "Mandatory FIR registration for cognizable offenses",
+    "summary": "Registration of FIR under Section 154 CrPC is mandatory when information discloses commission of a cognizable offense. Police cannot conduct preliminary inquiry before registration of FIR except in specific categories of cases.",
+    "relevance": "Addressed police reluctance to register FIRs. Made registration mandatory and defined limited circumstances where preliminary inquiry is permissible.",
+    "category": "criminal"
+  },
+  {
+    "case_name": "Vodafone International Holdings B.V. v. Union of India",
+    "citation": "(2012) 6 SCC 613",
+    "court": "Supreme Court of India",
+    "year": 2012,
+    "principle": "Indirect transfer of Indian assets not taxable; Look at substance",
+    "summary": "Transfer of shares of a foreign company holding Indian assets did not attract capital gains tax in India as the situs of shares was outside India. The court emphasized looking at the substance of the transaction rather than the form.",
+    "relevance": "Major international tax case that was later nullified by retrospective amendment. Emphasized substance over form in tax matters and limits of India's taxing jurisdiction.",
+    "category": "corporate"
+  },
+  {
+    "case_name": "Tata Consultancy Services Ltd. v. Cyrus Investments Pvt. Ltd.",
+    "citation": "(2021) 9 SCC 449",
+    "court": "Supreme Court of India",
+    "year": 2021,
+    "principle": "Majority shareholders' rights; Board's removal powers",
+    "summary": "The removal of Cyrus Mistry as Tata Sons chairman was upheld. Majority shareholders have the right to remove a director they have lost confidence in. The Articles of Association and SHA govern the relationship between shareholders.",
+    "relevance": "Landmark corporate governance case clarifying the relationship between holding companies and their subsidiaries, and the rights of majority shareholders in removal of directors.",
+    "category": "corporate"
+  },
+  {
+    "case_name": "Satyam Computer Services Ltd. - In Re",
+    "citation": "(2009) Comp Cas 313 (CLB)",
+    "court": "Company Law Board / Various Courts",
+    "year": 2009,
+    "principle": "Corporate fraud and governance failures",
+    "summary": "The Satyam scandal exposed massive accounting fraud where promoters manipulated financial statements for years. Led to significant reforms in corporate governance, auditor independence, and regulatory oversight in India.",
+    "relevance": "Triggered reforms in Companies Act 2013 including stricter audit requirements, independent director norms, and enhanced disclosure requirements.",
+    "category": "corporate"
+  },
+  {
+    "case_name": "Reliance Natural Resources Ltd. v. Reliance Industries Ltd.",
+    "citation": "(2010) 7 SCC 1",
+    "court": "Supreme Court of India",
+    "year": 2010,
+    "principle": "Natural gas pricing; Government policy prevails over MoU",
+    "summary": "Private agreements cannot override government policy on pricing of natural resources. The government's pricing policy for natural gas under PSC regime prevails over private MoU between two Reliance companies regarding gas supply.",
+    "relevance": "Clarified that exploitation of natural resources is subject to government policy and private arrangements cannot circumvent public interest in natural resource management.",
+    "category": "corporate"
+  },
+  {
+    "case_name": "Sahara India Real Estate Corporation Ltd. v. SEBI",
+    "citation": "(2012) 10 SCC 603",
+    "court": "Supreme Court of India",
+    "year": 2012,
+    "principle": "SEBI's jurisdiction over unlisted companies; Investor protection",
+    "summary": "SEBI has jurisdiction over issuance of securities by unlisted companies when they make public offers. The Optionally Fully Convertible Debentures issued by Sahara were securities requiring SEBI compliance.",
+    "relevance": "Expanded SEBI's regulatory reach over public offers of securities and strengthened investor protection framework for collective investment schemes.",
+    "category": "corporate"
+  },
+  {
+    "case_name": "Bangalore Water Supply & Sewerage Board v. A. Rajappa",
+    "citation": "AIR 1978 SC 548",
+    "court": "Supreme Court of India",
+    "year": 1978,
+    "principle": "Definition of 'Industry' under Industrial Disputes Act",
+    "summary": "An industry is any systematic activity organized by cooperation between employer and employees for production, supply, or distribution of goods and services to satisfy human wants. The dominant nature test was replaced by the triple test.",
+    "relevance": "Widened the definition of 'industry' significantly, bringing many establishments under the Industrial Disputes Act. The triple test remains the standard for determining if an establishment is an industry.",
+    "category": "labour"
+  },
+  {
+    "case_name": "Workmen of Dimakuchi Tea Estate v. Management of Dimakuchi Tea Estate",
+    "citation": "AIR 1958 SC 353",
+    "court": "Supreme Court of India",
+    "year": 1958,
+    "principle": "Principles of wage fixation",
+    "summary": "In wage fixation, the tribunal should consider factors including the financial capacity of the industry, prevailing wage rates in similar industries, cost of living, and the need to maintain industrial peace.",
+    "relevance": "Established foundational principles for wage determination in industrial adjudication that continue to guide tribunals.",
+    "category": "labour"
+  },
+  {
+    "case_name": "Standard Vacuum Refining Company v. Its Workmen",
+    "citation": "AIR 1961 SC 895",
+    "court": "Supreme Court of India",
+    "year": 1961,
+    "principle": "Bonus as deferred wage",
+    "summary": "Bonus is not a bounty or gratuitous payment but a deferred wage. Workers contribute to the prosperity of the establishment and are entitled to share in the profits in the form of bonus.",
+    "relevance": "Foundation for the Payment of Bonus Act, 1965. Established that bonus is a right and not an ex-gratia payment.",
+    "category": "labour"
+  },
+  {
+    "case_name": "SAIL v. National Union Waterfront Workers",
+    "citation": "(2001) 7 SCC 1",
+    "court": "Supreme Court of India",
+    "year": 2001,
+    "principle": "Contract labour regularization; Abolition not automatic absorption",
+    "summary": "Abolition of contract labour under the Contract Labour Act does not automatically result in absorption of contract workers in the principal employer's establishment. Absorption depends on various factors including availability of posts.",
+    "relevance": "Clarified the rights of contract workers upon abolition of contract labour and limited automatic absorption claims.",
+    "category": "labour"
+  },
+  {
+    "case_name": "Mohori Bibee v. Dharmodas Ghose",
+    "citation": "(1903) 30 IA 114",
+    "court": "Privy Council (Applicable in India)",
+    "year": 1903,
+    "principle": "Minor's agreement is void ab initio",
+    "summary": "An agreement by a minor is absolutely void and not merely voidable. The doctrine of estoppel cannot be applied against a minor. Money advanced to a minor under a void agreement cannot be recovered.",
+    "relevance": "Foundational contract law case establishing that minors lack capacity to contract. Still the leading authority on minor's agreements in India.",
+    "category": "contract"
+  },
+  {
+    "case_name": "Satyabrata Ghose v. Mugneeram Bangur & Co.",
+    "citation": "AIR 1954 SC 44",
+    "court": "Supreme Court of India",
+    "year": 1954,
+    "principle": "Doctrine of frustration under Section 56",
+    "summary": "A contract is frustrated when a supervening event makes its performance impossible or the very foundation of the contract disappears. The impossibility must relate to the substance of the obligation, not merely inconvenience or extra expense.",
+    "relevance": "Leading authority on frustration of contracts under Section 56 of the Indian Contract Act. Distinguishes between physical impossibility and commercial impossibility.",
+    "category": "contract"
+  },
+  {
+    "case_name": "Balfour v. Balfour",
+    "citation": "(1919) 2 KB 571",
+    "court": "Court of Appeal (UK, followed in India)",
+    "year": 1919,
+    "principle": "Domestic agreements lack intention to create legal relations",
+    "summary": "Agreements between husband and wife relating to domestic matters are presumed not to be intended to create legal relations and are not enforceable as contracts.",
+    "relevance": "Followed in India to determine contractual intention in domestic arrangements. The presumption can be rebutted by clear evidence of intention to be bound.",
+    "category": "contract"
+  },
+  {
+    "case_name": "Carlill v. Carbolic Smoke Ball Co.",
+    "citation": "(1893) 1 QB 256",
+    "court": "Court of Appeal (UK, followed in India)",
+    "year": 1893,
+    "principle": "Unilateral offer to the world; Communication of acceptance",
+    "summary": "An offer can be made to the world at large and acceptance is communicated by performing the conditions of the offer. In unilateral contracts, performance itself constitutes acceptance.",
+    "relevance": "Classic contract law case on offer and acceptance, followed extensively in India. Particularly relevant for reward cases and advertisement-based offers.",
+    "category": "contract"
+  },
+  {
+    "case_name": "Central Inland Water Transport Corporation v. Brojo Nath Ganguly",
+    "citation": "AIR 1986 SC 1571",
+    "court": "Supreme Court of India",
+    "year": 1986,
+    "principle": "Unconscionable contracts; Unequal bargaining power",
+    "summary": "A contract or clause may be struck down as unconscionable and opposed to public policy when there is inequality of bargaining power. Article 14 applies to unreasonable and arbitrary contractual terms by the State.",
+    "relevance": "Protection against arbitrary contractual terms in employment and standard form contracts. Extends constitutional protection to contractual relations with the State.",
+    "category": "contract"
+  },
+  {
+    "case_name": "K.K. Verma v. Union of India",
+    "citation": "AIR 1954 Bom 358",
+    "court": "Bombay High Court",
+    "year": 1954,
+    "principle": "Lease vs. License distinction",
+    "summary": "The distinction between lease and license depends on whether exclusive possession is granted. A lease grants an interest in the property while a license merely permits the licensee to do something on the property without conferring any interest.",
+    "relevance": "Fundamental case for distinguishing lease from license. Critical for determining applicability of rent control laws and eviction procedures.",
+    "category": "property"
+  },
+  {
+    "case_name": "Bharat Petroleum Corporation Ltd. v. Great Eastern Shipping Co. Ltd.",
+    "citation": "(2008) 1 SCC 503",
+    "court": "Supreme Court of India",
+    "year": 2008,
+    "principle": "Transfer of Property in movables; Section 19",
+    "summary": "The transfer of property in goods depends on the intention of the parties, ascertained from the contract terms, conduct, and circumstances. The rules in Sale of Goods Act help determine when property passes.",
+    "relevance": "Important for commercial transactions determining when risk and title in goods pass from seller to buyer.",
+    "category": "property"
+  },
+  {
+    "case_name": "Collector of Stamp Revenue v. Arundale",
+    "citation": "(1919) 42 Mad 152",
+    "court": "Madras High Court",
+    "year": 1919,
+    "principle": "Gift vs. Sale; Consideration in property transfers",
+    "summary": "A gift requires voluntary transfer without consideration, while a sale requires consideration. Inadequacy of consideration does not convert a sale into a gift, though it may affect genuineness.",
+    "relevance": "Classic case on distinguishing gift from sale in property transfers, relevant for stamp duty and transfer of property issues.",
+    "category": "property"
+  },
+  {
+    "case_name": "Shreya Singhal v. Union of India",
+    "citation": "(2015) 5 SCC 1",
+    "court": "Supreme Court of India",
+    "year": 2015,
+    "principle": "Section 66A IT Act unconstitutional; Free speech online",
+    "summary": "Section 66A of the Information Technology Act was struck down as unconstitutional for being vague and overbroad, violating Article 19(1)(a). Online speech is entitled to the same protection as offline speech.",
+    "relevance": "Landmark digital rights case protecting free speech online. Section 79 intermediary liability provisions were read down to require actual knowledge of unlawful content.",
+    "category": "cyber"
+  },
+  {
+    "case_name": "Google India Pvt. Ltd. v. Visaka Industries Ltd.",
+    "citation": "(2020) 3 SCC 428",
+    "court": "Supreme Court of India",
+    "year": 2019,
+    "principle": "Intermediary liability and safe harbour",
+    "summary": "Intermediaries enjoy safe harbour protection under Section 79 if they follow due diligence requirements and do not have actual knowledge of the infringing content. The protection is lost if they actively participate in infringement.",
+    "relevance": "Clarified intermediary liability provisions and balance between free speech and protection against defamation in the digital context.",
+    "category": "cyber"
+  },
+  {
+    "case_name": "CIT v. Vodafone International Holdings B.V.",
+    "citation": "(2012) 6 SCC 613",
+    "court": "Supreme Court of India",
+    "year": 2012,
+    "principle": "No tax on offshore indirect transfers",
+    "summary": "Transfer of shares in a foreign company holding Indian assets was not subject to capital gains tax in India. The 'look through' approach of the Revenue to tax indirect transfers was rejected.",
+    "relevance": "Led to retrospective amendment of the Income Tax Act to tax indirect transfers. Foundation case for GAAR and international taxation debates in India.",
+    "category": "tax"
+  },
+  {
+    "case_name": "McDowell & Co. Ltd. v. Commercial Tax Officer",
+    "citation": "(1985) 3 SCC 230",
+    "court": "Supreme Court of India",
+    "year": 1985,
+    "principle": "Tax avoidance schemes liable to be rejected",
+    "summary": "Tax planning may be legitimate, but colorable devices for tax avoidance cannot be part of tax planning. The court will examine the substance of transactions that are designed to avoid tax.",
+    "relevance": "Foundation for anti-avoidance rules in Indian tax law. Distinguished between legitimate tax planning and impermissible avoidance schemes.",
+    "category": "tax"
+  },
+  {
+    "case_name": "Azadi Bachao Andolan v. Union of India",
+    "citation": "(2003) 263 ITR 706 (SC)",
+    "court": "Supreme Court of India",
+    "year": 2003,
+    "principle": "Tax treaty benefits; Mauritius route",
+    "summary": "Treaty shopping by routing investments through Mauritius to avail DTAA benefits was permissible. Taxpayers have the right to arrange their affairs to minimize tax within the framework of law.",
+    "relevance": "Validated the Mauritius route for FDI into India. Later modified by GAAR provisions and renegotiated DTAA with Mauritius.",
+    "category": "tax"
+  },
+  {
+    "case_name": "Mohit Minerals Pvt. Ltd. v. Union of India",
+    "citation": "(2022) 10 SCC 700",
+    "court": "Supreme Court of India",
+    "year": 2022,
+    "principle": "GST Council recommendations not binding",
+    "summary": "Recommendations of the GST Council are not binding on the Union or States. Parliament and State Legislatures retain the power to deviate from GST Council recommendations while enacting legislation.",
+    "relevance": "Clarified the federal nature of GST and the constitutional relationship between the GST Council and legislative bodies.",
+    "category": "tax"
+  },
+  {
+    "case_name": "Indian Council for Enviro-Legal Action v. Union of India",
+    "citation": "AIR 1996 SC 1446",
+    "court": "Supreme Court of India",
+    "year": 1996,
+    "principle": "Polluter Pays Principle",
+    "summary": "Industries responsible for environmental damage must pay for restoration and compensation. The polluter pays principle is part of environmental law in India. The cost includes not just direct damages but also ecological restoration.",
+    "relevance": "Established polluter pays principle in Indian environmental jurisprudence. Applied in numerous cases involving industrial pollution and environmental damage.",
+    "category": "environmental"
+  },
+  {
+    "case_name": "Vellore Citizens Welfare Forum v. Union of India",
+    "citation": "AIR 1996 SC 2715",
+    "court": "Supreme Court of India",
+    "year": 1996,
+    "principle": "Precautionary Principle and Sustainable Development",
+    "summary": "The Precautionary Principle and Polluter Pays Principle are part of Indian environmental law. When there is threat of serious environmental damage, lack of scientific certainty should not be used to postpone preventive measures.",
+    "relevance": "Landmark case establishing precautionary principle and sustainable development as part of Indian law under Article 21 and Article 48A.",
+    "category": "environmental"
+  },
+  {
+    "case_name": "M.C. Mehta v. Union of India (Oleum Gas Leak Case)",
+    "citation": "AIR 1987 SC 1086",
+    "court": "Supreme Court of India",
+    "year": 1987,
+    "principle": "Absolute liability for hazardous industries",
+    "summary": "Enterprises engaged in inherently dangerous activities owe an absolute duty to the community. The principle of strict liability in Rylands v Fletcher was enhanced to absolute liability where enterprise cannot escape by proving due diligence.",
+    "relevance": "Created the principle of absolute liability unique to Indian law. More stringent than strict liability, with no exceptions for hazardous industries.",
+    "category": "environmental"
+  },
+  {
+    "case_name": "M.C. Mehta v. Union of India (Taj Trapezium Case)",
+    "citation": "AIR 1997 SC 734",
+    "court": "Supreme Court of India",
+    "year": 1997,
+    "principle": "Protection of cultural heritage from pollution",
+    "summary": "Industries in the Taj Trapezium Zone causing pollution affecting the Taj Mahal must either relocate or switch to natural gas. The cultural heritage of the nation must be protected from environmental degradation.",
+    "relevance": "Demonstrated the use of PIL for environmental protection of monuments. Led to comprehensive pollution control measures in the Agra region.",
+    "category": "environmental"
+  },
+  {
+    "case_name": "M.C. Mehta v. Union of India (Ganga Pollution Case)",
+    "citation": "AIR 1988 SC 1115",
+    "court": "Supreme Court of India",
+    "year": 1988,
+    "principle": "River pollution control; Effluent treatment mandatory",
+    "summary": "Industries and municipalities discharging effluents into the Ganga must set up effluent treatment plants. The right to clean water is part of the right to life under Article 21.",
+    "relevance": "Led to significant anti-pollution measures along the Ganga. Established the right to clean water as a fundamental right.",
+    "category": "environmental"
+  },
+  {
+    "case_name": "T.N. Godavarman Thirumulpad v. Union of India",
+    "citation": "AIR 1997 SC 1228",
+    "court": "Supreme Court of India",
+    "year": 1997,
+    "principle": "Forest conservation; Expanded definition of forest",
+    "summary": "The word 'forest' in the Forest Conservation Act, 1980 must be understood in its dictionary meaning irrespective of classification in government records. All timber operations in forests require central government approval.",
+    "relevance": "Continuing mandamus case that expanded forest protection significantly. Central Empowered Committee established to monitor forest cases.",
+    "category": "environmental"
+  },
+  {
+    "case_name": "Consumer Education & Research Centre v. Union of India",
+    "citation": "AIR 1995 SC 922",
+    "court": "Supreme Court of India",
+    "year": 1995,
+    "principle": "Worker health and safety as fundamental right",
+    "summary": "The right to health and medical care is a fundamental right under Article 21. Workers in hazardous industries are entitled to health insurance, periodic medical examination, and protection from occupational diseases.",
+    "relevance": "Extended Article 21 to include occupational health rights. Directed comprehensive measures for asbestos workers' protection.",
+    "category": "consumer"
+  },
+  {
+    "case_name": "Indian Medical Association v. V.P. Shantha",
+    "citation": "(1995) 6 SCC 651",
+    "court": "Supreme Court of India",
+    "year": 1995,
+    "principle": "Medical services under Consumer Protection Act",
+    "summary": "Medical services rendered by doctors and hospitals for consideration are 'services' under the Consumer Protection Act. Medical negligence can be adjudicated by consumer forums.",
+    "relevance": "Brought medical profession under consumer protection umbrella. Patients can seek remedy for medical negligence through consumer forums.",
+    "category": "consumer"
+  },
+  {
+    "case_name": "Lucknow Development Authority v. M.K. Gupta",
+    "citation": "(1994) 1 SCC 243",
+    "court": "Supreme Court of India",
+    "year": 1994,
+    "principle": "Housing construction by authority is service",
+    "summary": "Construction and allotment of houses by a statutory body like LDA constitutes 'service' under Consumer Protection Act. Delay in construction and defective construction are deficiencies in service.",
+    "relevance": "Extended consumer protection to real estate sector involving statutory authorities. Established accountability of development authorities to allottees.",
+    "category": "consumer"
+  },
+  {
+    "case_name": "Nandini Satpathy v. P.L. Dani",
+    "citation": "AIR 1978 SC 1025",
+    "court": "Supreme Court of India",
+    "year": 1978,
+    "principle": "Right against self-incrimination; Article 20(3)",
+    "summary": "The protection against self-incrimination under Article 20(3) extends to all stages of the process, not just the trial. A person cannot be compelled to answer questions that have a tendency to incriminate.",
+    "relevance": "Expanded the scope of Article 20(3) protection. Important for custodial interrogations and the rights of accused persons.",
+    "category": "criminal"
+  },
+  {
+    "case_name": "State of M.P. v. Shyamsunder Trivedi",
+    "citation": "(1995) 4 SCC 262",
+    "court": "Supreme Court of India",
+    "year": 1995,
+    "principle": "Last seen theory in circumstantial evidence",
+    "summary": "When the accused was last seen with the deceased and the deceased is thereafter found dead, the accused must explain the circumstances. The last seen theory creates a strong circumstantial link.",
+    "relevance": "Important case on circumstantial evidence in murder cases. The last seen doctrine continues to be applied in cases where direct evidence is unavailable.",
+    "category": "criminal"
+  },
+  {
+    "case_name": "Kedar Nath Singh v. State of Bihar",
+    "citation": "AIR 1962 SC 955",
+    "court": "Supreme Court of India",
+    "year": 1962,
+    "principle": "Sedition requires incitement to violence",
+    "summary": "Section 124A IPC (sedition) is constitutionally valid but must be strictly construed. Mere criticism of government does not constitute sedition unless it has a tendency to incite violence or create public disorder.",
+    "relevance": "Limited the scope of sedition law to prevent misuse against political dissent. The requirement of tendency to incite violence remains the test.",
+    "category": "constitutional"
+  },
+  {
+    "case_name": "Joseph Shine v. Union of India",
+    "citation": "(2019) 3 SCC 39",
+    "court": "Supreme Court of India",
+    "year": 2018,
+    "principle": "Section 497 IPC (Adultery) unconstitutional",
+    "summary": "Section 497 IPC treating only men as offenders for adultery was struck down as violating Articles 14, 15, and 21. Adultery may be a ground for civil consequences but cannot be a criminal offense as it violates dignity and privacy.",
+    "relevance": "Decriminalized adultery and recognized women's autonomy and agency in marriage. Rejected the patriarchal notion of women as property of husbands.",
+    "category": "constitutional"
+  },
+  {
+    "case_name": "Arnesh Kumar v. State of Bihar",
+    "citation": "(2014) 8 SCC 273",
+    "court": "Supreme Court of India",
+    "year": 2014,
+    "principle": "Guidelines for arrest under Section 498A IPC",
+    "summary": "Arrest in Section 498A cases should not be automatic. Police must satisfy themselves about the necessity of arrest. Magistrates must be satisfied that arrest was necessary before authorizing detention.",
+    "relevance": "Addressed concerns about misuse of dowry harassment provisions. Established procedural safeguards before arrest in matrimonial cases.",
+    "category": "criminal"
+  },
+  {
+    "case_name": "Common Cause v. Union of India (Euthanasia Case)",
+    "citation": "(2018) 5 SCC 1",
+    "court": "Supreme Court of India",
+    "year": 2018,
+    "principle": "Right to die with dignity; Passive euthanasia",
+    "summary": "Right to die with dignity is part of Article 21. Passive euthanasia and advance medical directives (living wills) are permissible. Active euthanasia and assisted suicide remain prohibited.",
+    "relevance": "Legalized passive euthanasia and recognized living wills. Provided detailed guidelines for withdrawal of life support in terminal cases.",
+    "category": "constitutional"
+  },
+  {
+    "case_name": "Subhash Kashinath Mahajan v. State of Maharashtra",
+    "citation": "(2018) 6 SCC 454",
+    "court": "Supreme Court of India",
+    "year": 2018,
+    "principle": "Safeguards in SC/ST Act cases (later restored)",
+    "summary": "Imposed procedural safeguards for arrests under the SC/ST Prevention of Atrocities Act including preliminary inquiry and approval of senior officer. This judgment was later nullified by an amendment to the Act.",
+    "relevance": "Highlighted tension between protection against caste atrocities and concerns about misuse. Led to significant political controversy and legislative response.",
+    "category": "criminal"
+  },
+  {
+    "case_name": "Secretary, Ministry of Defence v. Babita Puniya",
+    "citation": "(2020) 7 SCC 469",
+    "court": "Supreme Court of India",
+    "year": 2020,
+    "principle": "Permanent commission for women in armed forces",
+    "summary": "Women officers in the Indian Army are entitled to permanent commission on par with male officers. Denial of permanent commission to women based on gender is discriminatory and violates Articles 14 and 16.",
+    "relevance": "Advanced gender equality in armed forces. Rejected stereotypical notions about women's capabilities in military service.",
+    "category": "constitutional"
+  },
+  {
+    "case_name": "M. Nagaraj v. Union of India",
+    "citation": "(2006) 8 SCC 212",
+    "court": "Supreme Court of India",
+    "year": 2006,
+    "principle": "Reservations in promotions constitutional with conditions",
+    "summary": "Reservation in promotions for SC/ST is constitutionally permissible if the State demonstrates backwardness, inadequate representation, and maintenance of administrative efficiency. The enabling provisions are valid but data-based.",
+    "relevance": "Upheld reservations in promotions with conditions. Led to constitutional amendment (103rd) enabling quota in promotions based on quantifiable data.",
+    "category": "constitutional"
+  },
+  {
+    "case_name": "Shayara Bano v. Union of India",
+    "citation": "(2017) 9 SCC 1",
+    "court": "Supreme Court of India",
+    "year": 2017,
+    "principle": "Triple talaq unconstitutional",
+    "summary": "Instant triple talaq (talaq-e-biddat) is unconstitutional as it is arbitrary and violates Article 14. The practice was not an integral part of religious practice entitled to protection under Article 25.",
+    "relevance": "Major reform in Muslim personal law. Led to the Muslim Women (Protection of Rights on Marriage) Act, 2019 criminalizing instant triple talaq.",
+    "category": "constitutional"
+  },
+  {
+    "case_name": "Puttaswamy v. Union of India (Aadhaar Case)",
+    "citation": "(2019) 1 SCC 1",
+    "court": "Supreme Court of India",
+    "year": 2018,
+    "principle": "Aadhaar validity with restrictions",
+    "summary": "Aadhaar Act is constitutional but Section 57 allowing private entities to use Aadhaar was struck down. Aadhaar cannot be mandatory for bank accounts, mobile phones, or school admissions but is valid for welfare schemes and tax returns.",
+    "relevance": "Balanced state interest in preventing fraud with individual privacy rights. Set limits on Aadhaar's use while validating its core welfare function.",
+    "category": "constitutional"
+  },
+  {
+    "case_name": "Romila Thapar v. Union of India",
+    "citation": "(2018) 10 SCC 753",
+    "court": "Supreme Court of India",
+    "year": 2018,
+    "principle": "No SIT for Bhima Koregaon case",
+    "summary": "Declined to constitute SIT for investigating Bhima Koregaon case arrests, trusting the investigating agency. Dissent emphasized the right of dissent in democracy and need for independent investigation.",
+    "relevance": "Justice Chandrachud's dissent on dissent being the 'safety valve of democracy' became significant. Raised questions about investigative independence.",
+    "category": "criminal"
   }
 ]

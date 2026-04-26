@@ -22,7 +22,6 @@ import {
   AlertCircle,
   ArrowLeft,
   CheckCircle2,
-  IndianRupee,
   FileText,
   Download,
   Copy,
@@ -32,6 +31,16 @@ import {
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { templatesApi, type TemplateDetail } from "@/lib/api";
+
+interface TemplateGenerateResult {
+  success: boolean;
+  message: string;
+  template_id: string;
+  data: Record<string, unknown>;
+  status: string;
+  document_content?: string;
+  download_url?: string;
+}
 
 export default function TemplateFormPage({
   params,
@@ -45,7 +54,7 @@ export default function TemplateFormPage({
   const [formData, setFormData] = useState<Record<string, unknown>>({});
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [generateResult, setGenerateResult] = useState<Record<string, unknown> | null>(null);
+  const [generateResult, setGenerateResult] = useState<TemplateGenerateResult | null>(null);
   const [copied, setCopied] = useState(false);
   const [showPreview, setShowPreview] = useState(true);
 
@@ -409,9 +418,9 @@ export default function TemplateFormPage({
                     <p className="text-muted-foreground mb-6">
                       Your {template.name} has been generated.
                     </p>
-                    {generateResult.download_url && (
+                    {Boolean(generateResult.download_url) && (
                       <Button className="w-full max-w-xs gap-2" asChild>
-                        <a href={String(generateResult.download_url)} download>
+                        <a href={generateResult.download_url} download>
                           <Download className="h-4 w-4" />
                           Download Document
                         </a>
@@ -474,13 +483,12 @@ export default function TemplateFormPage({
                       <span className="text-sm text-muted-foreground">
                         {template.estimated_time}
                       </span>
-                      <span className="flex items-center gap-1 text-sm font-medium text-foreground">
-                        <IndianRupee className="h-3.5 w-3.5" />
-                        {template.price.toLocaleString("en-IN")}
-                      </span>
                       <span className="text-sm text-muted-foreground">
                         {template.fields.length} fields
                       </span>
+                      <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">
+                        Free
+                      </Badge>
                     </div>
                   </div>
                 </div>

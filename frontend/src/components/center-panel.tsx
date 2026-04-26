@@ -24,18 +24,18 @@ interface ActionCard {
 const actionCards: ActionCard[] = [
   {
     icon: Search,
-    title: "Research Case Law",
-    description: "Search Supreme Court, High Courts & Tribunal judgments",
-  },
-  {
-    icon: FileText,
-    title: "Draft Document",
-    description: "Create legal notices, petitions, contracts & opinions",
+    title: "Ask A Question",
+    description: "Start with grounded legal research in plain English",
   },
   {
     icon: FileSearch,
-    title: "Analyze Document",
-    description: "Extract key points, risks & obligations from documents",
+    title: "Inspect Sources",
+    description: "Open statutes, sections, and case-law summaries behind the answer",
+  },
+  {
+    icon: FileText,
+    title: "Route To Workflow",
+    description: "Move to drafting or compliance only after the research question is clear",
   },
 ];
 
@@ -115,7 +115,7 @@ export function CenterPanel({
               <span className="text-primary/80">{greeting} Shankar,</span>
             </h1>
             <h2 className="mt-2 text-4xl font-bold tracking-tight text-foreground/80">
-              How can I help you today?
+              What legal question do you want to research?
             </h2>
           </div>
 
@@ -145,7 +145,7 @@ export function CenterPanel({
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask a legal question, search for cases, or describe a document you need..."
+              placeholder="Ask a legal question, statute lookup, or compliance query..."
               className="min-h-[100px] resize-none border-0 bg-transparent p-0 text-[16px] placeholder:text-muted-foreground/60 focus-visible:ring-0"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
@@ -181,7 +181,7 @@ export function CenterPanel({
           {/* Security notice */}
           <div className="mt-4 flex items-center justify-center gap-2 text-sm text-primary">
             <ShieldCheck className="h-4 w-4" />
-            <span>All chats are confidential and encrypted</span>
+            <span>Research threads stay confidential and encrypted</span>
           </div>
         </div>
       </div>

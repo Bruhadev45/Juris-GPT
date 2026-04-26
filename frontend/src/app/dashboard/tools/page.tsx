@@ -3,8 +3,6 @@
 import Link from "next/link";
 import {
   Calculator,
-  Newspaper,
-  ScrollText,
   FolderOpen,
   CalendarDays,
   BookOpen,
@@ -22,22 +20,6 @@ const tools = [
     href: "/dashboard/calculator",
     color: "bg-primary/10 text-primary",
     badge: "6 Calculators",
-  },
-  {
-    title: "RTI Assistant",
-    description: "Generate Right to Information applications with a step-by-step wizard. Supports 16 government departments.",
-    icon: ScrollText,
-    href: "/dashboard/rti",
-    color: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
-    badge: "AI Powered",
-  },
-  {
-    title: "Legal News",
-    description: "Stay updated with the latest legal developments across Supreme Court, High Courts, SEBI, RBI, and more.",
-    icon: Newspaper,
-    href: "/dashboard/news",
-    color: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
-    badge: "Live Feed",
   },
   {
     title: "Case Law Browser",
@@ -71,9 +53,9 @@ export default function ToolsPage() {
       {/* Header */}
       <header className="bg-card border-b border-border px-6 py-4 flex-shrink-0">
         <div>
-          <h1 className="text-xl font-semibold text-foreground">Tools</h1>
+          <h1 className="text-xl font-semibold text-foreground">Research Utilities</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Quick task-based utilities that support legal decision-making
+            Supporting utilities you use after research, citation review, and source inspection
           </p>
         </div>
       </header>
@@ -163,11 +145,11 @@ export default function ToolsPage() {
               <div>
                 <h3 className="font-semibold text-foreground">Need help choosing?</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Not sure which tool to use? Ask the{" "}
+                  Not sure which workflow to open? Ask the{" "}
                   <Link href="/dashboard/chat" className="text-primary hover:underline font-medium">
-                    AI Lawyer
+                    Legal Assistant
                   </Link>{" "}
-                  and it will guide you to the right tool for your legal task.
+                  first and use these utilities once the research question is clear.
                 </p>
               </div>
             </CardContent>

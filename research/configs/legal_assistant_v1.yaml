@@ -1,0 +1,33 @@
+# JurisGPT Research Configuration
+# Version: 1.0
+
+corpus_version: "2024-03"
+embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+chunk_size: 1000
+chunk_overlap: 200
+retriever_top_k: 5
+reranker_enabled: false
+llm_model: "gpt-4o-mini"
+llm_temperature: 0.3
+prompt_version: "v2.0"
+
+# Confidence thresholds
+confidence:
+  high_threshold: 0.85
+  medium_threshold: 0.70
+  low_threshold: 0.50
+  min_high_relevance_citations: 2
+
+# Vector store settings
+vector_store:
+  type: "chroma"
+  persist_directory: "vectors/chroma_db"
+  collection_name: "jurisgpt_legal"
+
+# Evaluation targets
+evaluation:
+  retrieval_recall_at_5: 0.80
+  citation_precision: 0.90
+  hallucination_rate: 0.05
+  response_latency_p95_ms: 3000
+  groundedness_score: 0.85

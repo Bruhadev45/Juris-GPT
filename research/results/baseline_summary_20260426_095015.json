@@ -1,0 +1,50 @@
+{
+  "timestamp": "2026-04-26T09:50:15.212498+00:00",
+  "methodology_note": "These are automatic retrieval/RAG metrics. Do not present them as human legal correctness or hallucination labels.",
+  "variants": [
+    {
+      "variant": "lexical",
+      "queries": 10,
+      "recall_at_5": 0.9,
+      "precision_at_5": 0.88,
+      "mrr": 0.8583,
+      "ndcg_at_5": 0.7242,
+      "groundedness_rate": 1.0,
+      "hallucination_proxy_rate": 0.0,
+      "avg_response_time": 0.01,
+      "rag_config": {
+        "vector_store": "lexical",
+        "llm_type": "none",
+        "hybrid_search": false,
+        "use_reranker": false,
+        "corpus_size": 393,
+        "corpus_source": "local",
+        "corpus_doc_types": {
+          "case": 62,
+          "clause": 4,
+          "compliance": 41,
+          "faq": 60,
+          "news": 25,
+          "statute": 201
+        },
+        "loaded_corpus_files": [
+          "companies_act_sections.json",
+          "patent_act_sections.json",
+          "trademark_act_sections.json",
+          "income_tax_act_sections.json",
+          "gst_act_sections.json",
+          "consumer_protection_act_sections.json",
+          "industrial_disputes_act_sections.json",
+          "sebi_regulations_sections.json",
+          "shops_establishments_act_sections.json",
+          "case_summaries.json",
+          "legal_faqs.json",
+          "founder_agreement_clauses.json",
+          "compliance_deadlines.json",
+          "legal_news.json"
+        ],
+        "cloud_error": null
+      }
+    }
+  ]
+}

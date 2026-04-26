@@ -50,6 +50,8 @@ interface ChatContextValue {
   switchConversation: (id: string) => void;
   addMessage: (message: ChatMessage) => void;
   deleteConversation: (id: string) => void;
+  renameConversation: (id: string, newTitle: string) => void;
+  clearAllConversations: () => void;
 }
 
 const ChatContext = createContext<ChatContextValue | null>(null);
@@ -93,18 +95,22 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const addMessage = useCallback((message: ChatMessage) => {
     setState((prev) => {
       if (prev.activeConversationId) {
-        // Add to existing conversation
+        // Upsert: update existing message by ID, or append if new
         return {
           ...prev,
-          conversations: prev.conversations.map((conv) =>
-            conv.id === prev.activeConversationId
-              ? {
-                  ...conv,
-                  messages: [...conv.messages, message],
-                  updatedAt: new Date().toISOString(),
-                }
-              : conv
-          ),
+          conversations: prev.conversations.map((conv) => {
+            if (conv.id !== prev.activeConversationId) return conv;
+            const existingIdx = conv.messages.findIndex((m) => m.id === message.id);
+            const updatedMessages =
+              existingIdx >= 0
+                ? conv.messages.map((m, i) => (i === existingIdx ? message : m))
+                : [...conv.messages, message];
+            return {
+              ...conv,
+              messages: updatedMessages,
+              updatedAt: new Date().toISOString(),
+            };
+          }),
         };
       } else {
         // Create new conversation with this message
@@ -136,6 +142,24 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
+  const renameConversation = useCallback((id: string, newTitle: string) => {
+    setState((prev) => ({
+      ...prev,
+      conversations: prev.conversations.map((conv) =>
+        conv.id === id
+          ? { ...conv, title: newTitle, updatedAt: new Date().toISOString() }
+          : conv
+      ),
+    }));
+  }, []);
+
+  const clearAllConversations = useCallback(() => {
+    setState({
+      conversations: [],
+      activeConversationId: null,
+    });
+  }, []);
+
   const value = useMemo<ChatContextValue>(
     () => ({
       conversations: state.conversations,
@@ -146,6 +170,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       switchConversation,
       addMessage,
       deleteConversation,
+      renameConversation,
+      clearAllConversations,
     }),
     [
       state.conversations,
@@ -156,6 +182,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       switchConversation,
       addMessage,
       deleteConversation,
+      renameConversation,
+      clearAllConversations,
     ]
   );
 

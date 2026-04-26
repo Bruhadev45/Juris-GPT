@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 import json
 import uuid
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 from pathlib import Path
 
 router = APIRouter()
@@ -183,7 +183,7 @@ async def generate_rti(req: RTIGenerateRequest):
         "fee_mode": req.fee_mode,
         "is_bpl": req.is_bpl,
         "application_text": application_text,
-        "generated_at": datetime.utcnow().isoformat(),
+        "generated_at": datetime.now(timezone.utc).isoformat(),
         "status": "draft",
     }
 

@@ -32,7 +32,7 @@
 11. [Services Layer (`services/`)](#11-services-layer-services)
     - 11.1 [AI Analyzer Service](#111-ai-analyzer-service)
     - 11.2 [AI Document Generator Service](#112-ai-document-generator-service)
-    - 11.3 [Chatbot Service (NyayaSetu)](#113-chatbot-service-nyayasetu)
+    - 11.3 [Chatbot Service (JurisGPT)](#113-chatbot-service-jurisgpt)
     - 11.4 [Document Service](#114-document-service)
     - 11.5 [Email Service](#115-email-service)
 12. [Utility Functions (`utils/`)](#12-utility-functions-utils)
@@ -50,7 +50,7 @@
 
 - **AI-powered legal document generation** (Founder Agreements, NDAs, Employment Contracts, etc.)
 - **Smart contract analysis** with clause-by-clause risk assessment
-- **Legal chatbot (NyayaSetu)** for real-time legal Q&A using RAG (Retrieval-Augmented Generation)
+- **Legal chatbot (JurisGPT)** for real-time legal Q&A using RAG (Retrieval-Augmented Generation)
 - **Compliance tracking** with deadline management and AI risk assessments
 - **RTI (Right to Information) application generation** for Indian government departments
 - **Legal news aggregation** with AI-generated summaries
@@ -141,7 +141,7 @@ backend/
 │   │   ├── documents.py       # Document generation & download
 │   │   ├── admin.py           # Lawyer review admin panel
 │   │   ├── auth.py            # Authentication (currently disabled)
-│   │   ├── chatbot.py         # NyayaSetu AI chatbot
+│   │   ├── chatbot.py         # JurisGPT AI chatbot
 │   │   ├── legal_data.py      # Indian law search & case database
 │   │   ├── compliance.py      # Compliance deadline tracker
 │   │   ├── templates.py       # Legal document templates
@@ -160,7 +160,7 @@ backend/
 │   │   ├── __init__.py        # Package initializer
 │   │   ├── ai_analyzer.py     # GPT-4o contract analysis engine
 │   │   ├── ai_generator.py    # GPT-4o document generation
-│   │   ├── chatbot_service.py # NyayaSetu chatbot with RAG
+│   │   ├── chatbot_service.py # JurisGPT chatbot with RAG
 │   │   ├── document_service.py# Markdown-to-DOCX conversion & storage
 │   │   └── email_service.py   # Transactional email via Resend
 │   │
@@ -595,7 +595,7 @@ The backend exposes **18 route modules** with **50+ endpoints** organized by fea
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/chat/message` | Send a message to NyayaSetu chatbot |
+| `POST` | `/api/chat/message` | Send a message to JurisGPT chatbot |
 | `POST` | `/api/chat/document-assistance` | Get AI help for document generation |
 | `GET` | `/api/chat/suggestions` | Get initial conversation suggestions |
 | `GET` | `/api/chat/status` | Check chatbot and RAG pipeline status |
@@ -953,14 +953,14 @@ def generate_founder_agreement(
 
 ---
 
-### 11.3 Chatbot Service — NyayaSetu (`chatbot_service.py`)
+### 11.3 Chatbot Service — JurisGPT (`chatbot_service.py`)
 
-The chatbot service implements the **NyayaSetu** AI legal assistant.
+The chatbot service implements the **JurisGPT** AI legal assistant.
 
 **Architecture:**
 
 ```
-NyayaSetuChatbotService (Singleton)
+JurisGPTChatbotService (Singleton)
 │
 ├── _lazy_init() ──→ Tries to load RAG pipeline
 │
@@ -976,7 +976,7 @@ NyayaSetuChatbotService (Singleton)
 ```
 
 **RAG Pipeline Integration:**
-- Attempts to import `NyayaSetuRAG` from the data directory
+- Attempts to import `JurisGPTRAG` from the data directory
 - If the vector store is built, it retrieves relevant Indian law documents
 - Enhances queries with user context (company name, founders, matter type)
 - Returns responses with **source citations** and relevance scores
@@ -1131,7 +1131,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 | 10 | `GET` | `/api/admin/reviews/pending` | Pending reviews |
 | 11 | `POST` | `/api/admin/reviews/{id}/approve` | Approve review |
 | 12 | `POST` | `/api/admin/reviews/{id}/request-changes` | Request changes |
-| 13 | `POST` | `/api/chat/message` | Chat with NyayaSetu |
+| 13 | `POST` | `/api/chat/message` | Chat with JurisGPT |
 | 14 | `POST` | `/api/chat/document-assistance` | Document help |
 | 15 | `GET` | `/api/chat/suggestions` | Chat suggestions |
 | 16 | `GET` | `/api/chat/status` | Chatbot status |
@@ -1252,7 +1252,7 @@ POST /api/analyzer/{id}/analyze
 GET /api/analyzer/{id} ──→ Return full analysis
 ```
 
-### Chatbot (NyayaSetu) Flow
+### Chatbot (JurisGPT) Flow
 
 ```
 User Message
