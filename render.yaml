@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: jurisgpt-backend
+    env: python
+    region: oregon
+    plan: free
+    rootDir: backend
+
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: OPENAI_API_KEY
+        scope: build,runtime
+        sync: false
+      - key: JWT_SECRET
+        scope: build,runtime
+        sync: false
+      - key: DO_SPACES_KEY
+        scope: build,runtime
+        sync: false
+      - key: DO_SPACES_SECRET
+        scope: build,runtime
+        sync: false
+      - key: DO_SPACES_REGION
+        value: sgp1
+      - key: DO_SPACES_BUCKET
+        value: jurisgpt-data
+      - key: SUPABASE_URL
+        value: https://placeholder.supabase.co
+      - key: SUPABASE_SERVICE_KEY
+        scope: build,runtime
+        sync: false
