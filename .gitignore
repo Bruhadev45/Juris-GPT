@@ -83,3 +83,7 @@ __pycache__/
 # Cloud storage config (contains credentials)
 data/cloud_config.json
 cloud_config.json
+
+# Model files (too large for GitHub)
+*.gguf
+backend/models/*.gguf
