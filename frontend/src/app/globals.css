@@ -78,16 +78,15 @@
   --chart-3: #4A6B5C;
   --chart-4: #5C7A8A;
   --chart-5: #1A1A1A;
-  /* Sidebar — burgundy panel on every dashboard page so the brand is always
-     visible. Uses cream/gold text for contrast. */
-  --sidebar: #5C1622;
-  --sidebar-foreground: rgba(250, 246, 239, 0.78);
-  --sidebar-primary: #B8884D;
-  --sidebar-primary-foreground: #0A0A0A;
-  --sidebar-accent: rgba(184, 136, 77, 0.15);
-  --sidebar-accent-foreground: #FAF6EF;
-  --sidebar-border: rgba(184, 136, 77, 0.18);
-  --sidebar-ring: #B8884D;
+  /* Sidebar — cream/light panel (reverted from burgundy after user feedback). */
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #6B6B6B;
+  --sidebar-primary: #0A0A0A;
+  --sidebar-primary-foreground: #FAF6EF;
+  --sidebar-accent: #F4EFE5;
+  --sidebar-accent-foreground: #0A0A0A;
+  --sidebar-border: #E8E2D5;
+  --sidebar-ring: #7B1E2E;
   --burgundy: #7B1E2E;
   --gold: #B8884D;
   --sage: #4A6B5C;
