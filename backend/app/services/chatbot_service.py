@@ -106,6 +106,16 @@ class JurisGPTChatbotService:
 
         self._init_attempted = True
 
+        # Free-tier escape hatch: if DISABLE_RAG=true the chatbot answers
+        # via direct LLM calls without retrieving from the local corpus.
+        # Set this on Render free tier (512 MB) to avoid OOM from torch +
+        # transformers + sentence-transformers loading. Higher-RAM instances
+        # (Render Standard, 2GB+) should leave it unset.
+        if os.getenv("DISABLE_RAG", "").lower() in ("1", "true", "yes"):
+            self._initialization_error = "RAG disabled via DISABLE_RAG env var"
+            print("RAG disabled — chat will answer via LLM only (no citations)")
+            return
+
         try:
             # Dynamic import without sys.path pollution
             rag_pipeline_path = DATA_DIR / "rag_pipeline.py"

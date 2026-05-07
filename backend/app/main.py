@@ -40,34 +40,6 @@ from app.middleware.rate_limiter import RateLimitMiddleware
 from app.middleware.audit_logger import AuditLogMiddleware
 from app.middleware.csrf import CSRFMiddleware, csrf_router
 
-async def _preload_models() -> None:
-    """Pre-load the embedding model so the first chat request doesn't pay
-    model-download + load latency (5-10 s on Render free tier).
-
-    Runs in a thread so it doesn't block the FastAPI startup probe — which
-    matters because Render kills the worker if it doesn't bind a port within
-    its health-check timeout. The chatbot service uses a lazy_init pattern,
-    and we just trigger it eagerly here.
-    """
-    import asyncio
-    try:
-        from app.services.chatbot_service import chatbot_service
-    except Exception as e:
-        logger.warning("Could not import chatbot_service for preload: %s", e)
-        return
-
-    # Hand off the heavy import + first-load to a thread so the event loop
-    # stays responsive (uvicorn can bind the port while this warms up).
-    def _warm():
-        try:
-            chatbot_service._lazy_init()
-            logger.info("RAG/embedding model preloaded")
-        except Exception as e:
-            logger.warning("Model preload failed (chat will lazy-load instead): %s", e)
-
-    asyncio.create_task(asyncio.to_thread(_warm))
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # ── startup ──
@@ -80,8 +52,11 @@ async def lifespan(app: FastAPI):
         logger.error(msg)
         raise RuntimeError(msg)
 
-    # Fire-and-forget model preload — first chat request avoids the cold load.
-    await _preload_models()
+    # We deliberately don't preload the RAG model here on free-tier deployments
+    # — the embedding model + torch easily push the worker over Render's
+    # 512 MB limit and trigger OOM restarts. Lazy-loading on first chat is
+    # slower for the first user but stable. Set DISABLE_RAG=true to skip it
+    # entirely and answer via LLM only.
 
     logger.info("API ready to accept requests")
     yield
