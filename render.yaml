@@ -17,6 +17,13 @@ services:
       - key: ENVIRONMENT
         value: production
 
+      # === RAG embedding model ===
+      # Render free has 512 MB RAM — InLegalBERT (~700 MB) will OOM-kill the
+      # worker on first chat. Use MiniLM (~80 MB) on free tier; switch back to
+      # `law-ai/InLegalBERT` once you're on Standard ($25/mo, 2 GB RAM).
+      - key: EMBEDDING_MODEL
+        value: sentence-transformers/all-MiniLM-L6-v2
+
       # === Auth — ALL required ===
       - key: JWT_SECRET
         sync: false          # set in dashboard; required at startup in production
