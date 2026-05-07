@@ -91,3 +91,4 @@ backend/models/*.gguf
 .render-secrets.txt
 .vercel-api-token
 .render-api-key
+.clerk-keys.txt

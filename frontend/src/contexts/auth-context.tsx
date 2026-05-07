@@ -1,5 +1,14 @@
 "use client";
 
+/**
+ * Auth context — thin adapter over Clerk so the rest of the app keeps using
+ * a single `useAuth()` interface.
+ *
+ * What changed: when the project moved to Clerk we kept this module instead
+ * of deleting it so dashboard/sidebar callers like `useAuth().logout()` and
+ * `useAuth().user.full_name` keep working without per-component edits.
+ */
+
 import {
   createContext,
   useCallback,
@@ -9,16 +18,15 @@ import {
   useRef,
   useState,
 } from "react";
+import {
+  useUser as useClerkUser,
+  useAuth as useClerkAuth,
+  useClerk,
+} from "@clerk/nextjs";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const TOKEN_STORAGE_KEY = "jurisgpt.access_token";
-
-// Marker cookie read by `src/middleware.ts` to gate /dashboard/* etc. The
-// cookie holds NO secrets — the actual JWT stays in localStorage and is sent
-// via Authorization header. This is purely a soft signal so the edge runtime
-// (which can't read localStorage) can redirect to /login fast.
 const SESSION_COOKIE_NAME = "jurisgpt_session_active";
-const SESSION_COOKIE_MAX_AGE = 60 * 60; // 1 hour, matches JWT lifetime
+const SESSION_COOKIE_MAX_AGE = 60 * 60;
 
 export interface AuthUser {
   id: string;
@@ -31,196 +39,147 @@ export interface AuthUser {
   created_at: string;
 }
 
-export interface SignupRequest {
-  email: string;
-  password: string;
-  full_name: string;
-  company_name?: string;
-  phone?: string;
-}
-
 interface AuthContextValue {
   user: AuthUser | null;
   token: string | null;
   status: "loading" | "authenticated" | "anonymous";
-  login(email: string, password: string): Promise<AuthUser>;
-  signup(input: SignupRequest): Promise<AuthUser>;
   logout(): void;
   refresh(): Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-interface TokenResponse {
-  access_token: string;
-  token_type: string;
-  expires_in: number;
-  user: AuthUser;
-}
-
-function readToken(): string | null {
-  if (typeof window === "undefined") return null;
-  try {
-    return window.localStorage.getItem(TOKEN_STORAGE_KEY);
-  } catch {
-    return null;
-  }
-}
-
-function writeToken(value: string | null): void {
-  if (typeof window === "undefined") return;
-  try {
-    if (value) {
-      window.localStorage.setItem(TOKEN_STORAGE_KEY, value);
-    } else {
-      window.localStorage.removeItem(TOKEN_STORAGE_KEY);
-    }
-  } catch {
-    // Storage can be disabled (private mode, quotas) — fall through.
-  }
-  syncSessionCookie(value !== null);
-}
-
 function syncSessionCookie(active: boolean): void {
   if (typeof document === "undefined") return;
   const secureFlag = window.location.protocol === "https:" ? "; secure" : "";
-  if (active) {
-    document.cookie = `${SESSION_COOKIE_NAME}=1; path=/; max-age=${SESSION_COOKIE_MAX_AGE}; samesite=lax${secureFlag}`;
-  } else {
-    document.cookie = `${SESSION_COOKIE_NAME}=; path=/; max-age=0; samesite=lax${secureFlag}`;
-  }
+  document.cookie = `${SESSION_COOKIE_NAME}=${active ? "1" : ""}; path=/; max-age=${active ? SESSION_COOKIE_MAX_AGE : 0}; samesite=lax${secureFlag}`;
 }
 
-async function readJsonError(response: Response): Promise<string> {
+function writeToken(token: string | null): void {
+  if (typeof window === "undefined") return;
   try {
-    const body = (await response.json()) as { detail?: string; message?: string };
-    return body.detail || body.message || response.statusText || "Request failed";
+    if (token) window.localStorage.setItem(TOKEN_STORAGE_KEY, token);
+    else window.localStorage.removeItem(TOKEN_STORAGE_KEY);
   } catch {
-    return response.statusText || "Request failed";
+    // localStorage may be disabled (private mode).
   }
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const clerk = useClerk();
+  const clerkUser = useClerkUser();
+  const clerkAuth = useClerkAuth();
+
   const [token, setToken] = useState<string | null>(null);
   const [status, setStatus] = useState<AuthContextValue["status"]>("loading");
+  const lastTokenRefresh = useRef(0);
 
-  // Track whether we've finished the initial /me probe so we don't flip
-  // status to anonymous before the request returns.
-  const bootstrapped = useRef(false);
+  // Build a JurisGPT-shaped user object from Clerk's user resource.
+  const user = useMemo<AuthUser | null>(() => {
+    if (!clerkUser.isLoaded || !clerkUser.user) return null;
+    const u = clerkUser.user;
+    const email = u.primaryEmailAddress?.emailAddress ?? "";
+    return {
+      id: u.id,
+      email,
+      full_name:
+        [u.firstName, u.lastName].filter(Boolean).join(" ").trim() ||
+        u.username ||
+        email,
+      company_name: (u.publicMetadata?.company_name as string | undefined) ?? null,
+      phone: u.primaryPhoneNumber?.phoneNumber ?? null,
+      role: (u.publicMetadata?.role as string | undefined) ?? "user",
+      is_verified: u.primaryEmailAddress?.verification?.status === "verified",
+      created_at:
+        typeof u.createdAt === "string"
+          ? u.createdAt
+          : (u.createdAt as Date | undefined)?.toISOString?.() ?? new Date().toISOString(),
+    };
+  }, [clerkUser.isLoaded, clerkUser.user]);
 
-  const fetchMe = useCallback(async (accessToken: string): Promise<AuthUser | null> => {
-    try {
-      const response = await fetch(`${API_URL}/api/auth/me`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-      if (!response.ok) return null;
-      return (await response.json()) as AuthUser;
-    } catch {
-      return null;
-    }
-  }, []);
-
-  // On mount: if we have a stored token, verify it via /me.
+  // Sync Clerk session token into localStorage + marker cookie so api.ts and
+  // edge middleware can read auth state without depending on Clerk hooks.
   useEffect(() => {
-    if (bootstrapped.current) return;
-    bootstrapped.current = true;
-
-    const stored = readToken();
-    if (!stored) {
+    if (!clerkAuth.isLoaded) {
+      setStatus("loading");
+      return;
+    }
+    if (!clerkAuth.isSignedIn) {
+      writeToken(null);
+      syncSessionCookie(false);
+      setToken(null);
       setStatus("anonymous");
       return;
     }
-
-    setToken(stored);
-    // Cookie may have expired even if localStorage still has a token; refresh it.
-    syncSessionCookie(true);
-    fetchMe(stored).then((me) => {
-      if (me) {
-        setUser(me);
-        setStatus("authenticated");
-      } else {
-        // Token rejected — clear it so the user gets a clean re-login.
-        writeToken(null);
-        setToken(null);
-        setStatus("anonymous");
+    let cancelled = false;
+    (async () => {
+      try {
+        // Clerk JWT is short-lived (default 1 min) but auto-refreshes on
+        // getToken() — we keep a fresh copy in localStorage for api.ts.
+        const fresh = await clerkAuth.getToken();
+        if (cancelled) return;
+        if (fresh) {
+          writeToken(fresh);
+          syncSessionCookie(true);
+          setToken(fresh);
+          setStatus("authenticated");
+          lastTokenRefresh.current = Date.now();
+        }
+      } catch {
+        // Network error — leave status as loading so UI doesn't flash signed-out.
       }
-    });
-  }, [fetchMe]);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [clerkAuth.isLoaded, clerkAuth.isSignedIn, clerkAuth]);
 
-  const login = useCallback(async (email: string, password: string): Promise<AuthUser> => {
-    const response = await fetch(`${API_URL}/api/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-    if (!response.ok) {
-      throw new Error(await readJsonError(response));
-    }
-    const payload = (await response.json()) as TokenResponse;
-    writeToken(payload.access_token);
-    setToken(payload.access_token);
-    setUser(payload.user);
-    setStatus("authenticated");
-    return payload.user;
-  }, []);
-
-  const signup = useCallback(async (input: SignupRequest): Promise<AuthUser> => {
-    const response = await fetch(`${API_URL}/api/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(input),
-    });
-    if (!response.ok) {
-      throw new Error(await readJsonError(response));
-    }
-    const payload = (await response.json()) as TokenResponse;
-    writeToken(payload.access_token);
-    setToken(payload.access_token);
-    setUser(payload.user);
-    setStatus("authenticated");
-    return payload.user;
-  }, []);
+  // Refresh the cached token every 45s while signed in so api.ts always has
+  // a non-expired one.
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    const interval = window.setInterval(async () => {
+      try {
+        const fresh = await clerkAuth.getToken();
+        if (fresh) {
+          writeToken(fresh);
+          syncSessionCookie(true);
+          setToken(fresh);
+          lastTokenRefresh.current = Date.now();
+        }
+      } catch {
+        /* ignore — next tick retries */
+      }
+    }, 45_000);
+    return () => window.clearInterval(interval);
+  }, [status, clerkAuth]);
 
   const logout = useCallback(() => {
-    // Best-effort: tell the backend we're done. We don't await — server-side
-    // logout is informational only since JWTs are stateless.
-    const stored = readToken();
-    if (stored) {
-      fetch(`${API_URL}/api/auth/logout`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${stored}` },
-      }).catch(() => {
-        // Network error is fine; we're clearing local state regardless.
-      });
-    }
     writeToken(null);
+    syncSessionCookie(false);
     setToken(null);
-    setUser(null);
     setStatus("anonymous");
-  }, []);
+    clerk.signOut().catch(() => {
+      /* sign-out best effort */
+    });
+  }, [clerk]);
 
   const refresh = useCallback(async () => {
-    const stored = readToken();
-    if (!stored) {
-      setStatus("anonymous");
-      return;
+    try {
+      const fresh = await clerkAuth.getToken();
+      if (fresh) {
+        writeToken(fresh);
+        syncSessionCookie(true);
+        setToken(fresh);
+      }
+    } catch {
+      /* ignore */
     }
-    const me = await fetchMe(stored);
-    if (me) {
-      setUser(me);
-      setStatus("authenticated");
-    } else {
-      writeToken(null);
-      setToken(null);
-      setUser(null);
-      setStatus("anonymous");
-    }
-  }, [fetchMe]);
+  }, [clerkAuth]);
 
   const value = useMemo<AuthContextValue>(
-    () => ({ user, token, status, login, signup, logout, refresh }),
-    [user, token, status, login, signup, logout, refresh],
+    () => ({ user, token, status, logout, refresh }),
+    [user, token, status, logout, refresh],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -232,7 +191,12 @@ export function useAuth(): AuthContextValue {
   return ctx;
 }
 
-/** Read the current token outside React (for api.ts and similar utilities). */
+/** Read the current Clerk JWT outside React (api.ts, etc.). */
 export function getAccessToken(): string | null {
-  return readToken();
+  if (typeof window === "undefined") return null;
+  try {
+    return window.localStorage.getItem(TOKEN_STORAGE_KEY);
+  } catch {
+    return null;
+  }
 }

@@ -89,7 +89,25 @@ def create_access_token(user_id: str, email: str, role: str = "user") -> str:
 
 
 def decode_token(token: str) -> dict:
-    """Decode and validate JWT token"""
+    """Decode and validate a session JWT.
+
+    The project moved to Clerk, so production tokens are RS256-signed JWTs
+    with `iss=https://<clerk-domain>` and `kid` referencing Clerk's JWKS.
+    The legacy custom HS256 path is kept as a fallback so existing
+    smoke-test users (and anyone running fully local without Clerk) keep
+    working — try Clerk first, fall back to HS256.
+    """
+    # Prefer Clerk verification when configured.
+    try:
+        from app.services.clerk_auth import verify_clerk_jwt, ClerkAuthError
+        return verify_clerk_jwt(token)
+    except ClerkAuthError:
+        # If Clerk decode failed AND legacy HS256 isn't configured, surface 401.
+        pass
+    except Exception:
+        # Don't let unexpected import/JWKS failures break legacy HS256 callers.
+        logger.exception("Clerk JWT verifier crashed; falling back to legacy HS256")
+
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         return payload
@@ -97,6 +115,62 @@ def decode_token(token: str) -> dict:
         raise HTTPException(status_code=401, detail="Token has expired")
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
+
+
+async def _get_or_create_user(user_id: str, claims: dict) -> Optional[dict]:
+    """Resolve a JWT user_id to a row in public.users, creating it if missing.
+
+    For Clerk-issued JWTs this is the lazy-create path: when a Clerk user
+    signs in for the first time their row doesn't exist yet. We mint one
+    using their JWT claims (sub, email, primary email).
+    """
+    user = await user_repository.get_user_by_id(user_id)
+    if user:
+        return user
+
+    # Only lazy-create if claims look like a Clerk token (has iss, email).
+    email = (
+        claims.get("email")
+        or claims.get("primary_email")
+        or claims.get("email_address")
+    )
+    if not email:
+        # Try fetching from Clerk Backend API as a last resort.
+        from app.services.clerk_auth import fetch_clerk_user
+        clerk_user = await fetch_clerk_user(user_id)
+        if clerk_user:
+            primary = next(
+                (e for e in clerk_user.get("email_addresses", [])
+                 if e.get("id") == clerk_user.get("primary_email_address_id")),
+                None,
+            )
+            email = primary.get("email_address") if primary else None
+            full_name = (
+                " ".join(filter(None, [clerk_user.get("first_name"), clerk_user.get("last_name")]))
+                or clerk_user.get("username")
+                or email
+            )
+        else:
+            return None
+    else:
+        full_name = (
+            claims.get("name")
+            or claims.get("full_name")
+            or " ".join(filter(None, [claims.get("first_name"), claims.get("last_name")]))
+            or email
+        )
+
+    if not email:
+        return None
+
+    return await user_repository.create_user_record(
+        user_id=user_id,
+        email=email,
+        full_name=full_name or email,
+        password_hash="",  # Clerk owns credentials; no local password.
+        role="user",
+        is_verified=True,
+    )
 
 
 # ============== Dependency ==============
@@ -111,8 +185,6 @@ async def get_current_user(
     try:
         payload = decode_token(credentials.credentials)
     except HTTPException:
-        # decode_token raises 401 for invalid/expired tokens — for the
-        # optional-auth dependency we just treat that as "not signed in".
         return None
 
     user_id = payload.get("sub")
@@ -120,11 +192,8 @@ async def get_current_user(
         return None
 
     try:
-        return await user_repository.get_user_by_id(user_id)
+        return await _get_or_create_user(user_id, payload)
     except Exception:
-        # Repository failure (DB outage, etc.) is logged by the repository
-        # itself; we surface "not signed in" to avoid leaking internal errors
-        # to anonymous callers.
         logger.warning("get_current_user: repository lookup failed", exc_info=True)
         return None
 
@@ -142,7 +211,7 @@ async def require_auth(
     if not user_id:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-    user = await user_repository.get_user_by_id(user_id)
+    user = await _get_or_create_user(user_id, payload)
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
 

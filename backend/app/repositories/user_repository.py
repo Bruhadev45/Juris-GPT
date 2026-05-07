@@ -121,6 +121,53 @@ async def create_user(
         raise Exception(f"Database error creating user: {str(e)}")
 
 
+async def create_user_record(
+    *,
+    user_id: str,
+    email: str,
+    full_name: str,
+    password_hash: str = "",
+    role: str = "user",
+    is_verified: bool = False,
+    company_name: Optional[str] = None,
+    phone: Optional[str] = None,
+) -> Optional[dict]:
+    """Insert a user row with a caller-supplied id (used for Clerk lazy-create).
+
+    Unlike `create_user`, this does NOT hash a password — the caller controls
+    the value (Clerk users have an empty hash since Clerk owns credentials).
+    Returns the inserted row, or the existing row if a duplicate id/email
+    collision happens (idempotent for first-auth races).
+    """
+    if not supabase:
+        raise Exception("Supabase client not initialized")
+
+    user_data = {
+        "id": user_id,
+        "email": email,
+        "password_hash": password_hash,
+        "full_name": full_name,
+        "company_name": company_name,
+        "phone": phone,
+        "role": role,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "is_verified": is_verified,
+    }
+    try:
+        response = supabase.table("users").insert(user_data).execute()
+        if response.data:
+            return response.data[0]
+    except Exception as e:
+        msg = str(e).lower()
+        if "duplicate" in msg or "unique" in msg or "23505" in msg:
+            # Two concurrent first-requests raced; fetch the row that won.
+            existing = await get_user_by_id(user_id)
+            if existing:
+                return existing
+        raise Exception(f"Database error creating user: {e}")
+    return None
+
+
 async def get_user_by_id(user_id: str) -> Optional[dict]:
     """
     Get user by ID
