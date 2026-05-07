@@ -109,15 +109,23 @@ class Settings(BaseSettings):
         extra = "ignore"
 
     def validate_production_secrets(self) -> list[str]:
-        """Validate that required secrets are set for production. Returns list of missing keys."""
+        """Validate that required secrets are set for production. Returns list of missing keys.
+
+        Auth + storage are hard-required. LLM provider is "at least one of"
+        (OpenAI or Anthropic) since the app routes to whichever is configured.
+        """
         missing = []
         if self.environment == "production":
             if not self.supabase_url or "placeholder" in self.supabase_url:
                 missing.append("SUPABASE_URL")
             if not self.supabase_service_key or "placeholder" in self.supabase_service_key:
                 missing.append("SUPABASE_SERVICE_KEY")
-            if not self.openai_api_key or "placeholder" in self.openai_api_key:
-                missing.append("OPENAI_API_KEY")
+
+            openai_ok = bool(self.openai_api_key) and "placeholder" not in (self.openai_api_key or "")
+            anthropic_ok = bool(self.anthropic_api_key) and "placeholder" not in (self.anthropic_api_key or "")
+            if not (openai_ok or anthropic_ok):
+                missing.append("OPENAI_API_KEY or ANTHROPIC_API_KEY (at least one)")
+
             if not self.jwt_secret or len(self.jwt_secret) < 32:
                 missing.append("JWT_SECRET (must be at least 32 characters)")
         return missing
