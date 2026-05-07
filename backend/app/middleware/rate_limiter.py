@@ -3,12 +3,14 @@ Rate Limiting Middleware for JurisGPT API
 Implements token bucket algorithm for API rate limiting
 """
 
-from fastapi import Request, HTTPException
-from starlette.middleware.base import BaseHTTPMiddleware
+import asyncio
+import os
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from typing import Dict, Tuple
-import asyncio
+
+from fastapi import Request, HTTPException
+from starlette.middleware.base import BaseHTTPMiddleware
 
 
 class RateLimiter:
@@ -124,13 +126,16 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         if request.url.path in self.EXEMPT_PATHS:
             return await call_next(request)
 
-        # Get client IP
+        # Get client IP. We only honor X-Forwarded-For when we're actually
+        # running behind a known proxy — otherwise any caller can spoof
+        # `X-Forwarded-For: 1.2.3.4` to bypass per-IP limits. Set
+        # TRUST_PROXY_HEADERS=true in the env (e.g. on Render, Vercel-fronted
+        # FastAPI) to opt in.
         client_ip = request.client.host if request.client else "unknown"
-
-        # Check for forwarded IP (behind proxy)
-        forwarded_for = request.headers.get("X-Forwarded-For")
-        if forwarded_for:
-            client_ip = forwarded_for.split(",")[0].strip()
+        if os.getenv("TRUST_PROXY_HEADERS", "").lower() in ("1", "true", "yes"):
+            forwarded_for = request.headers.get("X-Forwarded-For")
+            if forwarded_for:
+                client_ip = forwarded_for.split(",")[0].strip()
 
         # Check rate limit
         allowed, info = await rate_limiter.is_allowed(client_ip)

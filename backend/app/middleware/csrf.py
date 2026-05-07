@@ -17,12 +17,14 @@ CSRF_COOKIE_MAX_AGE = 3600 * 24  # 24 hours
 # Methods that require CSRF validation
 UNSAFE_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
 
-# Paths exempt from CSRF (public APIs, webhooks, docs, chat)
+# Paths exempt from CSRF (public APIs, webhooks, docs).
+# /api/chat/* removed from this list — frontend now sends Authorization
+# headers, so cookie-based CSRF is moot for chat. Removing the exemption
+# closes the cross-site-POST hole the security audit flagged.
 CSRF_EXEMPT_PATHS = {
     "/api/webhooks/",
     "/api/auth/login",
     "/api/auth/register",
-    "/api/chat/",  # Chat endpoints (protected by auth, SSE doesn't support CSRF well)
     "/health",
     "/docs",
     "/redoc",
@@ -65,6 +67,14 @@ class CSRFMiddleware(BaseHTTPMiddleware):
         # Check if path is exempt
         path = request.url.path
         if any(path.startswith(exempt) for exempt in CSRF_EXEMPT_PATHS):
+            return await call_next(request)
+
+        # Bearer-token requests are CSRF-immune by design: the browser does
+        # not auto-attach an Authorization header on cross-origin requests,
+        # so an attacker on a malicious page cannot forge an authenticated
+        # POST. We only require CSRF tokens when the caller is relying on
+        # cookie-based auth.
+        if request.headers.get("authorization", "").lower().startswith("bearer "):
             return await call_next(request)
 
         # Get token from cookie

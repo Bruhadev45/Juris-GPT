@@ -325,13 +325,13 @@ function DocumentView({ output }: { output: TemplateOutput }) {
 function PrintPreview({ output }: { output: TemplateOutput }) {
   // A4 dimensions: 210mm × 297mm. We render at scale to fit the screen.
   return (
-    <div className="bg-neutral-200 dark:bg-neutral-900 -m-4 p-6 rounded-md min-h-full flex flex-col items-center gap-6">
-      <div className="text-center">
+    <div className="bg-neutral-200 dark:bg-neutral-900 -mx-4 -my-4 p-6 rounded-md min-h-full flex flex-col items-center gap-6 overflow-x-auto">
+      <div className="text-center shrink-0">
         <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
           Print Preview · A4
         </p>
-        <p className="text-[10px] text-muted-foreground mt-0.5">
-          210mm × 297mm · 22mm top/bottom · 18mm left/right margins
+        <p className="text-[10px] text-muted-foreground mt-0.5 whitespace-nowrap">
+          210 × 297 mm · 22 mm top/bottom · 18 mm left/right
         </p>
       </div>
 

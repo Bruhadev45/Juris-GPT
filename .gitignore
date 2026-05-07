@@ -88,3 +88,5 @@ cloud_config.json
 *.gguf
 backend/models/*.gguf
 .coverage
+.render-secrets.txt
+.vercel-api-token

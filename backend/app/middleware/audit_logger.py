@@ -222,11 +222,16 @@ class AuditLogMiddleware(BaseHTTPMiddleware):
         # Generate request ID
         request_id = str(uuid.uuid4())
 
-        # Get client IP
+        # Get client IP. Same trust model as rate_limiter.py: only honor
+        # X-Forwarded-For when TRUST_PROXY_HEADERS is set (i.e. we're behind
+        # a real proxy like Render/Vercel). Otherwise the audit log can be
+        # poisoned with spoofed IPs.
+        import os
         client_ip = request.client.host if request.client else "unknown"
-        forwarded_for = request.headers.get("X-Forwarded-For")
-        if forwarded_for:
-            client_ip = forwarded_for.split(",")[0].strip()
+        if os.getenv("TRUST_PROXY_HEADERS", "").lower() in ("1", "true", "yes"):
+            forwarded_for = request.headers.get("X-Forwarded-For")
+            if forwarded_for:
+                client_ip = forwarded_for.split(",")[0].strip()
 
         # Get user info from token (if available)
         user_id = None

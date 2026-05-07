@@ -1,6 +1,11 @@
+import logging
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
+
+logger = logging.getLogger(__name__)
 from app.routes import (
     companies,
     matters,
@@ -35,12 +40,31 @@ from app.middleware.rate_limiter import RateLimitMiddleware
 from app.middleware.audit_logger import AuditLogMiddleware
 from app.middleware.csrf import CSRFMiddleware, csrf_router
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # ── startup ──
+    logger.info("JurisGPT API starting up... environment=%s", settings.environment)
+    logger.info("CORS origins: %s", settings.cors_origins)
+
+    missing = settings.validate_production_secrets()
+    if missing:
+        msg = f"FATAL: Missing required secrets for production: {', '.join(missing)}"
+        logger.error(msg)
+        raise RuntimeError(msg)
+
+    logger.info("API ready to accept requests")
+    yield
+    # ── shutdown ──
+    logger.info("JurisGPT API shutting down")
+
+
 app = FastAPI(
     title="JurisGPT API",
     description="AI-powered legal services platform for Indian startups and MSMEs",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 # CORS middleware (must be first)
@@ -160,30 +184,6 @@ app.include_router(eval_routes.router, prefix="/api/eval", tags=["evaluation"])
 app.include_router(cases.router, tags=["cases"])
 app.include_router(lawyers.router, tags=["lawyers"])
 
-
-# ============== Startup & Shutdown Events ==============
-
-@app.on_event("startup")
-async def startup_event():
-    """Application startup tasks"""
-    print("JurisGPT API starting up...")
-    print(f"   Environment: {settings.environment}")
-    print(f"   CORS Origins: {settings.cors_origins}")
-
-    # Fail fast if production secrets are missing
-    missing = settings.validate_production_secrets()
-    if missing:
-        msg = f"FATAL: Missing required secrets for production: {', '.join(missing)}"
-        print(msg)
-        raise RuntimeError(msg)
-
-    print("API ready to accept requests")
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Application shutdown tasks"""
-    print("👋 JurisGPT API shutting down...")
 
 if __name__ == "__main__":
     import uvicorn
