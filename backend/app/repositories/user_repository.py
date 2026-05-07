@@ -153,6 +153,21 @@ async def create_user_record(
         "created_at": datetime.now(timezone.utc).isoformat(),
         "is_verified": is_verified,
     }
+    # Idempotent path 1: same id already exists (concurrent race).
+    by_id = await get_user_by_id(user_id)
+    if by_id:
+        return by_id
+
+    # Idempotent path 2: another row already owns this email. Most common
+    # case: the user signed up under custom-JWT auth before the Clerk
+    # migration, and now the same email is signing in via Clerk with a
+    # different id format. Treat it as the same person and return the
+    # existing row (we deliberately do NOT migrate the id field — that would
+    # require updating any FK references).
+    by_email = await get_user_by_email(email)
+    if by_email:
+        return by_email
+
     try:
         response = supabase.table("users").insert(user_data).execute()
         if response.data:
@@ -160,8 +175,11 @@ async def create_user_record(
     except Exception as e:
         msg = str(e).lower()
         if "duplicate" in msg or "unique" in msg or "23505" in msg:
-            # Two concurrent first-requests raced; fetch the row that won.
+            # Lost a race — fetch whichever row won.
             existing = await get_user_by_id(user_id)
+            if existing:
+                return existing
+            existing = await get_user_by_email(email)
             if existing:
                 return existing
         raise Exception(f"Database error creating user: {e}")
