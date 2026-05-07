@@ -3,7 +3,7 @@ Smart Document Review — AI-powered document review using GPT-4o.
 Uploads documents, extracts text, and performs real legal analysis.
 """
 
-from fastapi import APIRouter, HTTPException, UploadFile, File
+from fastapi import APIRouter, HTTPException, UploadFile, File, Depends
 from typing import Optional
 import uuid
 import json
@@ -12,8 +12,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from app.services.ai_analyzer import extract_text_from_file, review_document_with_ai
+from app.routes.auth import require_auth
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(require_auth)])
 
 REVIEWS_FILE = Path(__file__).parent.parent.parent / "data" / "reviews.json"
 UPLOAD_DIR = Path(__file__).parent.parent.parent / "data" / "uploads"

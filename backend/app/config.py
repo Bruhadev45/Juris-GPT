@@ -1,21 +1,57 @@
+import logging
+import os
 import secrets
 
 from pydantic_settings import BaseSettings
 from typing import Optional
+
+logger = logging.getLogger(__name__)
+
+
+def _resolve_jwt_secret() -> str:
+    """Get JWT secret from env, or generate a stable per-process default in dev only.
+
+    Production deployments MUST set JWT_SECRET. Without that, every restart
+    invalidates every issued token and multi-worker deployments hand out
+    different secrets per worker. We deliberately fail loud rather than
+    silently defaulting in production.
+    """
+    env_value = os.getenv("JWT_SECRET")
+    if env_value:
+        return env_value
+
+    environment = os.getenv("ENVIRONMENT", "development").lower()
+    if environment == "production":
+        raise RuntimeError(
+            "JWT_SECRET environment variable is required in production. "
+            "Generate one with `python -c 'import secrets; print(secrets.token_hex(32))'`."
+        )
+
+    # Development convenience: generate-and-stick for the lifetime of the process.
+    # Tokens still survive uvicorn auto-reload because the value is captured by
+    # the module-level `Settings` singleton and reused across imports.
+    generated = secrets.token_hex(32)
+    logger.warning(
+        "JWT_SECRET not set; generated a random secret for this process. "
+        "All issued tokens will be invalidated on restart. Set JWT_SECRET in .env to fix."
+    )
+    return generated
 
 
 class Settings(BaseSettings):
     supabase_url: Optional[str] = "https://placeholder.supabase.co"
     supabase_service_key: Optional[str] = "placeholder-service-key"
     openai_api_key: Optional[str] = "sk-placeholder"
-    razorpay_key_id: Optional[str] = None  # Optional for now
-    razorpay_key_secret: Optional[str] = None  # Optional for now
+
+    # Anthropic Claude (via PageGrid or direct)
+    anthropic_api_key: Optional[str] = None
+    anthropic_base_url: Optional[str] = None  # e.g., https://api.pagegrid.in for PageGrid
     resend_api_key: Optional[str] = "re_placeholder"
     database_url: Optional[str] = None
     environment: str = "development"
 
-    # JWT Secret — dedicated key, not derived from other secrets
-    jwt_secret: str = secrets.token_hex(32)
+    # JWT Secret — required in production, dev fallback is a per-process random.
+    jwt_secret: str = _resolve_jwt_secret()
 
     # DigitalOcean Spaces settings
     do_spaces_key: Optional[str] = None
@@ -45,9 +81,20 @@ class Settings(BaseSettings):
     rag_bm25_weight: float = 0.4
     rag_semantic_weight: float = 0.6
 
+    # ── RAG Data Source Configuration ────────────────────────────────
+    jurisgpt_vector_store: str = "local"
+    jurisgpt_llm_type: str = "anthropic"  # anthropic (PageGrid), openai, or local_legal_llama
+    data_source: str = "local"
+    cloud_data_path: Optional[str] = None
+    chroma_collection_name: str = "jurisgpt_legal_docs"
+
+    # ── External Legal APIs ─────────────────────────────────────────
+    indian_kanoon_api_key: Optional[str] = None  # Get from https://api.indiankanoon.org
+
     class Config:
         env_file = ".env"
         case_sensitive = False
+        extra = "ignore"
 
     def validate_production_secrets(self) -> list[str]:
         """Validate that required secrets are set for production. Returns list of missing keys."""

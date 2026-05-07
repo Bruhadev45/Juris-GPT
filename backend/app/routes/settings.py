@@ -1,11 +1,13 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pathlib import Path
 import json
 import aiofiles
 import aiofiles.os
 import asyncio
 
-router = APIRouter()
+from app.routes.auth import require_auth
+
+router = APIRouter(dependencies=[Depends(require_auth)])
 
 # Lock for thread-safe file operations
 _settings_lock = asyncio.Lock()

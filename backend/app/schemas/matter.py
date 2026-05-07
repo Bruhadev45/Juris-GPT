@@ -10,7 +10,7 @@ from .preference import LegalPreferenceResponse
 
 
 MatterStatus = Literal[
-    "draft", "payment_pending", "ai_generating", "lawyer_review", "approved", "rejected", "completed"
+    "draft", "ai_generating", "lawyer_review", "approved", "rejected", "completed"
 ]
 
 

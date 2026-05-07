@@ -135,29 +135,44 @@ export default function TemplateFormPage({
     const content = String(generateResult?.document_content || "");
     if (!content) return;
     const printWindow = window.open("", "_blank");
-    if (printWindow) {
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>${template?.name || "Document"}</title>
-            <style>
-              body { font-family: 'Georgia', serif; line-height: 1.8; padding: 40px; max-width: 800px; margin: 0 auto; color: #1a1a1a; }
-              h1 { font-size: 24px; text-align: center; margin-bottom: 30px; }
-              h2 { font-size: 18px; margin-top: 24px; border-bottom: 1px solid #ccc; padding-bottom: 6px; }
-              h3 { font-size: 15px; margin-top: 18px; }
-              p { margin: 8px 0; text-align: justify; }
-              ul, ol { margin: 8px 0 8px 20px; }
-              li { margin: 4px 0; }
-              strong { font-weight: 600; }
-              hr { border: none; border-top: 1px solid #ccc; margin: 20px 0; }
-            </style>
-          </head>
-          <body>${content.replace(/\n/g, "<br>")}</body>
-        </html>
-      `);
-      printWindow.document.close();
-      printWindow.print();
-    }
+    if (!printWindow) return;
+
+    // Build the document via DOM APIs so backend-supplied text is treated as
+    // text, not HTML. The original implementation used `document.write` with
+    // string interpolation, which let any `<script>` or event-handler in the
+    // backend payload execute in the print window.
+    const doc = printWindow.document;
+    doc.open();
+    doc.write("<!DOCTYPE html><html><head></head><body></body></html>");
+    doc.close();
+
+    const titleEl = doc.createElement("title");
+    titleEl.textContent = template?.name || "Document";
+    doc.head.appendChild(titleEl);
+
+    const styleEl = doc.createElement("style");
+    styleEl.textContent = `
+      body { font-family: 'Georgia', serif; line-height: 1.8; padding: 40px; max-width: 800px; margin: 0 auto; color: #1a1a1a; }
+      h1 { font-size: 24px; text-align: center; margin-bottom: 30px; }
+      h2 { font-size: 18px; margin-top: 24px; border-bottom: 1px solid #ccc; padding-bottom: 6px; }
+      h3 { font-size: 15px; margin-top: 18px; }
+      p { margin: 8px 0; text-align: justify; }
+      ul, ol { margin: 8px 0 8px 20px; }
+      li { margin: 4px 0; }
+      strong { font-weight: 600; }
+      hr { border: none; border-top: 1px solid #ccc; margin: 20px 0; }
+    `;
+    doc.head.appendChild(styleEl);
+
+    // Treat newlines as paragraph breaks; each line becomes a <p> with text
+    // assigned via textContent, eliminating the XSS vector entirely.
+    content.split(/\n+/).forEach((line) => {
+      const p = doc.createElement("p");
+      p.textContent = line;
+      doc.body.appendChild(p);
+    });
+
+    printWindow.print();
   }
 
   function renderField(field: TemplateDetail["fields"][number]) {

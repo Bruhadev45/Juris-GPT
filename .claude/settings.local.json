@@ -48,7 +48,31 @@
       "Bash(grep:*)",
       "Bash(git push:*)",
       "Bash(git fetch:*)",
-      "WebFetch(domain:www.arcline-ai.com)"
+      "WebFetch(domain:www.arcline-ai.com)",
+      "Bash(FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch:*)",
+      "Bash(brew install:*)",
+      "Bash(doctl version:*)",
+      "Bash(doctl auth:*)",
+      "Bash(doctl account get:*)",
+      "Bash(doctl balance get:*)",
+      "Bash(doctl apps:*)",
+      "Bash(doctl compute droplet list:*)",
+      "Bash(doctl databases list:*)",
+      "Bash(doctl compute ssh-key:*)",
+      "Bash(ssh-keygen:*)",
+      "Bash(git rm:*)",
+      "Bash(git commit:*)",
+      "Bash(vercel login:*)",
+      "Bash(vercel:*)",
+      "Bash(dig:*)",
+      "Bash(ping:*)",
+      "Bash(nslookup:*)",
+      "Bash(git add:*)",
+      "Bash(RENDER_API_KEY=\"rnd_tol0IyqrWr9t9PJwuFQycjkjPQ04\")",
+      "Bash(render login:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npm search:*)",
+      "Bash(API_KEY=\"rnd_tol0IyqrWr9t9PJwuFQycjkjPQ04\":*)"
     ]
   }
 }

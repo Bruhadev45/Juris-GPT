@@ -10,11 +10,13 @@ from pathlib import Path
 from typing import Optional
 
 import aiofiles
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
+
+from app.routes.auth import require_admin
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(tags=["Evaluation"])
+router = APIRouter(tags=["Evaluation"], dependencies=[Depends(require_admin)])
 
 DATA_DIR = Path(__file__).parent.parent.parent.parent / "data"
 EVAL_DIR = DATA_DIR / "eval"

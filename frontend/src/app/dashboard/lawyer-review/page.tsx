@@ -16,6 +16,15 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { adminApi } from "@/lib/api";
 
 interface Review {
@@ -77,6 +86,9 @@ export default function LawyerReviewPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [changesDialogOpen, setChangesDialogOpen] = useState(false);
+  const [changesReviewId, setChangesReviewId] = useState<string | null>(null);
+  const [changesFeedback, setChangesFeedback] = useState("");
 
   async function fetchReviews() {
     try {
@@ -107,10 +119,25 @@ export default function LawyerReviewPage() {
     }
   }
 
-  async function handleRequestChanges(reviewId: string) {
+  function openRequestChanges(reviewId: string) {
+    setChangesReviewId(reviewId);
+    setChangesFeedback("");
+    setChangesDialogOpen(true);
+  }
+
+  async function submitRequestChanges() {
+    if (!changesReviewId) return;
+    const feedback = changesFeedback.trim();
+    if (!feedback) {
+      setError("Please describe the changes the lawyer is requesting.");
+      return;
+    }
     try {
-      setActionLoading(reviewId);
-      await adminApi.requestChanges(reviewId, "Please review and update the document.");
+      setActionLoading(changesReviewId);
+      await adminApi.requestChanges(changesReviewId, feedback);
+      setChangesDialogOpen(false);
+      setChangesReviewId(null);
+      setChangesFeedback("");
       await fetchReviews();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to request changes");
@@ -263,7 +290,7 @@ export default function LawyerReviewPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleRequestChanges(review.id)}
+                            onClick={() => openRequestChanges(review.id)}
                             disabled={actionLoading === review.id}
                           >
                             {actionLoading === review.id ? (
@@ -293,6 +320,45 @@ export default function LawyerReviewPage() {
           </div>
         )}
       </div>
+
+      <Dialog open={changesDialogOpen} onOpenChange={setChangesDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Request Changes</DialogTitle>
+            <DialogDescription>
+              Describe what the user should revise. This message is sent to the
+              author so they know exactly what to update.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            value={changesFeedback}
+            onChange={(e) => setChangesFeedback(e.target.value)}
+            placeholder="e.g. Section 4 (Vesting) needs a 12-month cliff. Replace 'Mumbai' with the actual registered office state."
+            rows={6}
+            className="resize-none"
+            autoFocus
+          />
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setChangesDialogOpen(false)}
+              disabled={actionLoading === changesReviewId}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={submitRequestChanges}
+              disabled={!changesFeedback.trim() || actionLoading === changesReviewId}
+            >
+              {actionLoading === changesReviewId ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                "Send Feedback"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

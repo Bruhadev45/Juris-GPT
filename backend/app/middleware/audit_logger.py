@@ -79,7 +79,7 @@ class AuditLogger:
             "password", "password_hash", "secret", "token", "api_key",
             "access_token", "refresh_token", "authorization", "credit_card",
             "card_number", "cvv", "ssn", "pan_number", "aadhaar",
-            "openai_api_key", "supabase_service_key", "razorpay_key_secret",
+            "openai_api_key", "supabase_service_key",
             "do_spaces_secret", "resend_api_key", "jwt_secret",
         }
 

@@ -55,17 +55,6 @@ async def check_integrations():
         "icon": "/integrations/resend.svg",
     })
 
-    # Razorpay
-    razorpay_connected = bool(getattr(settings, "razorpay_key_id", None))
-    results.append({
-        "id": "razorpay",
-        "name": "Razorpay",
-        "description": "Payment gateway for subscriptions",
-        "category": "Payment",
-        "status": "connected" if razorpay_connected else "disconnected",
-        "icon": "/integrations/razorpay.svg",
-    })
-
     # Google Drive
     results.append({
         "id": "google-drive",

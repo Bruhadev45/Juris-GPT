@@ -40,7 +40,7 @@ CREATE TABLE public.legal_matters (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     company_id UUID NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
     matter_type TEXT NOT NULL DEFAULT 'founder_agreement',
-    status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'payment_pending', 'ai_generating', 'lawyer_review', 'approved', 'rejected', 'completed')),
+    status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'ai_generating', 'lawyer_review', 'approved', 'rejected', 'completed')),
     price DECIMAL(10, 2) NOT NULL DEFAULT 1999.00,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -55,18 +55,6 @@ CREATE TABLE public.documents (
     is_final BOOLEAN DEFAULT FALSE,
     storage_url TEXT, -- Supabase Storage URL
     file_name TEXT,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Payments table
-CREATE TABLE public.payments (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    matter_id UUID NOT NULL REFERENCES public.legal_matters(id) ON DELETE CASCADE,
-    amount DECIMAL(10, 2) NOT NULL,
-    razorpay_order_id TEXT UNIQUE,
-    razorpay_payment_id TEXT,
-    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'failed', 'refunded')),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -102,8 +90,6 @@ CREATE INDEX idx_founders_company_id ON public.founders(company_id);
 CREATE INDEX idx_legal_matters_company_id ON public.legal_matters(company_id);
 CREATE INDEX idx_legal_matters_status ON public.legal_matters(status);
 CREATE INDEX idx_documents_matter_id ON public.documents(matter_id);
-CREATE INDEX idx_payments_matter_id ON public.payments(matter_id);
-CREATE INDEX idx_payments_razorpay_order_id ON public.payments(razorpay_order_id);
 CREATE INDEX idx_lawyer_reviews_matter_id ON public.lawyer_reviews(matter_id);
 CREATE INDEX idx_lawyer_reviews_status ON public.lawyer_reviews(status);
 
@@ -113,7 +99,6 @@ ALTER TABLE public.companies ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.founders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.legal_matters ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.documents ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.payments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.lawyer_reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.legal_preferences ENABLE ROW LEVEL SECURITY;
 
@@ -137,14 +122,6 @@ CREATE POLICY "Users can view own documents" ON public.documents FOR SELECT USIN
         SELECT 1 FROM public.legal_matters 
         JOIN public.companies ON companies.id = legal_matters.company_id 
         WHERE legal_matters.id = documents.matter_id AND companies.user_id = auth.uid()
-    )
-);
-
-CREATE POLICY "Users can view own payments" ON public.payments FOR SELECT USING (
-    EXISTS (
-        SELECT 1 FROM public.legal_matters 
-        JOIN public.companies ON companies.id = legal_matters.company_id 
-        WHERE legal_matters.id = payments.matter_id AND companies.user_id = auth.uid()
     )
 );
 

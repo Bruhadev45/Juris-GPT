@@ -28,7 +28,6 @@ interface Integration {
 }
 
 const INTEGRATION_ICONS: Record<string, string> = {
-  razorpay: "/integrations/razorpay.svg",
   digilocker: "/integrations/digilocker.svg",
   google: "/integrations/google.svg",
   slack: "/integrations/slack.svg",

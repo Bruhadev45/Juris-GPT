@@ -17,11 +17,12 @@ CSRF_COOKIE_MAX_AGE = 3600 * 24  # 24 hours
 # Methods that require CSRF validation
 UNSAFE_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
 
-# Paths exempt from CSRF (public APIs, webhooks, docs)
+# Paths exempt from CSRF (public APIs, webhooks, docs, chat)
 CSRF_EXEMPT_PATHS = {
     "/api/webhooks/",
     "/api/auth/login",
     "/api/auth/register",
+    "/api/chat/",  # Chat endpoints (protected by auth, SSE doesn't support CSRF well)
     "/health",
     "/docs",
     "/redoc",

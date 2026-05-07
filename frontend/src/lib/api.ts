@@ -4,6 +4,39 @@
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+const TOKEN_STORAGE_KEY = "jurisgpt.access_token";
+
+/**
+ * Extract CSRF token from cookies
+ */
+function getCsrfToken(): string | null {
+  if (typeof document === "undefined") return null;
+  const cookies = document.cookie.split("; ");
+  for (const cookie of cookies) {
+    const [name, value] = cookie.split("=");
+    if (name === "csrf_token") {
+      return decodeURIComponent(value);
+    }
+  }
+  return null;
+}
+
+/**
+ * Read the JWT access token from localStorage.
+ *
+ * Kept as a module-local helper (instead of importing from auth-context) so
+ * api.ts has no circular dependency on the React tree and can be used by
+ * both client and server-side helpers.
+ */
+function getAccessToken(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.localStorage.getItem(TOKEN_STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
 export interface LawSection {
   section: number;
   title: string;
@@ -66,12 +99,33 @@ class ApiClient {
   }
 
   private async fetch<T>(endpoint: string, options?: RequestInit): Promise<T> {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (options?.headers) {
+      new Headers(options.headers).forEach((value, key) => {
+        headers[key] = value;
+      });
+    }
+
+    // Add CSRF token for state-changing methods
+    const method = options?.method?.toUpperCase() || "GET";
+    if (["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
+      const csrfToken = getCsrfToken();
+      if (csrfToken) {
+        headers["X-CSRF-Token"] = csrfToken;
+      }
+    }
+
+    // Forward the JWT access token if the caller hasn't already set one.
+    if (!headers["Authorization"]) {
+      const accessToken = getAccessToken();
+      if (accessToken) {
+        headers["Authorization"] = `Bearer ${accessToken}`;
+      }
+    }
+
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
       ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...options?.headers,
-      },
+      headers,
     });
 
     if (!response.ok) {
@@ -88,8 +142,8 @@ class ApiClient {
   ): Promise<LawSection[]> {
     const params = new URLSearchParams();
     if (options?.section) params.append("section", options.section.toString());
-    if (options?.limit) params.append("limit", options.limit.toString());
-    if (options?.offset) params.append("offset", options.offset.toString());
+    if (options?.limit !== undefined) params.append("limit", options.limit.toString());
+    if (options?.offset !== undefined) params.append("offset", options.offset.toString());
 
     const query = params.toString();
     return this.fetch<LawSection[]>(`/api/legal/laws/${lawName}${query ? `?${query}` : ""}`);
@@ -105,8 +159,8 @@ class ApiClient {
     search?: string;
   }): Promise<CaseSummary[]> {
     const params = new URLSearchParams();
-    if (options?.limit) params.append("limit", options.limit.toString());
-    if (options?.offset) params.append("offset", options.offset.toString());
+    if (options?.limit !== undefined) params.append("limit", options.limit.toString());
+    if (options?.offset !== undefined) params.append("offset", options.offset.toString());
     if (options?.search) params.append("search", options.search);
 
     const query = params.toString();
@@ -121,8 +175,8 @@ class ApiClient {
   }): Promise<CompaniesActSection[]> {
     const params = new URLSearchParams();
     if (options?.section) params.append("section", options.section);
-    if (options?.limit) params.append("limit", options.limit.toString());
-    if (options?.offset) params.append("offset", options.offset.toString());
+    if (options?.limit !== undefined) params.append("limit", options.limit.toString());
+    if (options?.offset !== undefined) params.append("offset", options.offset.toString());
     if (options?.search) params.append("search", options.search);
 
     const query = params.toString();
@@ -229,9 +283,15 @@ export const chatApi = {
     context?: Record<string, unknown>,
     conversationHistory?: Array<{ role: string; content: string }>
   ): Promise<ChatMessageResponse> {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    const csrfToken = getCsrfToken();
+    if (csrfToken) {
+      headers["X-CSRF-Token"] = csrfToken;
+    }
+
     const response = await fetch(`${API_URL}/api/chat/message`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify({ message, context, conversation_history: conversationHistory }),
     });
     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
@@ -253,9 +313,15 @@ export const chatApi = {
 
     (async () => {
       try {
+        const headers: Record<string, string> = { "Content-Type": "application/json" };
+        const csrfToken = getCsrfToken();
+        if (csrfToken) {
+          headers["X-CSRF-Token"] = csrfToken;
+        }
+
         const response = await fetch(`${API_URL}/api/chat/stream`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers,
           body: JSON.stringify({ message, context, conversation_history: conversationHistory }),
           signal: controller.signal,
         });
@@ -496,8 +562,8 @@ export const complianceApi = {
     if (options?.category) params.append("category", options.category);
     if (options?.status) params.append("status", options.status);
     if (options?.company_type) params.append("company_type", options.company_type);
-    if (options?.limit) params.append("limit", options.limit.toString());
-    if (options?.offset) params.append("offset", options.offset.toString());
+    if (options?.limit !== undefined) params.append("limit", options.limit.toString());
+    if (options?.offset !== undefined) params.append("offset", options.offset.toString());
     const query = params.toString();
     const response = await fetch(
       `${API_URL}/api/compliance/deadlines${query ? `?${query}` : ""}`
@@ -717,9 +783,15 @@ export const settingsApi = {
   },
 
   async updateProfile<T extends object>(data: T) {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    const csrfToken = getCsrfToken();
+    if (csrfToken) {
+      headers["X-CSRF-Token"] = csrfToken;
+    }
+
     const response = await fetch(`${API_URL}/api/settings/profile`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify(data),
     });
     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
@@ -756,9 +828,15 @@ export const supportApi = {
     message: string;
     category?: string;
   }) {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    const csrfToken = getCsrfToken();
+    if (csrfToken) {
+      headers["X-CSRF-Token"] = csrfToken;
+    }
+
     const response = await fetch(`${API_URL}/api/support/tickets`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify(data),
     });
     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
@@ -791,9 +869,15 @@ export const teamApi = {
   },
 
   async add(data: Partial<TeamMember>) {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    const csrfToken = getCsrfToken();
+    if (csrfToken) {
+      headers["X-CSRF-Token"] = csrfToken;
+    }
+
     const response = await fetch(`${API_URL}/api/team`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify(data),
     });
     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
@@ -862,9 +946,90 @@ export interface VaultDocument {
   file_size: number;
   file_type: string;
   category: string;
+  description?: string;
   tags: string[];
   uploaded_at: string;
+  download_url?: string;
   url?: string;
+}
+
+export interface VaultGraphNode {
+  id: string;
+  label: string;
+  type: "document" | "tag" | "category";
+  category: string;
+  size: number;
+  metadata: {
+    document_id?: string;
+    file_name?: string;
+    file_type?: string;
+    file_size?: number;
+    uploaded_at?: string;
+    description?: string;
+    tags?: string[];
+    document_count?: number;
+  };
+}
+
+export interface VaultGraphEdge {
+  source: string;
+  target: string;
+  type: "category" | "tag" | "shared_tag" | "reference";
+  label: string;
+  strength: number;
+}
+
+export interface VaultKnowledgeGraph {
+  nodes: VaultGraphNode[];
+  edges: VaultGraphEdge[];
+  stats: {
+    documents: number;
+    tags: number;
+    categories: number;
+    connections: number;
+  };
+}
+
+export interface VaultDocumentSummary {
+  id: string;
+  file_name: string;
+  category: string;
+  tags: string[];
+  description?: string;
+  uploaded_at: string;
+}
+
+export interface VaultDocumentLink {
+  raw: string;
+  target?: string;
+  alias?: string | null;
+  resolved?: boolean;
+  document?: VaultDocumentSummary | null;
+  source?: VaultDocumentSummary;
+}
+
+export interface VaultRelatedDocument {
+  document: VaultDocumentSummary;
+  shared_tags: string[];
+}
+
+export interface VaultDocumentLinks {
+  document: VaultDocumentSummary;
+  outgoing_links: VaultDocumentLink[];
+  backlinks: VaultDocumentLink[];
+  related_documents: VaultRelatedDocument[];
+}
+
+export interface VaultLinkSuggestion {
+  id: string;
+  title: string;
+  file_name: string;
+  category: string;
+}
+
+function csrfHeader(): Record<string, string> {
+  const csrfToken = getCsrfToken();
+  return csrfToken ? { "X-CSRF-Token": csrfToken } : {};
 }
 
 export const vaultApi = {
@@ -877,13 +1042,58 @@ export const vaultApi = {
     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
     return response.json();
   },
+  async graph(options?: { category?: string; tag?: string }): Promise<{ data: VaultKnowledgeGraph }> {
+    const params = new URLSearchParams();
+    if (options?.category) params.append("category", options.category);
+    if (options?.tag) params.append("tag", options.tag);
+    const query = params.toString();
+    const response = await fetch(`${API_URL}/api/vault/graph${query ? `?${query}` : ""}`);
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.json();
+  },
+  async getLinks(id: string): Promise<{ data: VaultDocumentLinks }> {
+    const response = await fetch(`${API_URL}/api/vault/${id}/links`);
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.json();
+  },
+  async get(id: string): Promise<{ data: VaultDocument }> {
+    const response = await fetch(`${API_URL}/api/vault/${id}`);
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.json();
+  },
+  async linkSuggestions(query: string): Promise<{ data: VaultLinkSuggestion[] }> {
+    const params = new URLSearchParams();
+    if (query) params.append("q", query);
+    const response = await fetch(`${API_URL}/api/vault/link-suggestions?${params.toString()}`);
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.json();
+  },
+  async updateMetadata(
+    id: string,
+    data: { category?: string; tags?: string[]; description?: string }
+  ): Promise<{ data: VaultDocument; message: string }> {
+    const response = await fetch(`${API_URL}/api/vault/${id}/metadata`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...csrfHeader() },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    return response.json();
+  },
   async upload(formData: FormData) {
-    const response = await fetch(`${API_URL}/api/vault/upload`, { method: "POST", body: formData });
+    const response = await fetch(`${API_URL}/api/vault/upload`, {
+      method: "POST",
+      headers: csrfHeader(),
+      body: formData,
+    });
     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
     return response.json();
   },
   async delete(id: string) {
-    const response = await fetch(`${API_URL}/api/vault/${id}`, { method: "DELETE" });
+    const response = await fetch(`${API_URL}/api/vault/${id}`, {
+      method: "DELETE",
+      headers: csrfHeader(),
+    });
     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
     return response.json();
   },
@@ -976,8 +1186,8 @@ export const newsApi = {
   async list(options?: { category?: string; limit?: number; offset?: number }) {
     const params = new URLSearchParams();
     if (options?.category) params.append("category", options.category);
-    if (options?.limit) params.append("limit", options.limit.toString());
-    if (options?.offset) params.append("offset", options.offset.toString());
+    if (options?.limit !== undefined) params.append("limit", options.limit.toString());
+    if (options?.offset !== undefined) params.append("offset", options.offset.toString());
     const query = params.toString();
     const response = await fetch(`${API_URL}/api/news${query ? `?${query}` : ""}`);
     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
@@ -1068,8 +1278,12 @@ export const contractsApi = {
     contractId: string,
     format: "pdf" | "docx"
   ): Promise<Blob> {
+    const token = getAccessToken();
+    const headers: Record<string, string> = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
     const response = await fetch(
-      `${API_URL}/api/contracts/${contractId}/download?format=${format}`
+      `${API_URL}/api/contracts/${contractId}/download?format=${format}`,
+      { headers },
     );
     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
     return response.blob();
@@ -1084,8 +1298,8 @@ export const contractsApi = {
     const params = new URLSearchParams();
     if (options?.type) params.append("type", options.type);
     if (options?.status) params.append("status", options.status);
-    if (options?.limit) params.append("limit", options.limit.toString());
-    if (options?.offset) params.append("offset", options.offset.toString());
+    if (options?.limit !== undefined) params.append("limit", options.limit.toString());
+    if (options?.offset !== undefined) params.append("offset", options.offset.toString());
     const query = params.toString();
     const response = await fetch(
       `${API_URL}/api/contracts${query ? `?${query}` : ""}`

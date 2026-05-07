@@ -578,3 +578,133 @@ async def get_legal_data_stats():
         stats["companies_act_sections"] = 0
 
     return stats
+
+
+# ── Live Updates Endpoint ──────────────────────────────────────────────────
+
+class LiveUpdateItem(BaseModel):
+    """Unified live update — judgment or news."""
+    id: str
+    type: str  # "judgment" | "news"
+    title: str
+    summary: str
+    source: str
+    published_at: str
+    url: Optional[str] = None
+    category: Optional[str] = None
+    court: Optional[str] = None
+    citation: Optional[str] = None
+    tags: List[str] = []
+
+
+class LiveUpdatesResponse(BaseModel):
+    items: List[LiveUpdateItem]
+    total: int
+    fetched_at: str
+    sources: List[str]
+
+
+def _load_recent_judgments() -> list:
+    """Load recent judgments JSON file (curated 2023-2025 SC + HC cases)."""
+    file_path = DATA_DIR / "samples" / "recent_judgments.json"
+    if not file_path.exists():
+        return []
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return []
+
+
+def _load_news() -> list:
+    """Load legal news JSON file."""
+    file_path = DATA_DIR / "samples" / "legal_news.json"
+    if not file_path.exists():
+        return []
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return []
+
+
+@router.get("/live-updates", response_model=LiveUpdatesResponse)
+async def live_updates(
+    limit: int = Query(20, ge=1, le=100),
+    types: Optional[str] = Query(None, description="Comma-separated: judgments,news"),
+    since: Optional[str] = Query(None, description="ISO date — only items published after"),
+):
+    """
+    Aggregated feed of recent judgments and legal news, sorted by date.
+
+    Designed for client-side polling (e.g. every 60s). Use the `since` query
+    parameter to fetch only new items: `since=2026-05-01T00:00:00Z`.
+    """
+    from datetime import datetime as _dt
+
+    requested = set((types or "judgments,news").split(","))
+    items: List[LiveUpdateItem] = []
+
+    if "judgments" in requested:
+        for j in _load_recent_judgments():
+            published = j.get("date") or f"{j.get('year', 2024)}-01-01"
+            # Normalize to ISO 8601 with time component
+            if "T" not in published:
+                published = f"{published}T00:00:00Z"
+            items.append(
+                LiveUpdateItem(
+                    id=j.get("id", j.get("case_name", "")),
+                    type="judgment",
+                    title=j["case_name"],
+                    summary=j.get("summary", ""),
+                    source=j.get("court", "Court"),
+                    published_at=published,
+                    url=None,
+                    category=j.get("category"),
+                    court=j.get("court"),
+                    citation=j.get("citation"),
+                    tags=j.get("tags", []),
+                )
+            )
+
+    if "news" in requested:
+        for n in _load_news():
+            items.append(
+                LiveUpdateItem(
+                    id=n.get("id", n.get("title", "")),
+                    type="news",
+                    title=n["title"],
+                    summary=n.get("summary", ""),
+                    source=n.get("source", "News"),
+                    published_at=n.get("published_at", ""),
+                    url=n.get("url"),
+                    category=n.get("category"),
+                    tags=n.get("tags", []),
+                )
+            )
+
+    # Filter by `since` if provided
+    if since:
+        try:
+            since_dt = _dt.fromisoformat(since.replace("Z", "+00:00"))
+            filtered = []
+            for item in items:
+                try:
+                    item_dt = _dt.fromisoformat(item.published_at.replace("Z", "+00:00"))
+                    if item_dt > since_dt:
+                        filtered.append(item)
+                except (ValueError, TypeError):
+                    continue
+            items = filtered
+        except (ValueError, TypeError):
+            pass  # Ignore invalid `since`
+
+    # Sort by published_at descending (newest first)
+    items.sort(key=lambda i: i.published_at, reverse=True)
+
+    return LiveUpdatesResponse(
+        items=items[:limit],
+        total=len(items),
+        fetched_at=_dt.utcnow().isoformat() + "Z",
+        sources=sorted({item.source for item in items}),
+    )

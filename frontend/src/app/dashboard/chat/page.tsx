@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, Suspense } from "react";
+import { useState, useEffect, useRef, useCallback, Suspense, useMemo } from "react";
 import {
   Search,
   FileText,
@@ -32,6 +32,7 @@ import {
   Zap,
   MessageSquare,
   Mic,
+  MicOff,
   Settings,
   MoreHorizontal,
   Share2,
@@ -42,12 +43,21 @@ import {
   Trash2,
   Database,
   History,
+  Sun,
+  Moon,
+  Keyboard,
+  X,
+  Command,
 } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useVoiceInput } from "@/hooks/use-voice-input";
+import { useKeyboardShortcuts, formatShortcut, isMac, type ShortcutConfig } from "@/hooks/use-keyboard-shortcuts";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import rehypeSanitize from "rehype-sanitize";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -58,6 +68,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion, AnimatePresence } from "framer-motion";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+// Build the headers for direct fetch calls (SSE streaming + non-streamed
+// fallback below). The shared api.ts client auto-injects the JWT, but this
+// file talks to the backend directly, so we duplicate the logic here.
+function buildAuthHeaders(): Record<string, string> {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (typeof window !== "undefined") {
+    try {
+      const token = window.localStorage.getItem("jurisgpt.access_token");
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+    } catch {
+      // localStorage may be disabled (private mode); fall through.
+    }
+  }
+  return headers;
+}
 
 interface ActionCard {
   icon: React.ElementType;
@@ -71,32 +97,32 @@ interface ActionCard {
 const actionCards: ActionCard[] = [
   {
     icon: Search,
-    title: "Research A Question",
-    description: "Ask about startup, corporate, contract, or compliance law in plain English",
+    title: "Just ask",
+    description: "Type a question in plain English. JurisGPT cites the exact statute or judgment behind every answer.",
     prompt: "What are the annual compliance requirements for a private limited company in India?",
     gradient: "from-primary/10 via-primary/5 to-transparent",
     iconBg: "bg-primary/10 text-primary",
   },
   {
     icon: BookOpen,
-    title: "Find A Statute",
-    description: "Look up a section, act, or legal provision with supporting source snippets",
+    title: "Look up a section",
+    description: "Mention any Indian act and section. JurisGPT explains it in plain English with the source attached.",
     prompt: "What does Section 149 of the Companies Act say about directors?",
     gradient: "from-[#4A6B5C]/10 via-[#4A6B5C]/5 to-transparent",
     iconBg: "bg-[#E8EFE9] text-[#4A6B5C]",
   },
   {
     icon: FileSearch,
-    title: "Check A Clause",
-    description: "Understand enforceability, risk, and legal context before drafting or review",
+    title: "Sanity-check a clause",
+    description: "Paste a clause or describe one. JurisGPT flags risks, cites case law, and suggests a safer rewrite.",
     prompt: "Are non-compete clauses enforceable in India for startup employees?",
     gradient: "from-[#B8884D]/15 via-[#B8884D]/5 to-transparent",
     iconBg: "bg-[#F5EBD8] text-[#B8884D]",
   },
   {
     icon: ScrollText,
-    title: "Route To Drafting",
-    description: "Research the clauses first, then move into drafting workflows only when needed",
+    title: "Plan a drafting flow",
+    description: "Discuss the clauses first, then jump to a contract template only when you&apos;re ready.",
     prompt: "What clauses should be included in a founder agreement before I draft it?",
     gradient: "from-stone-500/10 via-stone-500/5 to-transparent",
     iconBg: "bg-stone-500/10 text-stone-700 dark:text-stone-200",
@@ -106,8 +132,8 @@ const actionCards: ActionCard[] = [
 const suggestedPrompts = [
   "What filings are due this quarter for a private limited company?",
   "What are the standard founder vesting terms for an Indian startup?",
-  "What does the Companies Act require for appointment of directors?",
-  "What clauses should I review before drafting a service agreement?",
+  "Walk me through GST registration for a SaaS startup.",
+  "Is a non-compete enforceable on a co-founder in India?",
 ];
 
 /* ─── Animated Background ─── */
@@ -126,6 +152,58 @@ function AnimatedBackground() {
   );
 }
 
+/* ─── Thinking Indicator (Claude-style) ─── */
+function ThinkingIndicator({ thinkingText }: { thinkingText?: string }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      className="w-full max-w-3xl"
+    >
+      <div className="bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-800/30 rounded-xl overflow-hidden">
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-amber-100/30 dark:hover:bg-amber-900/20 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              className="h-4 w-4 rounded-full border-2 border-amber-500 border-t-transparent"
+            />
+            <span className="text-sm font-medium text-amber-700 dark:text-amber-400">Thinking...</span>
+          </div>
+          <motion.div
+            animate={{ rotate: isExpanded ? 180 : 0 }}
+            transition={{ duration: 0.2 }}
+            className="ml-auto"
+          >
+            <ChevronDown className="h-4 w-4 text-amber-600 dark:text-amber-500" />
+          </motion.div>
+        </button>
+        <AnimatePresence>
+          {isExpanded && thinkingText && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="border-t border-amber-200/50 dark:border-amber-800/30"
+            >
+              <div className="px-4 py-3 text-sm text-amber-800/80 dark:text-amber-300/80 font-mono whitespace-pre-wrap max-h-48 overflow-y-auto">
+                {thinkingText}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </motion.div>
+  );
+}
+
 /* ─── Typing Indicator ─── */
 function TypingIndicator() {
   return (
@@ -133,36 +211,32 @@ function TypingIndicator() {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
-      className="flex gap-3 items-start"
+      className="flex gap-3 items-start w-full max-w-3xl"
     >
-      <motion.div
-        className="flex-shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shadow-sm border border-primary/10"
-        animate={{ scale: [1, 1.05, 1] }}
-        transition={{ duration: 2, repeat: Infinity }}
-      >
-        <Image src="/logo.png" alt="AI" width={20} height={20} />
-      </motion.div>
-      <div className="bg-gradient-to-br from-card to-card/80 border border-border/60 rounded-2xl rounded-tl-md px-5 py-3.5 shadow-lg shadow-black/5">
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1">
-            {[0, 1, 2].map((i) => (
-              <motion.div
-                key={i}
-                className="h-2 w-2 rounded-full bg-gradient-to-t from-primary to-primary/60"
-                animate={{
-                  y: [0, -8, 0],
-                  scale: [1, 1.2, 1],
-                }}
-                transition={{
-                  duration: 0.6,
-                  repeat: Infinity,
-                  delay: i * 0.12,
-                  ease: "easeInOut",
-                }}
-              />
-            ))}
-          </div>
-          <span className="ml-1 text-sm text-muted-foreground font-medium">Analyzing...</span>
+      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+        <Sparkles className="h-4 w-4 text-primary" />
+      </div>
+      <div className="flex-1">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-sm font-semibold text-foreground">JurisGPT</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          {[0, 1, 2].map((i) => (
+            <motion.div
+              key={i}
+              className="h-2 w-2 rounded-full bg-primary/60"
+              animate={{
+                y: [0, -6, 0],
+                opacity: [0.4, 1, 0.4],
+              }}
+              transition={{
+                duration: 0.8,
+                repeat: Infinity,
+                delay: i * 0.15,
+                ease: "easeInOut",
+              }}
+            />
+          ))}
         </div>
       </div>
     </motion.div>
@@ -180,6 +254,7 @@ function CopyButton({ text }: { text: string }) {
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error("Failed to copy to clipboard:", err);
+      toast.error("Failed to copy to clipboard");
     }
   };
 
@@ -649,11 +724,48 @@ function InlineCitationMarker({ index }: { index: number }) {
   );
 }
 
+/** Clean response content by removing raw citation artifacts */
+function cleanResponseContent(content: string): string {
+  if (!content) return content;
+
+  // Remove patterns like "[1] [2]" or "[1] [2] [3]" at the very start
+  let cleaned = content.replace(/^(\s*\[\d+\]\s*)+/, "");
+
+  // Remove "Citation: [N]" or "Citation [N]" patterns
+  cleaned = cleaned.replace(/Citation:?\s*\[\d+\]/gi, "");
+
+  // Remove lines that are just citation references
+  cleaned = cleaned.replace(/^(\[\d+\]\s*)+$/gm, "");
+
+  // Remove redundant echo of the user question at the start (heuristic)
+  // If the response starts with "Please provide..." or "What are..." it's likely echoing
+  const echoPatterns = [
+    /^Please\s+provide\s+guidance\s+on/i,
+    /^What\s+are\s+the\s+relevant/i,
+    /^Please\s+explain/i,
+  ];
+  for (const pattern of echoPatterns) {
+    if (pattern.test(cleaned)) {
+      // Find the first paragraph break and remove the echo
+      const parts = cleaned.split(/\n\n/);
+      if (parts.length > 1) {
+        cleaned = parts.slice(1).join("\n\n");
+      }
+    }
+  }
+
+  return cleaned.trim();
+}
+
 /** Replace [1], [2], etc. in markdown text with clickable citation links */
 function injectCitationLinks(content: string, citationCount: number): string {
   if (!content || citationCount === 0) return content;
+
+  // First clean the content
+  const cleaned = cleanResponseContent(content);
+
   // Replace [N] patterns where N is 1..citationCount with markdown links
-  return content.replace(/\[(\d+)\]/g, (match, numStr) => {
+  return cleaned.replace(/\[(\d+)\]/g, (match, numStr) => {
     const num = parseInt(numStr, 10);
     if (num >= 1 && num <= citationCount) {
       // Use a special anchor that we'll intercept in the custom renderer
@@ -783,7 +895,7 @@ function FollowUpQuestions({
   );
 }
 
-/* ─── Message Bubble ─── */
+/* ─── Message Bubble (Professional ChatGPT/Claude Style) ─── */
 function MessageBubble({
   message,
   isLatest,
@@ -809,203 +921,164 @@ function MessageBubble({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 15, scale: 0.97 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      className={cn("flex gap-3 group", isUser ? "justify-end" : "justify-start")}
-    >
-      {/* AI Avatar */}
-      {!isUser && (
-        <motion.div
-          className="flex-shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mt-1 shadow-sm border border-primary/10"
-          initial={{ scale: 0, rotate: -180 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 300, delay: 0.1 }}
-        >
-          <Image src="/logo.png" alt="AI" width={20} height={20} />
-        </motion.div>
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className={cn(
+        "w-full max-w-3xl mx-auto group",
+        isUser ? "flex justify-end" : ""
       )}
-
-      <div className={cn("flex flex-col", isUser ? "items-end max-w-[75%]" : "items-start", isDocumentMessage && !isUser ? "max-w-[85%]" : "max-w-[75%]")}>
-        {/* Document Header Badge */}
-        {isDocumentMessage && !isUser && (
-          <motion.div
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-2 mb-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-primary/15 to-primary/5 border border-primary/20 shadow-sm"
-          >
-            <ScrollText className="h-4 w-4 text-primary" />
-            <span className="text-xs font-semibold text-primary">
-              {getDocumentTypeLabel(message?.documentType)} Generated
-            </span>
-          </motion.div>
-        )}
-
-        <div
-          className={cn(
-            "rounded-2xl px-5 py-4 shadow-lg transition-all",
-            isUser
-              ? "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground rounded-tr-md shadow-primary/20"
-              : isDocumentMessage
-                ? "bg-gradient-to-br from-card to-card/80 border-2 border-primary/20 text-card-foreground rounded-tl-md"
-                : "bg-gradient-to-br from-card to-card/80 border border-border/60 text-card-foreground rounded-tl-md shadow-black/5"
-          )}
-        >
-          {!isUser ? (
-            <>
-              {documentData && documentData.document ? (
-                <>
-                  {/* Document Content with Special Formatting */}
-                  <div className="mb-4">
-                    <div className="bg-muted/40 rounded-xl p-5 border border-border/40 font-mono text-[13px] leading-relaxed overflow-x-auto">
-                      <pre className="whitespace-pre-wrap text-foreground/90">{documentData.document || ""}</pre>
-                    </div>
-                  </div>
-
-                  {/* Document Actions */}
-                  <DocumentActions
-                    documentContent={documentData.document || ""}
-                    documentType={message?.documentType}
-                  />
-
-                  {/* Explanation */}
-                  {documentData.explanation && (
-                    <div className="mt-5 pt-5 border-t border-border/40">
-                      <div className="text-[14px] leading-relaxed prose prose-sm prose-neutral dark:prose-invert max-w-none prose-p:my-2 prose-li:my-1 prose-headings:my-3 prose-headings:text-primary prose-a:text-primary prose-code:text-primary prose-code:bg-primary/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:before:content-none prose-code:after:content-none">
-                        <ReactMarkdown rehypePlugins={[rehypeSanitize]}>{documentData.explanation}</ReactMarkdown>
-                      </div>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <>
-                  {/* Confidence, Grounded, and Data Source indicators */}
-                  {(message?.confidence || message?.grounded || message?.modelUsed) && (
-                    <div className="flex flex-wrap items-center gap-2 mb-4">
-                      {message?.confidence && (
-                        <ConfidenceBadge confidence={message.confidence} />
-                      )}
-                      {message?.grounded && (
-                        <GroundedIndicator grounded={message.grounded} />
-                      )}
-                      {message?.modelUsed && (
-                        <DataSourceBadge modelUsed={message.modelUsed} />
-                      )}
-                    </div>
-                  )}
-
-                  {/* Main answer content */}
-                  <div className="text-[14px] leading-relaxed prose prose-sm prose-neutral dark:prose-invert max-w-none prose-p:my-2 prose-li:my-1 prose-headings:my-3 prose-headings:text-primary prose-headings:font-semibold prose-a:text-primary prose-code:text-primary prose-code:bg-primary/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:before:content-none prose-code:after:content-none prose-strong:text-foreground prose-strong:font-semibold">
-                    <ReactMarkdown
-                      rehypePlugins={[rehypeSanitize]}
-                      components={{
-                        a: ({ href, children, ...props }) => {
-                          // Intercept citation anchor links
-                          if (href?.startsWith("#citation-")) {
-                            const num = href.replace("#citation-", "");
-                            return (
-                              <button
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  const el = document.getElementById(href.slice(1));
-                                  if (el) {
-                                    el.scrollIntoView({ behavior: "smooth", block: "center" });
-                                    window.location.hash = href.slice(1);
-                                  }
-                                }}
-                                className="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 mx-0.5 rounded-md bg-primary/15 text-primary text-[10px] font-bold hover:bg-primary/25 hover:scale-110 transition-all cursor-pointer align-super border border-primary/20 no-underline"
-                                title={`Jump to citation ${num}`}
-                              >
-                                {num}
-                              </button>
-                            );
-                          }
-                          return <a href={href} {...props}>{children}</a>;
-                        },
-                      }}
-                    >
-                      {injectCitationLinks(messageContent, message?.citations?.length ?? 0)}
-                    </ReactMarkdown>
-                  </div>
-
-                  {/* Limitations */}
-                  {message?.limitations && (
-                    <LimitationsSection limitations={message.limitations} />
-                  )}
-
-                  {/* Citations */}
-                  {message?.citations && message.citations.length > 0 && (
-                    <CitationsSection citations={message.citations} />
-                  )}
-
-                  {/* Follow-up questions (new format) or suggestions (legacy format) */}
-                  {(message?.followUpQuestions || message?.suggestions) && onFollowUpSelect && (
-                    <FollowUpQuestions
-                      questions={message.followUpQuestions || message.suggestions || []}
-                      onSelect={onFollowUpSelect}
-                    />
-                  )}
-                </>
-              )}
-            </>
-          ) : (
-            <p className="text-[14px] leading-relaxed">{messageContent}</p>
-          )}
+    >
+      {isUser ? (
+        /* User Message - Right aligned bubble */
+        <div className="max-w-[80%] flex flex-col items-end">
+          <div className="bg-primary text-primary-foreground rounded-2xl rounded-tr-sm px-4 py-3 shadow-sm">
+            <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{messageContent}</p>
+          </div>
+          <span className="text-[11px] text-muted-foreground/60 mt-1.5 mr-1">{time}</span>
         </div>
+      ) : (
+        /* AI Message - Full width, clean design */
+        <div className="w-full">
+          {/* AI Header */}
+          <div className="flex items-center gap-2 mb-3">
+            <div className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
+              <Sparkles className="h-4 w-4 text-primary" />
+            </div>
+            <span className="text-sm font-semibold text-foreground">JurisGPT</span>
+            <span className="text-[11px] text-muted-foreground/60">{time}</span>
+          </div>
 
-        {/* Message meta */}
-        <div
-          className={cn(
-            "flex items-center gap-2 mt-2 px-1",
-            isUser ? "flex-row-reverse" : "flex-row"
-          )}
-        >
-          <span className="text-[11px] text-muted-foreground/50 font-medium">{time}</span>
-          {!isUser && (
-            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              <CopyButton text={messageContent} />
-              <motion.button
-                className="p-1.5 rounded-lg text-muted-foreground/50 hover:text-green-600 hover:bg-green-500/10 transition-all"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                title="Helpful"
-              >
-                <ThumbsUp className="h-3.5 w-3.5" />
-              </motion.button>
-              <motion.button
-                className="p-1.5 rounded-lg text-muted-foreground/50 hover:text-red-600 hover:bg-red-500/10 transition-all"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                title="Not helpful"
-              >
-                <ThumbsDown className="h-3.5 w-3.5" />
-              </motion.button>
-              <motion.button
-                className="p-1.5 rounded-lg text-muted-foreground/50 hover:text-primary hover:bg-primary/10 transition-all"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                title="Regenerate"
-              >
-                <RefreshCw className="h-3.5 w-3.5" />
-              </motion.button>
+          {/* Document Badge */}
+          {isDocumentMessage && (
+            <div className="flex items-center gap-2 mb-3 px-3 py-1.5 rounded-lg bg-primary/5 border border-primary/10 w-fit">
+              <ScrollText className="h-4 w-4 text-primary" />
+              <span className="text-xs font-medium text-primary">
+                {getDocumentTypeLabel(message?.documentType)} Generated
+              </span>
             </div>
           )}
-        </div>
-      </div>
 
-      {/* User Avatar */}
-      {isUser && (
-        <motion.div
-          initial={{ scale: 0, rotate: 180 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 300, delay: 0.1 }}
-        >
-          <Avatar className="h-9 w-9 flex-shrink-0 mt-1 shadow-lg shadow-primary/20">
-            <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-xs font-bold">
-              S
-            </AvatarFallback>
-          </Avatar>
-        </motion.div>
+          {/* Confidence Indicators - Compact */}
+          {(message?.confidence || message?.grounded || message?.modelUsed) && (
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              {message?.confidence && (
+                <ConfidenceBadge confidence={message.confidence} />
+              )}
+              {message?.grounded && (
+                <GroundedIndicator grounded={message.grounded} />
+              )}
+              {message?.modelUsed && (
+                <DataSourceBadge modelUsed={message.modelUsed} />
+              )}
+            </div>
+          )}
+
+          {/* Content Area */}
+          <div className="pl-9">
+            {documentData && documentData.document ? (
+              <>
+                {/* Document Content */}
+                <div className="mb-4">
+                  <div className="bg-muted/30 rounded-lg p-4 border border-border/30 font-mono text-[13px] leading-relaxed overflow-x-auto">
+                    <pre className="whitespace-pre-wrap text-foreground/90">{documentData.document || ""}</pre>
+                  </div>
+                </div>
+                <DocumentActions
+                  documentContent={documentData.document || ""}
+                  documentType={message?.documentType}
+                />
+                {documentData.explanation && (
+                  <div className="mt-4 pt-4 border-t border-border/30">
+                    <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none">
+                      <ReactMarkdown rehypePlugins={[rehypeSanitize]}>{documentData.explanation}</ReactMarkdown>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                {/* Main Answer - Clean prose styling */}
+                <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none prose-headings:text-foreground prose-headings:font-semibold prose-h1:text-lg prose-h2:text-base prose-h3:text-sm prose-p:my-2 prose-p:leading-relaxed prose-li:my-1 prose-ul:my-2 prose-ol:my-2 prose-strong:text-foreground prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-code:text-primary prose-code:bg-primary/5 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-[13px] prose-code:before:content-none prose-code:after:content-none prose-pre:bg-muted/30 prose-pre:border prose-pre:border-border/30">
+                  <ReactMarkdown
+                    rehypePlugins={[rehypeSanitize]}
+                    components={{
+                      a: ({ href, children, ...props }) => {
+                        if (href?.startsWith("#citation-")) {
+                          const num = href.replace("#citation-", "");
+                          return (
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                const el = document.getElementById(href.slice(1));
+                                if (el) {
+                                  el.scrollIntoView({ behavior: "smooth", block: "center" });
+                                }
+                              }}
+                              className="inline-flex items-center justify-center min-w-[1.1rem] h-[1.1rem] px-1 mx-0.5 rounded bg-primary/10 text-primary text-[10px] font-semibold hover:bg-primary/20 transition-colors cursor-pointer align-super no-underline"
+                            >
+                              {num}
+                            </button>
+                          );
+                        }
+                        return <a href={href} {...props}>{children}</a>;
+                      },
+                    }}
+                  >
+                    {injectCitationLinks(messageContent, message?.citations?.length ?? 0)}
+                  </ReactMarkdown>
+                </div>
+
+                {/* Limitations */}
+                {message?.limitations && (
+                  <LimitationsSection limitations={message.limitations} />
+                )}
+
+                {/* Citations */}
+                {message?.citations && message.citations.length > 0 && (
+                  <CitationsSection citations={message.citations} />
+                )}
+
+                {/* Follow-up Questions */}
+                {(message?.followUpQuestions || message?.suggestions) && onFollowUpSelect && (
+                  <FollowUpQuestions
+                    questions={message.followUpQuestions || message.suggestions || []}
+                    onSelect={onFollowUpSelect}
+                  />
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Action buttons - show on hover */}
+          <div className="pl-9 mt-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <CopyButton text={messageContent} />
+            <motion.button
+              className="p-1.5 rounded-lg text-muted-foreground/50 hover:text-green-600 hover:bg-green-500/10 transition-all"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              title="Helpful"
+            >
+              <ThumbsUp className="h-3.5 w-3.5" />
+            </motion.button>
+            <motion.button
+              className="p-1.5 rounded-lg text-muted-foreground/50 hover:text-red-600 hover:bg-red-500/10 transition-all"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              title="Not helpful"
+            >
+              <ThumbsDown className="h-3.5 w-3.5" />
+            </motion.button>
+            <motion.button
+              className="p-1.5 rounded-lg text-muted-foreground/50 hover:text-primary hover:bg-primary/10 transition-all"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              title="Regenerate"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+            </motion.button>
+          </div>
+        </div>
       )}
     </motion.div>
   );
@@ -1016,17 +1089,30 @@ function ChatInput({
   input,
   setInput,
   onSubmit,
+  onStop,
   isLoading,
   compact = false,
+  inputRef,
 }: {
   input: string;
   setInput: (val: string) => void;
   onSubmit: () => void;
+  onStop?: () => void;
   isLoading: boolean;
   compact?: boolean;
+  inputRef?: React.RefObject<HTMLTextAreaElement | null>;
 }) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const internalRef = useRef<HTMLTextAreaElement>(null);
+  const textareaRef = inputRef || internalRef;
   const [isFocused, setIsFocused] = useState(false);
+
+  // Voice input
+  const { isListening, isSupported: voiceSupported, toggleListening, interimTranscript } = useVoiceInput({
+    onResult: (transcript) => {
+      setInput(input + transcript + " ");
+    },
+    language: "en-IN",
+  });
 
   // Auto-resize textarea
   useEffect(() => {
@@ -1034,7 +1120,7 @@ function ChatInput({
       textareaRef.current.style.height = "auto";
       textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, compact ? 120 : 160)}px`;
     }
-  }, [input, compact]);
+  }, [input, compact, textareaRef]);
 
   return (
     <motion.div
@@ -1060,17 +1146,18 @@ function ChatInput({
       )}>
         {/* Input Area */}
         <div className="flex items-start gap-3">
-          <div className="flex-1">
+          <div className="flex-1 relative">
             <Textarea
               ref={textareaRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
-              placeholder="Ask about company law, contracts, compliance, or draft documents..."
+              placeholder={isListening ? "Speak now..." : "Ask about company law, contracts, compliance, or draft documents..."}
               className={cn(
                 "resize-none border-0 bg-transparent p-0 placeholder:text-muted-foreground/40 focus-visible:ring-0 text-[15px] leading-relaxed",
-                compact ? "min-h-[40px]" : "min-h-[60px]"
+                compact ? "min-h-[40px]" : "min-h-[60px]",
+                isListening && "placeholder:text-red-400/60"
               )}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
@@ -1079,6 +1166,19 @@ function ChatInput({
                 }
               }}
             />
+            {/* Voice interim transcript overlay */}
+            <AnimatePresence>
+              {isListening && interimTranscript && (
+                <motion.div
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute bottom-0 left-0 right-0 text-sm text-red-500/70 italic pointer-events-none"
+                >
+                  {interimTranscript}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
 
@@ -1105,14 +1205,23 @@ function ChatInput({
               <FileText className="h-4 w-4" />
               <span className="text-xs font-medium hidden sm:inline">Templates</span>
             </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
-              title="Voice input"
-            >
-              <Mic className="h-4 w-4" />
-            </motion.button>
+            {voiceSupported && (
+              <motion.button
+                onClick={toggleListening}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={cn(
+                  "flex items-center gap-1.5 rounded-xl px-3 py-2 transition-all",
+                  isListening
+                    ? "text-red-500 bg-red-500/10 animate-pulse"
+                    : "text-muted-foreground hover:text-primary hover:bg-primary/10"
+                )}
+                title={isListening ? "Stop listening" : "Voice input"}
+              >
+                {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                {isListening && <span className="text-xs font-medium hidden sm:inline">Listening...</span>}
+              </motion.button>
+            )}
           </div>
 
           {/* Right Actions */}
@@ -1132,35 +1241,44 @@ function ChatInput({
               )}
             </AnimatePresence>
 
-            {/* Send Button */}
-            <motion.button
-              onClick={onSubmit}
-              disabled={!input.trim() || isLoading}
-              whileHover={input.trim() && !isLoading ? { scale: 1.05, y: -1 } : {}}
-              whileTap={input.trim() && !isLoading ? { scale: 0.95 } : {}}
-              className={cn(
-                "flex items-center gap-2 rounded-xl px-5 py-2.5 font-semibold text-sm transition-all duration-300",
-                input.trim() && !isLoading
-                  ? "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40"
-                  : "bg-secondary/80 text-muted-foreground/50 cursor-not-allowed"
-              )}
-            >
-              {isLoading ? (
-                <>
-                  <motion.div
-                    className="h-4 w-4 border-2 border-current border-t-transparent rounded-full"
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
-                  />
-                  <span className="hidden sm:inline">Thinking...</span>
-                </>
+            {/* Stop / Send Buttons */}
+            <AnimatePresence mode="wait">
+              {isLoading && onStop ? (
+                <motion.button
+                  key="stop"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  onClick={onStop}
+                  whileHover={{ scale: 1.05, y: -1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex items-center gap-2 rounded-xl px-5 py-2.5 font-semibold text-sm bg-red-500/90 text-white shadow-lg shadow-red-500/30 hover:bg-red-600 hover:shadow-xl hover:shadow-red-500/40 transition-all duration-300"
+                >
+                  <X className="h-4 w-4" />
+                  <span className="hidden sm:inline">Stop</span>
+                </motion.button>
               ) : (
-                <>
+                <motion.button
+                  key="send"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  onClick={onSubmit}
+                  disabled={!input.trim() || isLoading}
+                  whileHover={input.trim() && !isLoading ? { scale: 1.05, y: -1 } : {}}
+                  whileTap={input.trim() && !isLoading ? { scale: 0.95 } : {}}
+                  className={cn(
+                    "flex items-center gap-2 rounded-xl px-5 py-2.5 font-semibold text-sm transition-all duration-300",
+                    input.trim() && !isLoading
+                      ? "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40"
+                      : "bg-secondary/80 text-muted-foreground/50 cursor-not-allowed"
+                  )}
+                >
                   <span className="hidden sm:inline">Send</span>
                   <ArrowUp className="h-4 w-4" />
-                </>
+                </motion.button>
               )}
-            </motion.button>
+            </AnimatePresence>
           </div>
         </div>
       </div>
@@ -1183,34 +1301,88 @@ function ConversationSidebar({
     createNewConversation,
     deleteConversation,
   } = useChat();
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Filter conversations based on search
+  const filteredConversations = useMemo(() => {
+    if (!searchQuery.trim()) return conversations;
+    const query = searchQuery.toLowerCase();
+    return conversations.filter(conv =>
+      conv.title.toLowerCase().includes(query) ||
+      conv.messages.some(msg => msg.content.toLowerCase().includes(query))
+    );
+  }, [conversations, searchQuery]);
+
+  // Highlight matching text
+  const highlightMatch = (text: string, query: string) => {
+    if (!query.trim()) return text;
+    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    const parts = text.split(regex);
+    return parts.map((part, i) =>
+      regex.test(part) ? (
+        <span key={i} className="bg-primary/30 text-primary font-semibold rounded px-0.5">{part}</span>
+      ) : part
+    );
+  };
 
   if (!isOpen) return null;
 
   return (
     <motion.aside
       initial={{ width: 0, opacity: 0 }}
-      animate={{ width: 280, opacity: 1 }}
+      animate={{ width: 300, opacity: 1 }}
       exit={{ width: 0, opacity: 0 }}
-      transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="relative z-20 flex flex-col border-r border-border/40 bg-card/50 backdrop-blur-lg overflow-hidden"
+      transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+      className="relative z-20 flex flex-col border-r border-border/40 bg-gradient-to-b from-card/80 to-card/50 backdrop-blur-xl overflow-hidden"
     >
       {/* Sidebar Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border/40">
         <div className="flex items-center gap-2">
-          <History className="h-4 w-4 text-primary" />
+          <div className="p-1.5 rounded-lg bg-primary/10">
+            <History className="h-3.5 w-3.5 text-primary" />
+          </div>
           <span className="text-sm font-semibold text-foreground">History</span>
-          <span className="px-1.5 py-0.5 rounded-md bg-primary/10 text-primary text-[10px] font-bold">
-            {conversations.length}
+          <span className="px-1.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
+            {filteredConversations.length}
           </span>
         </div>
         <motion.button
-          whileHover={{ scale: 1.1 }}
+          whileHover={{ scale: 1.1, rotate: 180 }}
           whileTap={{ scale: 0.9 }}
           onClick={onToggle}
           className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
         >
-          <PanelLeftClose className="h-4 w-4" />
+          <X className="h-4 w-4" />
         </motion.button>
+      </div>
+
+      {/* Search Bar */}
+      <div className="px-3 pt-3">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/50" />
+          <input
+            ref={searchInputRef}
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search conversations..."
+            className="w-full pl-9 pr-3 py-2 text-sm rounded-xl bg-secondary/50 border border-border/40 placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
+          />
+          <AnimatePresence>
+            {searchQuery && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md text-muted-foreground/50 hover:text-foreground hover:bg-secondary transition-all"
+              >
+                <X className="h-3 w-3" />
+              </motion.button>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
       {/* New Chat Button */}
@@ -1219,59 +1391,82 @@ function ConversationSidebar({
           whileHover={{ scale: 1.01, y: -1 }}
           whileTap={{ scale: 0.99 }}
           onClick={createNewConversation}
-          className="w-full flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-primary to-primary/90 text-primary-foreground text-sm font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all"
+          className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-primary to-primary/90 text-primary-foreground text-sm font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all"
         >
           <Plus className="h-4 w-4" />
           New Conversation
+          <kbd className="ml-auto px-1.5 py-0.5 rounded bg-primary-foreground/20 text-[10px] font-mono">
+            {isMac() ? "⌘" : "Ctrl"}K
+          </kbd>
         </motion.button>
       </div>
 
       {/* Conversation List */}
       <div className="flex-1 overflow-y-auto px-3 pb-3 space-y-1">
-        {conversations.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <MessageSquare className="h-8 w-8 text-muted-foreground/20 mb-3" />
-            <p className="text-xs text-muted-foreground/50">No conversations yet</p>
-          </div>
-        ) : (
-          conversations.map((conv) => (
+        <AnimatePresence mode="popLayout">
+          {filteredConversations.length === 0 ? (
             <motion.div
-              key={conv.id}
-              whileHover={{ x: 2 }}
-              className={cn(
-                "group flex items-center gap-2 px-3 py-2.5 rounded-xl cursor-pointer transition-all text-left",
-                conv.id === activeConversationId
-                  ? "bg-primary/10 border border-primary/20 text-primary"
-                  : "hover:bg-secondary/80 text-muted-foreground hover:text-foreground"
-              )}
-              onClick={() => switchConversation(conv.id)}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex flex-col items-center justify-center py-12 text-center"
             >
-              <MessageSquare className="h-3.5 w-3.5 flex-shrink-0 opacity-60" />
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium truncate">{conv.title}</p>
-                <p className="text-[10px] text-muted-foreground/50 mt-0.5">
-                  {conv.messages.length} message{conv.messages.length !== 1 ? "s" : ""} &middot;{" "}
-                  {new Date(conv.updatedAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
-                </p>
-              </div>
-              <motion.button
-                initial={{ opacity: 0 }}
-                whileHover={{ scale: 1.1 }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  deleteConversation(conv.id);
-                }}
-                className="p-1 rounded-md text-muted-foreground/30 hover:text-red-500 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all"
-              >
-                <Trash2 className="h-3 w-3" />
-              </motion.button>
+              <MessageSquare className="h-8 w-8 text-muted-foreground/20 mb-3" />
+              <p className="text-xs text-muted-foreground/50">
+                {searchQuery ? "No matching conversations" : "No conversations yet"}
+              </p>
             </motion.div>
-          ))
-        )}
+          ) : (
+            filteredConversations.map((conv, idx) => (
+              <motion.div
+                key={conv.id}
+                layout
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20, height: 0 }}
+                transition={{ delay: idx * 0.02 }}
+                whileHover={{ x: 3 }}
+                className={cn(
+                  "group flex items-center gap-2 px-3 py-2.5 rounded-xl cursor-pointer transition-all text-left",
+                  conv.id === activeConversationId
+                    ? "bg-gradient-to-r from-primary/15 to-primary/5 border border-primary/25 text-primary shadow-sm"
+                    : "hover:bg-secondary/80 text-muted-foreground hover:text-foreground border border-transparent"
+                )}
+                onClick={() => switchConversation(conv.id)}
+              >
+                <div className={cn(
+                  "p-1.5 rounded-lg transition-colors",
+                  conv.id === activeConversationId ? "bg-primary/20" : "bg-secondary/50"
+                )}>
+                  <MessageSquare className="h-3 w-3" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium truncate">
+                    {highlightMatch(conv.title, searchQuery)}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground/50 mt-0.5">
+                    {conv.messages.length} message{conv.messages.length !== 1 ? "s" : ""} &middot;{" "}
+                    {new Date(conv.updatedAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                  </p>
+                </div>
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileHover={{ scale: 1.1 }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteConversation(conv.id);
+                  }}
+                  className="p-1.5 rounded-lg text-muted-foreground/30 hover:text-red-500 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </motion.button>
+              </motion.div>
+            ))
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Sidebar Footer — corpus info */}
-      <div className="px-4 py-3 border-t border-border/40 bg-secondary/30">
+      <div className="px-4 py-3 border-t border-border/40 bg-gradient-to-r from-secondary/40 to-secondary/20">
         <div className="flex items-center gap-2 text-[10px] text-muted-foreground/60">
           <Database className="h-3 w-3" />
           <span>Local corpus &middot; 183 legal docs</span>
@@ -1281,19 +1476,175 @@ function ConversationSidebar({
   );
 }
 
+/* ─── Keyboard Shortcuts Modal ─── */
+function KeyboardShortcutsModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const shortcuts = [
+    { keys: isMac() ? "⌘K" : "Ctrl+K", description: "New conversation" },
+    { keys: isMac() ? "⌘/" : "Ctrl+/", description: "Focus input" },
+    { keys: isMac() ? "⌘B" : "Ctrl+B", description: "Toggle sidebar" },
+    { keys: isMac() ? "⌘⇧L" : "Ctrl+Shift+L", description: "Toggle theme" },
+    { keys: "Esc", description: "Close modal / Stop voice" },
+    { keys: "Enter", description: "Send message" },
+    { keys: "Shift+Enter", description: "New line" },
+  ];
+
+  if (!isOpen) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        onClick={(e) => e.stopPropagation()}
+        className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden"
+      >
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-primary/10">
+              <Keyboard className="h-5 w-5 text-primary" />
+            </div>
+            <h2 className="text-lg font-semibold">Keyboard Shortcuts</h2>
+          </div>
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={onClose}
+            className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
+          >
+            <X className="h-4 w-4" />
+          </motion.button>
+        </div>
+        <div className="p-4 space-y-2">
+          {shortcuts.map((shortcut, i) => (
+            <motion.div
+              key={shortcut.keys}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.03 }}
+              className="flex items-center justify-between py-2 px-3 rounded-xl hover:bg-secondary/50 transition-colors"
+            >
+              <span className="text-sm text-muted-foreground">{shortcut.description}</span>
+              <kbd className="px-2.5 py-1 rounded-lg bg-secondary text-xs font-mono font-semibold border border-border shadow-sm">
+                {shortcut.keys}
+              </kbd>
+            </motion.div>
+          ))}
+        </div>
+        <div className="px-6 py-3 border-t border-border bg-secondary/30 text-center">
+          <span className="text-xs text-muted-foreground">
+            Press <kbd className="px-1.5 py-0.5 rounded bg-secondary text-[10px] font-mono mx-1">?</kbd> anytime to show this
+          </span>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 /* ─── Chat Page Content ─── */
 function ChatPageContent() {
   const { activeConversation, activeConversationId, addMessage, conversations, createNewConversation } = useChat();
   const searchParams = useSearchParams();
+  const { theme, setTheme } = useTheme();
   const [input, setInput] = useState("");
   const [greeting, setGreeting] = useState("Good morning");
   const [isLoading, setIsLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [shortcutsModalOpen, setShortcutsModalOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Stop generation function
+  const handleStop = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+      setIsLoading(false);
+      toast.info("Response generation stopped");
+    }
+  }, []);
 
   const messages = activeConversation?.messages ?? [];
   const hasMessages = messages.length > 0;
+
+  // Ref tracks the latest messages so handleSubmit doesn't need `messages` in deps.
+  // Without this, the callback was re-created on every token during streaming.
+  const messagesRef = useRef<ChatMessage[]>(messages);
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
+
+  // Keyboard shortcuts
+  useKeyboardShortcuts([
+    {
+      key: "k",
+      meta: true,
+      handler: () => createNewConversation(),
+      description: "New conversation",
+    },
+    {
+      key: "k",
+      ctrl: true,
+      handler: () => createNewConversation(),
+      description: "New conversation",
+    },
+    {
+      key: "/",
+      meta: true,
+      handler: () => inputRef.current?.focus(),
+      description: "Focus input",
+    },
+    {
+      key: "/",
+      ctrl: true,
+      handler: () => inputRef.current?.focus(),
+      description: "Focus input",
+    },
+    {
+      key: "b",
+      meta: true,
+      handler: () => setSidebarOpen(prev => !prev),
+      description: "Toggle sidebar",
+    },
+    {
+      key: "b",
+      ctrl: true,
+      handler: () => setSidebarOpen(prev => !prev),
+      description: "Toggle sidebar",
+    },
+    {
+      key: "l",
+      meta: true,
+      shift: true,
+      handler: () => setTheme(theme === "dark" ? "light" : "dark"),
+      description: "Toggle theme",
+    },
+    {
+      key: "l",
+      ctrl: true,
+      shift: true,
+      handler: () => setTheme(theme === "dark" ? "light" : "dark"),
+      description: "Toggle theme",
+    },
+    {
+      key: "?",
+      handler: () => setShortcutsModalOpen(true),
+      description: "Show shortcuts",
+    },
+    {
+      key: "Escape",
+      handler: () => setShortcutsModalOpen(false),
+      description: "Close modal",
+    },
+  ]);
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -1318,198 +1669,229 @@ function ChatPageContent() {
   const handleSubmit = useCallback(async () => {
     if (!input.trim() || isLoading) return;
 
+    const savedInput = input.trim();
     const userMessage: ChatMessage = {
       id: crypto.randomUUID(),
       role: "user",
-      content: input,
+      content: savedInput,
       timestamp: new Date().toISOString(),
     };
 
     addMessage(userMessage);
-    const savedInput = input;
     setInput("");
     setIsLoading(true);
 
-    // Build conversation history for context
-    const history = messages
-      .filter(Boolean)
+    // Build conversation history from latest messages (read via ref to avoid stale closure)
+    const history = messagesRef.current
       .slice(-6)
       .map((m) => ({ role: m.role, content: m.content }));
 
-    // Try SSE streaming first, fall back to standard fetch
     const aiMessageId = crypto.randomUUID();
     let streamedContent = "";
     let streamStarted = false;
     let streamCompleted = false;
 
-    try {
-      await new Promise<void>((resolve, reject) => {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => {
-          controller.abort();
-          reject(new Error("Stream timeout"));
-        }, 60000);
+    // Token-batching: streaming many tokens per second triggers a state update each.
+    // We coalesce updates via requestAnimationFrame so React re-renders at most ~60fps.
+    let pendingFlush: number | null = null;
+    const flushTokens = () => {
+      pendingFlush = null;
+      addMessage({
+        id: aiMessageId,
+        role: "assistant",
+        content: streamedContent,
+        timestamp: new Date().toISOString(),
+      });
+    };
+    const scheduleFlush = () => {
+      if (pendingFlush !== null) return;
+      pendingFlush = requestAnimationFrame(flushTokens);
+    };
+    const cancelPendingFlush = () => {
+      if (pendingFlush !== null) {
+        cancelAnimationFrame(pendingFlush);
+        pendingFlush = null;
+      }
+    };
 
-        fetch(`${API_BASE}/api/chat/stream`, {
+    try {
+      // Create new AbortController and store in ref so handleStop can access it
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+      const timeoutId = setTimeout(() => controller.abort(), 60_000);
+
+      const response = await fetch(`${API_BASE}/api/chat/stream`, {
+        method: "POST",
+        headers: buildAuthHeaders(),
+        body: JSON.stringify({
+          message: savedInput,
+          conversation_id: activeConversationId,
+          conversation_history: history,
+        }),
+        signal: controller.signal,
+      });
+
+      if (!response.ok || !response.body) {
+        clearTimeout(timeoutId);
+        throw new Error("Stream not available");
+      }
+
+      // Insert empty assistant placeholder so UI shows the bubble immediately
+      addMessage({
+        id: aiMessageId,
+        role: "assistant",
+        content: "",
+        timestamp: new Date().toISOString(),
+      });
+      streamStarted = true;
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let currentEvent = "";
+      let citations: Citation[] | undefined;
+      let metadata: {
+        confidence?: string;
+        limitations?: string;
+        grounded?: boolean;
+        follow_up_questions?: string[];
+        model_used?: string;
+        is_document?: boolean;
+        document_type?: string;
+      } = {};
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (line.startsWith("event: ")) {
+            currentEvent = line.slice(7).trim();
+            continue;
+          }
+          if (!line.startsWith("data: ") || !currentEvent) continue;
+
+          let parsed: unknown;
+          try {
+            parsed = JSON.parse(line.slice(6));
+          } catch (parseErr) {
+            console.warn("Skipping malformed SSE JSON:", parseErr);
+            currentEvent = "";
+            continue;
+          }
+
+          switch (currentEvent) {
+            case "token": {
+              const tokenPayload = parsed as { token?: string };
+              if (tokenPayload?.token) {
+                streamedContent += tokenPayload.token;
+                scheduleFlush();
+              }
+              break;
+            }
+            case "citations":
+              citations = parsed as Citation[];
+              break;
+            case "metadata":
+              metadata = parsed as typeof metadata;
+              break;
+            case "done":
+              cancelPendingFlush();
+              addMessage({
+                id: aiMessageId,
+                role: "assistant",
+                content: streamedContent,
+                timestamp: new Date().toISOString(),
+                citations,
+                confidence: metadata.confidence as ChatMessage["confidence"],
+                limitations: metadata.limitations,
+                grounded: metadata.grounded || false,
+                followUpQuestions: metadata.follow_up_questions,
+                modelUsed: metadata.model_used || undefined,
+                isDocument: metadata.is_document || false,
+                documentType: metadata.document_type || undefined,
+              });
+              streamCompleted = true;
+              break;
+            case "error":
+              throw new Error((parsed as { error?: string })?.error || "Stream error");
+          }
+          currentEvent = "";
+        }
+      }
+
+      clearTimeout(timeoutId);
+      cancelPendingFlush();
+
+      // Stream ended without "done" — flush whatever we have
+      if (!streamCompleted && streamedContent) {
+        addMessage({
+          id: aiMessageId,
+          role: "assistant",
+          content: streamedContent,
+          timestamp: new Date().toISOString(),
+        });
+      }
+    } catch (streamErr) {
+      cancelPendingFlush();
+      console.warn("SSE streaming failed, falling back to /message:", streamErr);
+
+      // If streaming already produced full content, keep it instead of re-fetching
+      if (streamStarted && streamCompleted) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/api/chat/message`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: buildAuthHeaders(),
           body: JSON.stringify({
             message: savedInput,
             conversation_id: activeConversationId,
             conversation_history: history,
           }),
-          signal: controller.signal,
-        })
-          .then(async (response) => {
-            if (!response.ok || !response.body) {
-              throw new Error("Stream not available");
-            }
+        });
 
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let buffer = "";
-            let currentEvent = "";
-            let citations: Citation[] | undefined;
-            let metadata: {
-              confidence?: string;
-              limitations?: string;
-              grounded?: boolean;
-	              follow_up_questions?: string[];
-	              model_used?: string;
-	              is_document?: boolean;
-	              document_type?: string;
-	            } = {};
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
 
-            // Add initial empty AI message for progressive rendering
-            const initialAiMessage: ChatMessage = {
-              id: aiMessageId,
-              role: "assistant",
-              content: "",
-              timestamp: new Date().toISOString(),
-	            };
-	            addMessage(initialAiMessage);
-	            streamStarted = true;
-
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-
-              buffer += decoder.decode(value, { stream: true });
-              const lines = buffer.split("\n");
-              buffer = lines.pop() || "";
-
-              for (const line of lines) {
-                if (line.startsWith("event: ")) {
-                  currentEvent = line.slice(7).trim();
-                } else if (line.startsWith("data: ") && currentEvent) {
-                  try {
-                    const parsed = JSON.parse(line.slice(6));
-                    switch (currentEvent) {
-                      case "token":
-                        streamedContent += parsed.token;
-                        // Update the existing message in-place
-                        addMessage({
-                          id: aiMessageId,
-                          role: "assistant",
-                          content: streamedContent,
-                          timestamp: new Date().toISOString(),
-                        });
-                        break;
-                      case "citations":
-                        citations = parsed;
-                        break;
-                      case "metadata":
-                        metadata = parsed;
-                        break;
-                      case "done":
-                        // Final update with all metadata
-                        addMessage({
-                          id: aiMessageId,
-                          role: "assistant",
-                          content: streamedContent,
-                          timestamp: new Date().toISOString(),
-                          citations: citations,
-                          confidence: metadata.confidence as ChatMessage["confidence"],
-                          limitations: metadata.limitations,
-                          grounded: metadata.grounded || false,
-	                          followUpQuestions: metadata.follow_up_questions,
-	                          modelUsed: metadata.model_used || undefined,
-	                          isDocument: metadata.is_document || false,
-	                          documentType: metadata.document_type || undefined,
-	                        });
-	                        streamCompleted = true;
-	                        break;
-                      case "error":
-                        reject(new Error(parsed.error));
-                        return;
-                    }
-                  } catch (parseErr) {
-                    console.warn("Skipping malformed SSE JSON:", parseErr);
-                  }
-                  currentEvent = "";
-                }
-              }
-            }
-
-            clearTimeout(timeout);
-            resolve();
-          })
-          .catch((err) => {
-            clearTimeout(timeout);
-            reject(err);
-          });
-      });
-    } catch (streamErr) {
-	      console.warn("SSE streaming unavailable, falling back to fetch:", streamErr);
-	      // Streaming failed or not available — fall back to standard fetch
-	      if (!streamStarted || !streamCompleted) {
-	        try {
-	          const response = await fetch(`${API_BASE}/api/chat/message`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              message: savedInput,
-              conversation_id: activeConversationId,
-              conversation_history: history,
-            }),
-          });
-
-          const data = await response.json();
-          const messageContent = data.answer || data.message || "I couldn't process your request. Please try again.";
-
-          const aiMessage: ChatMessage = {
-            id: aiMessageId,
-            role: "assistant",
-            content: messageContent,
-            timestamp: new Date().toISOString(),
-            isDocument: data.is_document || false,
-            documentType: data.document_type || undefined,
-            citations: data.citations || undefined,
-            confidence: data.confidence || undefined,
-            limitations: data.limitations || undefined,
-            grounded: data.grounded || false,
-            followUpQuestions: data.follow_up_questions || undefined,
-            modelUsed: data.model_used || undefined,
-            suggestions: data.suggestions || undefined,
-            sources: data.sources || undefined,
-          };
-	          addMessage(aiMessage);
-	        } catch (error) {
-	          console.error("Chat API error:", error);
-	          addMessage({
-	            id: aiMessageId,
-	            role: "assistant",
-	            content: streamStarted && streamedContent
-	              ? `${streamedContent}\n\nSorry, the response stream ended before metadata could be verified. Please retry if citations are missing.`
-	              : "Sorry, I couldn't connect to the server. Please make sure the backend is running on http://localhost:8000",
-	            timestamp: new Date().toISOString(),
-	          });
-	        }
+        addMessage({
+          id: aiMessageId,
+          role: "assistant",
+          content: data.answer || data.message || "I couldn't process your request. Please try again.",
+          timestamp: new Date().toISOString(),
+          isDocument: data.is_document || false,
+          documentType: data.document_type || undefined,
+          citations: data.citations || undefined,
+          confidence: data.confidence || undefined,
+          limitations: data.limitations || undefined,
+          grounded: data.grounded || false,
+          followUpQuestions: data.follow_up_questions || undefined,
+          modelUsed: data.model_used || undefined,
+          suggestions: data.suggestions || undefined,
+          sources: data.sources || undefined,
+        });
+      } catch (fallbackErr) {
+        console.error("Chat fallback also failed:", fallbackErr);
+        addMessage({
+          id: aiMessageId,
+          role: "assistant",
+          content:
+            "Sorry, I couldn't reach the server. Make sure the backend is running on " +
+            `${API_BASE} and try again.`,
+          timestamp: new Date().toISOString(),
+        });
       }
     } finally {
+      abortControllerRef.current = null;
       setIsLoading(false);
     }
-  }, [input, isLoading, addMessage, activeConversationId, messages]);
+  }, [input, isLoading, addMessage, activeConversationId]);
 
   const handleActionCard = (prompt: string) => {
     setInput(prompt);
@@ -1521,6 +1903,16 @@ function ChatPageContent() {
 
   return (
     <div className="flex h-full flex-1 bg-background relative">
+      {/* ─── Keyboard Shortcuts Modal ─── */}
+      <AnimatePresence>
+        {shortcutsModalOpen && (
+          <KeyboardShortcutsModal
+            isOpen={shortcutsModalOpen}
+            onClose={() => setShortcutsModalOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
       {/* ─── Conversation Sidebar ─── */}
       <AnimatePresence>
         {sidebarOpen && (
@@ -1585,12 +1977,45 @@ function ChatPageContent() {
               whileTap={{ scale: 0.95 }}
               onClick={createNewConversation}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-primary bg-primary/10 hover:bg-primary/15 transition-all"
-              title="New conversation"
+              title={`New conversation (${isMac() ? "⌘" : "Ctrl"}+K)`}
             >
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">New Chat</span>
             </motion.button>
           )}
+
+          {/* Theme Toggle */}
+          <motion.button
+            whileHover={{ scale: 1.05, rotate: 15 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="p-2 rounded-xl text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
+            title={`Toggle theme (${isMac() ? "⌘" : "Ctrl"}+Shift+L)`}
+          >
+            <AnimatePresence mode="wait">
+              {theme === "dark" ? (
+                <motion.div key="sun" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }}>
+                  <Sun className="h-4 w-4" />
+                </motion.div>
+              ) : (
+                <motion.div key="moon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }}>
+                  <Moon className="h-4 w-4" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.button>
+
+          {/* Keyboard Shortcuts */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setShortcutsModalOpen(true)}
+            className="p-2 rounded-xl text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all hidden sm:flex"
+            title="Keyboard shortcuts (?)"
+          >
+            <Keyboard className="h-4 w-4" />
+          </motion.button>
+
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -1657,7 +2082,7 @@ function ChatPageContent() {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
                 >
-                  Citation-grounded legal research for Indian startup and corporate law
+                  Ask anything about Indian law — JurisGPT will answer in plain English and cite the source.
                 </motion.p>
               </motion.div>
 
@@ -1752,7 +2177,9 @@ function ChatPageContent() {
                     input={input}
                     setInput={setInput}
                     onSubmit={handleSubmit}
+                    onStop={handleStop}
                     isLoading={isLoading}
+                    inputRef={inputRef}
                   />
                 </motion.div>
 
@@ -1821,8 +2248,10 @@ function ChatPageContent() {
                   input={input}
                   setInput={setInput}
                   onSubmit={handleSubmit}
+                  onStop={handleStop}
                   isLoading={isLoading}
                   compact
+                  inputRef={inputRef}
                 />
                 <div className="mt-3 flex items-center justify-center gap-2 text-xs text-muted-foreground/40">
                   <ShieldCheck className="h-3.5 w-3.5" />

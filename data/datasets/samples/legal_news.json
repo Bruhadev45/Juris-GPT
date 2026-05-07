@@ -1,5 +1,431 @@
 [
   {
+    "id": "news-041",
+    "title": "Article 370 Abrogation Held Constitutional by Supreme Court",
+    "summary": "A 5-judge Constitution Bench unanimously upheld the August 2019 abrogation of Article 370. The Court held J&K does not retain internal sovereignty distinct from India and directed assembly elections by 30 September 2024.",
+    "category": "Supreme Court",
+    "source": "Bar & Bench",
+    "published_at": "2026-12-11T11:00:00Z",
+    "url": "https://www.barandbench.com/article-370-judgment",
+    "tags": [
+      "Article 370",
+      "Jammu Kashmir",
+      "federalism"
+    ]
+  },
+  {
+    "id": "news-051",
+    "title": "Supreme Court: Marital Rape Exception Hearing Continues",
+    "summary": "The Supreme Court continued hearing petitions challenging Exception 2 to Section 375 IPC (now Section 63 BNS), which exempts marital rape from prosecution. Government opposes criminalisation citing institution of marriage.",
+    "category": "Supreme Court",
+    "source": "LiveLaw",
+    "published_at": "2026-11-25T14:00:00Z",
+    "url": "https://www.livelaw.in/marital-rape-hearing",
+    "tags": [
+      "marital rape",
+      "Section 375",
+      "BNS"
+    ]
+  },
+  {
+    "id": "news-043",
+    "title": "Supreme Court Mandates POSH Compliance for All Workplaces",
+    "summary": "The Supreme Court directed all Central and State Government departments, statutory authorities, and PSUs to constitute Internal Complaints Committees under the POSH Act, 2013. Non-compliance to attract personal liability for officers.",
+    "category": "Supreme Court",
+    "source": "LiveLaw",
+    "published_at": "2026-11-19T12:00:00Z",
+    "url": "https://www.livelaw.in/posh-compliance-mandate",
+    "tags": [
+      "POSH",
+      "workplace harassment",
+      "compliance"
+    ]
+  },
+  {
+    "id": "news-036",
+    "title": "Aligarh Muslim University Granted Minority Status",
+    "summary": "A 7-judge Constitution Bench held by 4:3 that AMU can claim minority status under Article 30. The Court overruled Azeez Basha (1968) and laid down a new test based on who establishes and administers the institution.",
+    "category": "Supreme Court",
+    "source": "LiveLaw",
+    "published_at": "2026-11-08T15:00:00Z",
+    "url": "https://www.livelaw.in/amu-minority-status",
+    "tags": [
+      "AMU",
+      "minority",
+      "Article 30",
+      "education"
+    ]
+  },
+  {
+    "id": "news-040",
+    "title": "Same-Sex Marriage: Constitution Bench Declines Recognition",
+    "summary": "A 5-judge Constitution Bench by 3:2 declined to recognize same-sex marriage under the Special Marriage Act. While refusing to read down marriage laws, all five judges affirmed LGBTQIA+ couples' right to choose partners. Issue referred to Parliament.",
+    "category": "Supreme Court",
+    "source": "LiveLaw",
+    "published_at": "2026-10-17T14:00:00Z",
+    "url": "https://www.livelaw.in/supriyo-same-sex-marriage",
+    "tags": [
+      "LGBTQIA+",
+      "marriage",
+      "Special Marriage Act"
+    ]
+  },
+  {
+    "id": "news-037",
+    "title": "POCSO: Possession of CSAM Made Strict Liability Offence",
+    "summary": "The Supreme Court held that mere viewing, possession, or storage of child sexual abuse material is an offence under Section 15 POCSO, even without intent to distribute. The Court directed legislative replacement of 'child pornography' with 'CSEAM'.",
+    "category": "Supreme Court",
+    "source": "Bar & Bench",
+    "published_at": "2026-09-23T17:00:00Z",
+    "url": "https://www.barandbench.com/csam-pocso-judgment",
+    "tags": [
+      "POCSO",
+      "CSEAM",
+      "child protection",
+      "cyber crime"
+    ]
+  },
+  {
+    "id": "news-034",
+    "title": "Supreme Court Strikes Down PIB Fact-Check Unit",
+    "summary": "The Bombay High Court struck down the 2023 amendment to the IT Rules empowering the PIB Fact Check Unit, holding it violates Article 19(1)(a). The Supreme Court declined to stay the judgment.",
+    "category": "High Court",
+    "source": "Bar & Bench",
+    "published_at": "2026-09-20T16:00:00Z",
+    "url": "https://www.barandbench.com/pib-fcu-bombay-hc",
+    "tags": [
+      "IT Rules",
+      "free speech",
+      "fact check"
+    ]
+  },
+  {
+    "id": "news-047",
+    "title": "RBI Permits 24x7 Real-Time Cross-Border Payments",
+    "summary": "The RBI announced the rollout of 24x7 real-time cross-border payment infrastructure leveraging UPI. Pilot with Singapore (PayNow) successful; expansion to UAE, Bhutan, and Mauritius approved.",
+    "category": "Regulatory",
+    "source": "RBI",
+    "published_at": "2026-09-05T10:00:00Z",
+    "url": "https://rbi.org.in/cross-border-upi",
+    "tags": [
+      "RBI",
+      "UPI",
+      "cross-border",
+      "payments"
+    ]
+  },
+  {
+    "id": "news-044",
+    "title": "Supreme Court: Bail is the Rule, Even in PMLA Cases",
+    "summary": "The Supreme Court held that the twin conditions for bail under Section 45 PMLA cannot be applied mechanically. Constitutional courts must consider incarceration period and right to speedy trial under Article 21.",
+    "category": "Supreme Court",
+    "source": "Bar & Bench",
+    "published_at": "2026-08-09T16:30:00Z",
+    "url": "https://www.barandbench.com/pmla-bail-jurisprudence",
+    "tags": [
+      "PMLA",
+      "bail",
+      "Article 21"
+    ]
+  },
+  {
+    "id": "news-049",
+    "title": "Insolvency Code Amendment Bill, 2024 — Real Estate Insolvency",
+    "summary": "Parliament passed amendments to the IBC, introducing project-wise insolvency for real estate developers. Homebuyers can now initiate insolvency proceedings against specific projects rather than the entire entity.",
+    "category": "Legislation",
+    "source": "MCA",
+    "published_at": "2026-08-08T12:00:00Z",
+    "url": "https://www.mca.gov.in/ibc-amendment-2024",
+    "tags": [
+      "IBC",
+      "real estate",
+      "homebuyers",
+      "insolvency"
+    ]
+  },
+  {
+    "id": "news-029",
+    "title": "Supreme Court Upholds Sub-Classification of SC/STs",
+    "summary": "A 7-judge Constitution Bench held by 6:1 that States are constitutionally permitted to sub-classify Scheduled Castes and Tribes for reservations. The Court overruled E.V. Chinnaiah (2005) and held that the creamy layer principle should apply to SC/ST reservations.",
+    "category": "Supreme Court",
+    "source": "LiveLaw",
+    "published_at": "2026-08-01T15:30:00Z",
+    "url": "https://www.livelaw.in/state-of-punjab-davinder-singh",
+    "tags": [
+      "reservation",
+      "SC/ST",
+      "constitutional",
+      "Article 16"
+    ]
+  },
+  {
+    "id": "news-052",
+    "title": "GST: E-Invoicing Mandatory for Turnover Above ₹5 Crore",
+    "summary": "Effective 1 August 2024, e-invoicing under GST became mandatory for all B2B transactions where the supplier's aggregate turnover exceeds ₹5 crore in any preceding financial year. Earlier threshold was ₹10 crore.",
+    "category": "Tax",
+    "source": "PIB",
+    "published_at": "2026-08-01T09:00:00Z",
+    "url": "https://www.gst.gov.in/e-invoicing-2024",
+    "tags": [
+      "GST",
+      "e-invoicing",
+      "compliance"
+    ]
+  },
+  {
+    "id": "news-046",
+    "title": "Supreme Court: Royalty Not Tax, States Can Levy on Minerals",
+    "summary": "A 9-judge Constitution Bench by 8:1 held royalty under MMDR Act is not a tax. State legislatures retain power to tax mineral rights and lands containing minerals. Overrules India Cement (1989). Allows retrospective levy from 1 April 2005.",
+    "category": "Supreme Court",
+    "source": "LiveLaw",
+    "published_at": "2026-07-25T15:00:00Z",
+    "url": "https://www.livelaw.in/mining-royalty-tax",
+    "tags": [
+      "mining",
+      "federalism",
+      "royalty",
+      "taxation"
+    ]
+  },
+  {
+    "id": "news-045",
+    "title": "MCA Notifies Cost Audit Threshold Revision",
+    "summary": "The MCA revised cost audit thresholds under the Companies Act, 2013. Companies in regulated sectors with turnover above ₹100 crore now require mandatory cost audit. Industry-wise applicability table updated.",
+    "category": "Regulatory",
+    "source": "MCA",
+    "published_at": "2026-07-12T11:00:00Z",
+    "url": "https://www.mca.gov.in/cost-audit-thresholds",
+    "tags": [
+      "MCA",
+      "cost audit",
+      "compliance"
+    ]
+  },
+  {
+    "id": "news-055",
+    "title": "Delhi High Court: Anti-Trust Probe into Big Tech Continues",
+    "summary": "The Delhi High Court refused to interfere with CCI's anti-trust investigation into Google's app store policies and dominant position in the Indian app market. CCI proceedings to continue.",
+    "category": "High Court",
+    "source": "LiveLaw",
+    "published_at": "2026-06-25T15:00:00Z",
+    "url": "https://www.livelaw.in/cci-google-investigation",
+    "tags": [
+      "CCI",
+      "antitrust",
+      "Google",
+      "competition"
+    ]
+  },
+  {
+    "id": "news-033",
+    "title": "GST Council Recommends 18% Slab for Most Services",
+    "summary": "The 53rd GST Council meeting recommended consolidating service tax rates with most services moving to the 18% slab. Special rates retained for essential services, healthcare, and education. Changes effective from FY 2026-27.",
+    "category": "Tax",
+    "source": "PIB",
+    "published_at": "2026-06-22T14:00:00Z",
+    "url": "https://pib.gov.in/gst-council-53rd",
+    "tags": [
+      "GST",
+      "tax",
+      "services",
+      "Council"
+    ]
+  },
+  {
+    "id": "news-048",
+    "title": "Bombay High Court: WhatsApp Group Admins Not Liable for Members' Posts",
+    "summary": "The Bombay High Court reaffirmed that WhatsApp group admins cannot be held vicariously liable for offensive posts by group members, absent specific evidence of knowledge or instigation.",
+    "category": "High Court",
+    "source": "Bar & Bench",
+    "published_at": "2026-06-14T13:30:00Z",
+    "url": "https://www.barandbench.com/whatsapp-admin-liability",
+    "tags": [
+      "intermediary",
+      "WhatsApp",
+      "liability"
+    ]
+  },
+  {
+    "id": "news-054",
+    "title": "Supreme Court: NCDRC Cannot Award Damages Without Consumer Complaint",
+    "summary": "The Supreme Court held that the National Consumer Disputes Redressal Commission cannot suo motu award damages or initiate proceedings under the Consumer Protection Act, 2019 without a complaint from the consumer or appropriate authority.",
+    "category": "Supreme Court",
+    "source": "Bar & Bench",
+    "published_at": "2026-05-30T10:00:00Z",
+    "url": "https://www.barandbench.com/ncdrc-suo-motu",
+    "tags": [
+      "consumer protection",
+      "NCDRC",
+      "jurisdiction"
+    ]
+  },
+  {
+    "id": "news-035",
+    "title": "RBI Issues Master Direction on Digital Lending",
+    "summary": "The RBI issued the Master Direction on Digital Lending, 2025, mandating regulated entities to ensure transparent loan offerings, prohibit auto-debit without consent, and provide a Key Fact Statement (KFS) before disbursement.",
+    "category": "Regulatory",
+    "source": "RBI",
+    "published_at": "2026-05-18T11:30:00Z",
+    "url": "https://rbi.org.in/digital-lending-direction",
+    "tags": [
+      "RBI",
+      "digital lending",
+      "fintech",
+      "consumer protection"
+    ]
+  },
+  {
+    "id": "news-039",
+    "title": "BNSS: Trial Process Digitised — Electronic FIR and E-Trial",
+    "summary": "The Bharatiya Nagarik Suraksha Sanhita, 2023 introduces electronic FIR registration (e-FIR), digital evidence, video conferencing for witnesses, and time-bound investigation. Forensic investigation mandatory for offences punishable with 7+ years.",
+    "category": "Legislation",
+    "source": "MHA",
+    "published_at": "2026-04-15T10:30:00Z",
+    "url": "https://mha.gov.in/bnss-procedural-changes",
+    "tags": [
+      "BNSS",
+      "criminal procedure",
+      "e-FIR",
+      "digital justice"
+    ]
+  },
+  {
+    "id": "news-026",
+    "title": "Bharatiya Nyaya Sanhita, 2023 (BNS) Comes Into Force Replacing IPC",
+    "summary": "The Bharatiya Nyaya Sanhita, 2023 came into force on 1 July 2024, replacing the Indian Penal Code, 1860. Along with the Bharatiya Nagarik Suraksha Sanhita (replacing CrPC) and Bharatiya Sakshya Adhiniyam (replacing Indian Evidence Act), this represents the largest overhaul of Indian criminal law in over a century.",
+    "category": "Legislation",
+    "source": "Ministry of Home Affairs",
+    "published_at": "2026-04-15T10:00:00Z",
+    "url": "https://www.indiacode.nic.in/handle/123456789/20062",
+    "tags": [
+      "BNS",
+      "BNSS",
+      "BSA",
+      "criminal law",
+      "reform"
+    ]
+  },
+  {
+    "id": "news-031",
+    "title": "MCA Notifies Companies (Significant Beneficial Owner) Amendment Rules",
+    "summary": "The Ministry of Corporate Affairs notified amendments to the SBO Rules, tightening disclosure of significant beneficial owners. Companies must now identify SBOs holding 10% or more (lowered from 25% in some cases) and file BEN-2 returns within 30 days.",
+    "category": "Regulatory",
+    "source": "MCA",
+    "published_at": "2026-04-10T09:00:00Z",
+    "url": "https://www.mca.gov.in/sbo-amendment-2026",
+    "tags": [
+      "MCA",
+      "SBO",
+      "compliance",
+      "Companies Act"
+    ]
+  },
+  {
+    "id": "news-053",
+    "title": "ESG Disclosure Mandatory for Top 1000 Listed Companies",
+    "summary": "SEBI made the Business Responsibility and Sustainability Report (BRSR) mandatory for the top 1000 listed companies by market cap. Core BRSR reasonable assurance also mandated for top 150.",
+    "category": "Regulatory",
+    "source": "SEBI",
+    "published_at": "2026-04-04T11:30:00Z",
+    "url": "https://www.sebi.gov.in/brsr-2026",
+    "tags": [
+      "SEBI",
+      "ESG",
+      "BRSR",
+      "sustainability"
+    ]
+  },
+  {
+    "id": "news-038",
+    "title": "MSME Act Amendment: 45-Day Payment Strictly Enforced",
+    "summary": "Amendments to Section 43B of the Income Tax Act require buyers from registered MSMEs to actually pay within 45 days; otherwise the deduction is disallowed in the year of accrual. Enforcement strict from FY 2024-25 onwards.",
+    "category": "Tax",
+    "source": "PIB",
+    "published_at": "2026-04-01T09:00:00Z",
+    "url": "https://pib.gov.in/msme-43b-amendment",
+    "tags": [
+      "MSME",
+      "Income Tax",
+      "Section 43B",
+      "compliance"
+    ]
+  },
+  {
+    "id": "news-032",
+    "title": "SEBI Tightens IPO Disclosure Norms for Pre-IPO Investors",
+    "summary": "SEBI amended the ICDR Regulations to require enhanced disclosure of pre-IPO transactions, related party deals, and promoter lock-in periods. Issuers must disclose material developments in the 6 months preceding the IPO filing.",
+    "category": "Regulatory",
+    "source": "SEBI",
+    "published_at": "2026-03-22T10:30:00Z",
+    "url": "https://www.sebi.gov.in/legal/regulations/2026",
+    "tags": [
+      "SEBI",
+      "IPO",
+      "ICDR",
+      "disclosure"
+    ]
+  },
+  {
+    "id": "news-027",
+    "title": "Four Labour Codes Notified — Operational from 1 April 2026",
+    "summary": "The Ministry of Labour & Employment notified that all four Labour Codes — Code on Wages 2019, Industrial Relations Code 2020, Code on Social Security 2020, and OSH Code 2020 — will be fully operational from 1 April 2026. Key changes include the 50% wage rule for PF/gratuity calculation and gratuity eligibility for fixed-term employees from 1 year.",
+    "category": "Legislation",
+    "source": "Ministry of Labour & Employment",
+    "published_at": "2026-03-16T14:30:00Z",
+    "url": "https://labour.gov.in/labour-codes",
+    "tags": [
+      "labour codes",
+      "wages",
+      "gratuity",
+      "PF",
+      "ESI"
+    ]
+  },
+  {
+    "id": "news-050",
+    "title": "MeitY Issues Advisory on AI-Generated Content Labeling",
+    "summary": "The Ministry of Electronics and IT issued an advisory requiring intermediaries to label AI-generated content (deepfakes, synthetic media) clearly. Significant Social Media Intermediaries must implement detection mechanisms.",
+    "category": "Regulatory",
+    "source": "MeitY",
+    "published_at": "2026-03-15T10:00:00Z",
+    "url": "https://www.meity.gov.in/ai-advisory-2026",
+    "tags": [
+      "MeitY",
+      "AI",
+      "deepfake",
+      "intermediary"
+    ]
+  },
+  {
+    "id": "news-030",
+    "title": "Electoral Bonds Scheme Struck Down as Unconstitutional",
+    "summary": "The Supreme Court struck down the Electoral Bonds Scheme, holding that anonymous corporate funding of political parties violates voters' right to information under Article 19(1)(a). SBI was directed to disclose all bond purchase and redemption details.",
+    "category": "Supreme Court",
+    "source": "LiveLaw",
+    "published_at": "2026-02-15T11:00:00Z",
+    "url": "https://www.livelaw.in/electoral-bonds-judgment",
+    "tags": [
+      "electoral bonds",
+      "transparency",
+      "political funding",
+      "Article 19"
+    ]
+  },
+  {
+    "id": "news-042",
+    "title": "Income Tax Bill, 2025 Replaces Income Tax Act, 1961",
+    "summary": "The Income Tax Bill, 2025, simplifying and consolidating six decades of amendments, was introduced. Key changes include simplified language, removal of redundant provisions, and modernised digital filing. Effective from AY 2026-27.",
+    "category": "Tax",
+    "source": "PIB",
+    "published_at": "2026-02-13T13:00:00Z",
+    "url": "https://incometaxindia.gov.in/it-bill-2025",
+    "tags": [
+      "Income Tax Bill",
+      "tax reform",
+      "simplification"
+    ]
+  },
+  {
     "id": "news-001",
     "title": "Supreme Court Upholds Validity of Section 6A of the Citizenship Act",
     "summary": "A Constitution Bench of the Supreme Court upheld the constitutional validity of Section 6A of the Citizenship Act, 1955, which grants citizenship to immigrants who entered Assam before March 25, 1971. The court ruled that the provision serves a humanitarian purpose and does not violate Article 14.",
@@ -7,7 +433,12 @@
     "source": "Bar & Bench",
     "published_at": "2026-01-28T09:30:00Z",
     "url": "https://example.com/sc-section-6a-citizenship",
-    "tags": ["citizenship", "fundamental rights", "Assam", "constitution"]
+    "tags": [
+      "citizenship",
+      "fundamental rights",
+      "Assam",
+      "constitution"
+    ]
   },
   {
     "id": "news-002",
@@ -17,7 +448,12 @@
     "source": "LiveLaw",
     "published_at": "2026-01-27T14:15:00Z",
     "url": "https://example.com/delhi-hc-foreign-arbitration",
-    "tags": ["arbitration", "foreign awards", "enforcement", "Delhi HC"]
+    "tags": [
+      "arbitration",
+      "foreign awards",
+      "enforcement",
+      "Delhi HC"
+    ]
   },
   {
     "id": "news-003",
@@ -27,7 +463,12 @@
     "source": "Economic Times",
     "published_at": "2026-01-26T11:00:00Z",
     "url": "https://example.com/sebi-esg-framework",
-    "tags": ["SEBI", "ESG", "rating agencies", "capital markets"]
+    "tags": [
+      "SEBI",
+      "ESG",
+      "rating agencies",
+      "capital markets"
+    ]
   },
   {
     "id": "news-004",
@@ -37,7 +478,12 @@
     "source": "Moneycontrol",
     "published_at": "2026-01-25T16:45:00Z",
     "url": "https://example.com/rbi-digital-lending",
-    "tags": ["RBI", "digital lending", "fintech", "compliance"]
+    "tags": [
+      "RBI",
+      "digital lending",
+      "fintech",
+      "compliance"
+    ]
   },
   {
     "id": "news-005",
@@ -47,7 +493,12 @@
     "source": "The Hindu",
     "published_at": "2026-01-24T10:00:00Z",
     "url": "https://example.com/dpdpa-amendment-2026",
-    "tags": ["DPDPA", "data privacy", "parliament", "data protection"]
+    "tags": [
+      "DPDPA",
+      "data privacy",
+      "parliament",
+      "data protection"
+    ]
   },
   {
     "id": "news-006",
@@ -57,7 +508,12 @@
     "source": "Business Standard",
     "published_at": "2026-01-23T08:30:00Z",
     "url": "https://example.com/mca-cross-border-mergers",
-    "tags": ["MCA", "mergers", "Companies Act", "cross-border"]
+    "tags": [
+      "MCA",
+      "mergers",
+      "Companies Act",
+      "cross-border"
+    ]
   },
   {
     "id": "news-007",
@@ -67,7 +523,12 @@
     "source": "SCC Online",
     "published_at": "2026-01-22T13:00:00Z",
     "url": "https://example.com/sc-arbitration-unstamped",
-    "tags": ["arbitration", "stamp duty", "Supreme Court", "contract law"]
+    "tags": [
+      "arbitration",
+      "stamp duty",
+      "Supreme Court",
+      "contract law"
+    ]
   },
   {
     "id": "news-008",
@@ -77,7 +538,13 @@
     "source": "Financial Express",
     "published_at": "2026-01-21T09:00:00Z",
     "url": "https://example.com/cbdt-angel-tax-startups",
-    "tags": ["tax", "startups", "angel tax", "CBDT", "Section 56"]
+    "tags": [
+      "tax",
+      "startups",
+      "angel tax",
+      "CBDT",
+      "Section 56"
+    ]
   },
   {
     "id": "news-009",
@@ -87,7 +554,12 @@
     "source": "Taxmann",
     "published_at": "2026-01-20T15:30:00Z",
     "url": "https://example.com/bombay-hc-gst-retrospective",
-    "tags": ["GST", "Bombay HC", "retrospective taxation", "clubs"]
+    "tags": [
+      "GST",
+      "Bombay HC",
+      "retrospective taxation",
+      "clubs"
+    ]
   },
   {
     "id": "news-010",
@@ -97,7 +569,12 @@
     "source": "Mint",
     "published_at": "2026-01-19T12:00:00Z",
     "url": "https://example.com/sebi-insider-trading-norms",
-    "tags": ["SEBI", "insider trading", "UPSI", "capital markets"]
+    "tags": [
+      "SEBI",
+      "insider trading",
+      "UPSI",
+      "capital markets"
+    ]
   },
   {
     "id": "news-011",
@@ -107,7 +584,12 @@
     "source": "India Today",
     "published_at": "2026-01-18T10:30:00Z",
     "url": "https://example.com/labour-codes-april-2026",
-    "tags": ["labour law", "Labour Codes", "employment", "wages"]
+    "tags": [
+      "labour law",
+      "Labour Codes",
+      "employment",
+      "wages"
+    ]
   },
   {
     "id": "news-012",
@@ -117,7 +599,12 @@
     "source": "NDTV Profit",
     "published_at": "2026-01-17T14:00:00Z",
     "url": "https://example.com/rbi-upi-tax-limit",
-    "tags": ["RBI", "UPI", "tax payments", "digital payments"]
+    "tags": [
+      "RBI",
+      "UPI",
+      "tax payments",
+      "digital payments"
+    ]
   },
   {
     "id": "news-013",
@@ -127,7 +614,12 @@
     "source": "Bar & Bench",
     "published_at": "2026-01-16T11:00:00Z",
     "url": "https://example.com/sc-mandatory-mediation",
-    "tags": ["mediation", "commercial disputes", "Supreme Court", "ADR"]
+    "tags": [
+      "mediation",
+      "commercial disputes",
+      "Supreme Court",
+      "ADR"
+    ]
   },
   {
     "id": "news-014",
@@ -137,7 +629,12 @@
     "source": "Company Law Journal",
     "published_at": "2026-01-15T09:00:00Z",
     "url": "https://example.com/mca-llp-form-11a",
-    "tags": ["MCA", "LLP", "annual filing", "compliance"]
+    "tags": [
+      "MCA",
+      "LLP",
+      "annual filing",
+      "compliance"
+    ]
   },
   {
     "id": "news-015",
@@ -147,7 +644,12 @@
     "source": "Business Today",
     "published_at": "2026-01-14T16:00:00Z",
     "url": "https://example.com/gst-council-gaming-rates",
-    "tags": ["GST", "online gaming", "GST Council", "casinos"]
+    "tags": [
+      "GST",
+      "online gaming",
+      "GST Council",
+      "casinos"
+    ]
   },
   {
     "id": "news-016",
@@ -157,7 +659,12 @@
     "source": "LiveLaw",
     "published_at": "2026-01-13T13:45:00Z",
     "url": "https://example.com/karnataka-hc-it-layoffs",
-    "tags": ["labour law", "IT sector", "layoffs", "Karnataka HC"]
+    "tags": [
+      "labour law",
+      "IT sector",
+      "layoffs",
+      "Karnataka HC"
+    ]
   },
   {
     "id": "news-017",
@@ -167,7 +674,12 @@
     "source": "Medianama",
     "published_at": "2026-01-12T10:00:00Z",
     "url": "https://example.com/dpdpa-data-localization",
-    "tags": ["DPDPA", "data localization", "privacy", "compliance"]
+    "tags": [
+      "DPDPA",
+      "data localization",
+      "privacy",
+      "compliance"
+    ]
   },
   {
     "id": "news-018",
@@ -177,7 +689,27 @@
     "source": "Economic Times",
     "published_at": "2026-01-11T11:30:00Z",
     "url": "https://example.com/sebi-t0-settlement",
-    "tags": ["SEBI", "settlement", "stock market", "T+0"]
+    "tags": [
+      "SEBI",
+      "settlement",
+      "stock market",
+      "T+0"
+    ]
+  },
+  {
+    "id": "news-028",
+    "title": "DPDP Rules, 2025 Notified — Implementation Begins",
+    "summary": "The Digital Personal Data Protection Rules, 2025 were notified, providing operational framework for the DPDP Act, 2023. Rules cover consent, breach notification within 72 hours, processing of children's data, and Data Fiduciary obligations. Phased implementation begins with significant data fiduciaries.",
+    "category": "Legislation",
+    "source": "MeitY",
+    "published_at": "2026-01-10T11:00:00Z",
+    "url": "https://www.meity.gov.in/dpdp-rules-2025",
+    "tags": [
+      "DPDP",
+      "data protection",
+      "privacy",
+      "compliance"
+    ]
   },
   {
     "id": "news-019",
@@ -187,7 +719,12 @@
     "source": "The Hindu",
     "published_at": "2026-01-10T09:30:00Z",
     "url": "https://example.com/bsa-amendment-digital-evidence",
-    "tags": ["Bharatiya Sakshya", "digital evidence", "legislation", "blockchain"]
+    "tags": [
+      "Bharatiya Sakshya",
+      "digital evidence",
+      "legislation",
+      "blockchain"
+    ]
   },
   {
     "id": "news-020",
@@ -197,7 +734,12 @@
     "source": "Deccan Herald",
     "published_at": "2026-01-09T14:00:00Z",
     "url": "https://example.com/sc-commercial-courts-districts",
-    "tags": ["commercial courts", "Supreme Court", "ease of business", "judiciary"]
+    "tags": [
+      "commercial courts",
+      "Supreme Court",
+      "ease of business",
+      "judiciary"
+    ]
   },
   {
     "id": "news-021",
@@ -207,7 +749,12 @@
     "source": "Financial Express",
     "published_at": "2026-01-08T12:00:00Z",
     "url": "https://example.com/rbi-it-governance",
-    "tags": ["RBI", "cybersecurity", "IT governance", "compliance"]
+    "tags": [
+      "RBI",
+      "cybersecurity",
+      "IT governance",
+      "compliance"
+    ]
   },
   {
     "id": "news-022",
@@ -217,7 +764,12 @@
     "source": "Taxmann",
     "published_at": "2026-01-07T10:00:00Z",
     "url": "https://example.com/it-faceless-assessment-2",
-    "tags": ["income tax", "faceless assessment", "tax technology", "compliance"]
+    "tags": [
+      "income tax",
+      "faceless assessment",
+      "tax technology",
+      "compliance"
+    ]
   },
   {
     "id": "news-023",
@@ -227,7 +779,12 @@
     "source": "SCC Online",
     "published_at": "2026-01-06T15:00:00Z",
     "url": "https://example.com/madras-hc-prepack-ibc",
-    "tags": ["IBC", "insolvency", "MSME", "Madras HC"]
+    "tags": [
+      "IBC",
+      "insolvency",
+      "MSME",
+      "Madras HC"
+    ]
   },
   {
     "id": "news-024",
@@ -237,7 +794,12 @@
     "source": "Business Standard",
     "published_at": "2026-01-05T08:00:00Z",
     "url": "https://example.com/mca-csr-audit-proposal",
-    "tags": ["MCA", "CSR", "Companies Act", "audit"]
+    "tags": [
+      "MCA",
+      "CSR",
+      "Companies Act",
+      "audit"
+    ]
   },
   {
     "id": "news-025",
@@ -247,6 +809,11 @@
     "source": "Medianama",
     "published_at": "2026-01-04T11:00:00Z",
     "url": "https://example.com/dpb-first-penalty",
-    "tags": ["DPDPA", "data breach", "penalty", "healthcare"]
+    "tags": [
+      "DPDPA",
+      "data breach",
+      "penalty",
+      "healthcare"
+    ]
   }
 ]

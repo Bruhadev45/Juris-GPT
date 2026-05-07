@@ -47,6 +47,9 @@ import {
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { contractsApi } from "@/lib/api";
+import { LiveContractPreview } from "@/components/contracts/live-preview";
+import { DraftControls } from "@/components/contracts/draft-controls";
+import { cn } from "@/lib/utils";
 
 // Contract field definitions for each type
 const CONTRACT_CONFIGS: Record<
@@ -1072,29 +1075,40 @@ export default function ContractGeneratorPage({
   function handlePrint() {
     if (!generatedContent) return;
     const printWindow = window.open("", "_blank");
-    if (printWindow) {
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>${config?.name || "Contract"}</title>
-            <style>
-              body { font-family: 'Georgia', serif; line-height: 1.8; padding: 40px; max-width: 800px; margin: 0 auto; color: #1a1a1a; }
-              h1 { font-size: 24px; text-align: center; margin-bottom: 30px; }
-              h2 { font-size: 18px; margin-top: 24px; border-bottom: 1px solid #ccc; padding-bottom: 6px; }
-              h3 { font-size: 15px; margin-top: 18px; }
-              p { margin: 8px 0; text-align: justify; }
-              ul, ol { margin: 8px 0 8px 20px; }
-              li { margin: 4px 0; }
-              strong { font-weight: 600; }
-              hr { border: none; border-top: 1px solid #ccc; margin: 20px 0; }
-            </style>
-          </head>
-          <body>${generatedContent.replace(/\n/g, "<br>")}</body>
-        </html>
-      `);
-      printWindow.document.close();
-      printWindow.print();
-    }
+    if (!printWindow) return;
+
+    // Build via DOM APIs to avoid XSS — `generatedContent` is backend-supplied
+    // and previously interpolated raw into a `document.write` template literal.
+    const doc = printWindow.document;
+    doc.open();
+    doc.write("<!DOCTYPE html><html><head></head><body></body></html>");
+    doc.close();
+
+    const titleEl = doc.createElement("title");
+    titleEl.textContent = config?.name || "Contract";
+    doc.head.appendChild(titleEl);
+
+    const styleEl = doc.createElement("style");
+    styleEl.textContent = `
+      body { font-family: 'Georgia', serif; line-height: 1.8; padding: 40px; max-width: 800px; margin: 0 auto; color: #1a1a1a; }
+      h1 { font-size: 24px; text-align: center; margin-bottom: 30px; }
+      h2 { font-size: 18px; margin-top: 24px; border-bottom: 1px solid #ccc; padding-bottom: 6px; }
+      h3 { font-size: 15px; margin-top: 18px; }
+      p { margin: 8px 0; text-align: justify; }
+      ul, ol { margin: 8px 0 8px 20px; }
+      li { margin: 4px 0; }
+      strong { font-weight: 600; }
+      hr { border: none; border-top: 1px solid #ccc; margin: 20px 0; }
+    `;
+    doc.head.appendChild(styleEl);
+
+    generatedContent.split(/\n+/).forEach((line) => {
+      const p = doc.createElement("p");
+      p.textContent = line;
+      doc.body.appendChild(p);
+    });
+
+    printWindow.print();
   }
 
   function renderField(field: (typeof currentStepConfig)["fields"][number]) {
@@ -1381,9 +1395,9 @@ export default function ContractGeneratorPage({
   // Form wizard view
   return (
     <div className="flex h-screen bg-background">
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0 lg:w-1/2 lg:flex-none">
         {/* Header */}
-        <header className="bg-card border-b border-border px-6 py-4">
+        <header className="bg-card border-b border-border px-6 py-3">
           <div className="flex items-center gap-3">
             <Link href="/dashboard/contracts">
               <Button variant="ghost" size="sm">
@@ -1391,11 +1405,32 @@ export default function ContractGeneratorPage({
                 Back
               </Button>
             </Link>
-            <div className="flex-1">
-              <h1 className="text-xl font-semibold text-foreground">{config.name}</h1>
-              <p className="text-sm text-muted-foreground">{config.description}</p>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-lg font-semibold text-foreground truncate leading-tight">{config.name}</h1>
+              <p className="text-xs text-muted-foreground truncate">{config.description}</p>
             </div>
-            <div className="flex items-center gap-2">
+            <DraftControls
+              type={type}
+              contractName={config.name}
+              formData={formData}
+              onLoad={(data) => setFormData(data)}
+              onClear={() => {
+                if (config) {
+                  const defaults: Record<string, unknown> = {};
+                  config.steps.forEach((step) => {
+                    step.fields.forEach((field) => {
+                      if (field.defaultValue !== undefined) defaults[field.name] = field.defaultValue;
+                      else if (field.type === "boolean") defaults[field.name] = false;
+                      else defaults[field.name] = "";
+                    });
+                  });
+                  setFormData(defaults);
+                }
+                setCurrentStep(0);
+              }}
+              className="hidden md:flex shrink-0"
+            />
+            <div className="hidden 2xl:flex items-center gap-2 shrink-0">
               <Badge variant="outline" className="gap-1">
                 <Clock className="h-3 w-3" />
                 {config.estimatedTime}
@@ -1405,6 +1440,15 @@ export default function ContractGeneratorPage({
                 {config.lawReference}
               </Badge>
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="lg:hidden gap-1.5"
+              onClick={() => setShowPreview((v) => !v)}
+            >
+              <Eye className="h-4 w-4" />
+              {showPreview ? "Hide" : "Preview"}
+            </Button>
           </div>
         </header>
 
@@ -1559,6 +1603,30 @@ export default function ContractGeneratorPage({
           </div>
         </div>
       </div>
+
+      {/* ─── Right: Live preview pane ───────────────────────────── */}
+      <aside
+        className={cn(
+          "lg:flex lg:w-1/2 lg:flex-none",
+          showPreview ? "fixed inset-0 z-40 flex bg-background lg:static lg:z-auto" : "hidden lg:flex"
+        )}
+      >
+        {/* Mobile close button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="lg:hidden absolute top-3 right-3 z-10"
+          onClick={() => setShowPreview(false)}
+        >
+          Close
+        </Button>
+        <LiveContractPreview
+          type={type}
+          config={config}
+          formData={formData}
+          className="w-full"
+        />
+      </aside>
     </div>
   );
 }

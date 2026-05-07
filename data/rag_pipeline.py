@@ -36,6 +36,10 @@ VECTORS_DIR = BASE_DIR / "vectors"
 PROCESSED_DIR = BASE_DIR / "processed"
 SAMPLES_DIR = BASE_DIR / "datasets" / "samples"
 CLOUD_CACHE_DIR = BASE_DIR / "cloud_cache"
+
+# Obsidian integration
+OBSIDIAN_ENABLED = os.getenv("OBSIDIAN_ENABLED", "true").lower() == "true"
+OBSIDIAN_VAULT_PATH = os.getenv("OBSIDIAN_VAULT_PATH", os.path.expanduser("~/Documents/Obsidian Vault"))
 STATUTE_SAMPLE_FILES = [
     "companies_act_sections.json",
     "patent_act_sections.json",
@@ -46,6 +50,12 @@ STATUTE_SAMPLE_FILES = [
     "industrial_disputes_act_sections.json",
     "sebi_regulations_sections.json",
     "shops_establishments_act_sections.json",
+    # New comprehensive legal data
+    "insolvency_bankruptcy_code.json",
+    "information_technology_act.json",
+    "fema_regulations.json",
+    "competition_act.json",
+    "llp_act.json",
 ]
 
 CURATED_SAMPLE_FILES = [
@@ -98,7 +108,9 @@ LEGAL_ABBREVIATIONS: Dict[str, str] = {
     "it act": "Income Tax Act",
     "rti": "Right to Information",
     "dpdpa": "Digital Personal Data Protection Act",
-    "sec": "Section",
+    # NOTE: "sec" is intentionally not here — it is normalised by
+    # SECTION_REF_RE so that "sec 27" becomes "Section 27", not
+    # "Section (SEC) 27".
 }
 
 # ── Section Reference Pattern ────────────────────────────────────────
@@ -219,8 +231,9 @@ class JurisGPTRAG:
             self.vector_store = "lexical"
             logger.info("Using local lexical corpus (%d documents)", len(self.local_corpus))
 
-        # Build BM25 index for hybrid search
-        if self.hybrid_search and self.local_corpus:
+        # Always build the inverted index for fast lexical scan, and BM25
+        # whenever rank-bm25 is available (cheap to build, makes hybrid free).
+        if self.local_corpus:
             self._build_bm25_index()
 
         # Initialize LLM
@@ -359,9 +372,66 @@ class JurisGPTRAG:
             self.vector_store = None
 
     def _init_llm(self):
-        """Initialize LLM for generation — local LLM primary, OpenAI fallback."""
+        """Initialize LLM for generation — Anthropic primary, OpenAI fallback, local LLM last."""
 
-        # 1. Try local Legal Llama
+        # 1. Try Anthropic Claude first (best quality for legal reasoning)
+        # Supports direct Anthropic API or PageGrid proxy (https://pagegrid.in)
+        anthropic_key = os.getenv("ANTHROPIC_API_KEY", "")
+        anthropic_base_url = os.getenv("ANTHROPIC_BASE_URL", "")
+
+        if self.llm_type in ("anthropic", "claude", "pagegrid") or (anthropic_key and not anthropic_key.startswith("sk-placeholder")):
+            if anthropic_key:
+                try:
+                    from langchain_anthropic import ChatAnthropic
+
+                    # Build kwargs - add base_url if using PageGrid or custom endpoint
+                    # PageGrid uses different model names: claude-sonnet-4-6, claude-haiku-4-5, claude-opus-4-6
+                    is_pagegrid = anthropic_base_url and "pagegrid" in anthropic_base_url.lower()
+                    model_name = "claude-sonnet-4-6" if is_pagegrid else "claude-sonnet-4-20250514"
+
+                    llm_kwargs = {
+                        "model": model_name,
+                        "temperature": 0.3,
+                        "max_tokens": 4000,
+                        "api_key": anthropic_key
+                    }
+
+                    # PageGrid or custom base URL support
+                    if anthropic_base_url:
+                        llm_kwargs["base_url"] = anthropic_base_url
+                        provider_name = "PageGrid" if is_pagegrid else "Custom Endpoint"
+                    else:
+                        provider_name = "Anthropic"
+
+                    self.llm = ChatAnthropic(**llm_kwargs)
+                    self.llm_type = "anthropic"
+                    logger.info("Using %s Claude Sonnet 4 (primary)", provider_name)
+                    return
+                except ImportError:
+                    logger.warning("langchain-anthropic not installed, trying OpenAI...")
+                except Exception as e:
+                    logger.warning("Anthropic initialization failed: %s", e)
+
+        # 2. Try OpenAI
+        openai_key = os.getenv("OPENAI_API_KEY", "")
+        if self.llm_type == "openai" or (openai_key and not openai_key.startswith("sk-placeholder")):
+            if openai_key:
+                try:
+                    from langchain_openai import ChatOpenAI
+                    self.llm = ChatOpenAI(
+                        model="gpt-4o-mini",
+                        temperature=0.3,
+                        max_tokens=4000
+                    )
+                    self.llm_type = "openai"
+                    logger.info("Using OpenAI GPT-4o-mini")
+                    return
+                except ImportError:
+                    logger.warning("langchain-openai not installed, trying local LLM...")
+                except Exception as e:
+                    logger.warning("OpenAI initialization failed: %s", e)
+
+        # 3. Try local Legal Llama
         if self.llm_type in ("local_legal_llama", "local"):
             try:
                 # Import from the backend services package
@@ -371,11 +441,11 @@ class JurisGPTRAG:
                     # When running from data/ directory, use importlib
                     backend_dir = Path(__file__).parent.parent / "backend"
                     local_llm_path = backend_dir / "app" / "services" / "local_llm.py"
-                    
+
                     spec = importlib.util.spec_from_file_location("local_llm", local_llm_path)
                     if spec is None or spec.loader is None:
                         raise ImportError(f"LocalLegalLLM not found at {local_llm_path}")
-                    
+
                     local_llm_module = importlib.util.module_from_spec(spec)
                     added_backend_dir = False
                     if str(backend_dir) not in sys.path:
@@ -397,28 +467,13 @@ class JurisGPTRAG:
                     logger.info("Local Legal Llama model available (lazy-loaded)")
                     return
                 else:
-                    logger.warning("Local LLM model file not found, trying OpenAI fallback...")
+                    logger.warning("Local LLM model file not found...")
                     self.local_llm = None
             except ImportError as e:
                 logger.warning("Local LLM import error: %s", e)
                 self.local_llm = None
 
-        # 2. OpenAI fallback
-        openai_key = os.getenv("OPENAI_API_KEY", "")
-        if openai_key and not openai_key.startswith("sk-placeholder"):
-            try:
-                from langchain_openai import ChatOpenAI
-                self.llm = ChatOpenAI(
-                    model="gpt-4o-mini",
-                    temperature=0.3,
-                    max_tokens=4000
-                )
-                logger.info("Using OpenAI GPT-4o-mini (fallback)")
-                return
-            except ImportError:
-                pass
-
-        # 3. No LLM — retrieval-only mode
+        # 4. No LLM — retrieval-only mode
         self.llm = None
         if self.vector_store == "lexical":
             logger.info("Local lexical mode enabled (no remote LLM required)")
@@ -428,7 +483,13 @@ class JurisGPTRAG:
     # ─── BM25 Index ──────────────────────────────────────────────────
 
     def _build_bm25_index(self):
-        """Build BM25 index from the local corpus for hybrid retrieval."""
+        """Build BM25 index and an inverted index for fast lexical scan.
+
+        BM25 needs a token *list* (with repetitions) per document so that term
+        frequency is preserved. The inverted index ``token -> [doc_ids]`` lets
+        the lexical retriever skip documents that share zero query terms,
+        turning an O(corpus_size) scan into O(matched_docs).
+        """
         if not self.local_corpus:
             return
         try:
@@ -439,10 +500,19 @@ class JurisGPTRAG:
             return
 
         self._bm25_corpus_tokens = [
-            list(doc.get("tokens", set())) for doc in self.local_corpus
+            list(doc.get("tokens", [])) for doc in self.local_corpus
         ]
         self._bm25_index = BM25Okapi(self._bm25_corpus_tokens)
-        logger.info("BM25 index built (%d documents)", len(self._bm25_corpus_tokens))
+        # Build inverted index for fast lexical candidate selection
+        self._inverted_index: Dict[str, List[int]] = {}
+        for doc_idx, tokens in enumerate(self._bm25_corpus_tokens):
+            for token in set(tokens):
+                self._inverted_index.setdefault(token, []).append(doc_idx)
+        logger.info(
+            "BM25 + inverted index built (%d documents, %d unique tokens)",
+            len(self._bm25_corpus_tokens),
+            len(self._inverted_index),
+        )
 
     # ─── Cross-Encoder Re-ranker ─────────────────────────────────────
 
@@ -467,9 +537,13 @@ class JurisGPTRAG:
             return None
 
     def _rerank(self, query: str, citations: List[Citation], top_k: int) -> List[Citation]:
-        """Re-rank citations using the cross-encoder model."""
+        """Re-rank citations using the cross-encoder model.
+
+        Reranks even when ``len(citations) <= top_k`` because semantic
+        re-ordering of the small set still improves precision-at-1.
+        """
         reranker = self._get_reranker()
-        if reranker is None or len(citations) <= top_k:
+        if reranker is None or not citations:
             return citations[:top_k]
 
         pairs = [(query, c.content) for c in citations]
@@ -499,19 +573,21 @@ class JurisGPTRAG:
 
     @staticmethod
     def preprocess_query(query: str) -> str:
-        """Expand legal abbreviations and normalize section references."""
-        processed = query
+        """Expand legal abbreviations and normalize section references.
 
-        # Expand known abbreviations (case-insensitive, whole-word)
-        for abbr, expansion in LEGAL_ABBREVIATIONS.items():
-            pattern = re.compile(r"\b" + re.escape(abbr) + r"\b", re.IGNORECASE)
-            processed = pattern.sub(f"{expansion} ({abbr.upper()})", processed)
-
-        # Normalize section references: "sec 149" → "Section 149"
+        Section references are normalised *first* so that "sec 27" becomes
+        "Section 27" before the abbreviation map runs. Otherwise a generic
+        "sec" → "Section" abbreviation would interfere with the
+        ``Section <number>`` pattern.
+        """
         def _expand_section(match: re.Match) -> str:
             return f"Section {match.group(1)}"
 
-        processed = SECTION_REF_RE.sub(_expand_section, processed)
+        processed = SECTION_REF_RE.sub(_expand_section, query)
+
+        for abbr, expansion in LEGAL_ABBREVIATIONS.items():
+            pattern = re.compile(r"\b" + re.escape(abbr) + r"\b", re.IGNORECASE)
+            processed = pattern.sub(f"{expansion} ({abbr.upper()})", processed)
 
         return processed
 
@@ -547,7 +623,13 @@ class JurisGPTRAG:
         url: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
-        """Build a local corpus record."""
+        """Build a local corpus record.
+
+        Tokens are stored as ``list`` (not ``set``) so that BM25 keeps the term
+        frequency information it needs to score correctly. A separate
+        ``token_set`` is kept for fast O(1) intersection during the lexical
+        scan.
+        """
         document = {
             "title": title,
             "content": content,
@@ -566,8 +648,12 @@ class JurisGPTRAG:
             act or "",
             " ".join(str(v) for v in (metadata or {}).values()),
         ])
-        document["tokens"] = set(self._tokenize(token_source))
-        document["title_tokens"] = set(self._tokenize(title))
+        body_tokens = self._tokenize(token_source)
+        title_tokens = self._tokenize(title)
+        document["tokens"] = body_tokens
+        document["token_set"] = set(body_tokens)
+        document["title_tokens"] = title_tokens
+        document["title_token_set"] = set(title_tokens)
         return document
 
     # ─── Corpus Loading ──────────────────────────────────────────────
@@ -619,8 +705,56 @@ class JurisGPTRAG:
                 metadata=item.get("metadata", {}),
             ))
 
+        # ── Load Obsidian vault notes (if enabled) ─────────────────
+        if OBSIDIAN_ENABLED:
+            obsidian_docs = self._load_obsidian_corpus(corpus)
+            if obsidian_docs > 0:
+                logger.info("Loaded %d documents from Obsidian vault", obsidian_docs)
+
         self.local_corpus = corpus
         self.corpus_source = "local"
+
+    def _load_obsidian_corpus(self, corpus: List[Dict[str, Any]]) -> int:
+        """Load notes from Obsidian vault into corpus."""
+        try:
+            from obsidian_loader import load_obsidian_corpus, ObsidianLoader
+        except ImportError:
+            try:
+                from .obsidian_loader import load_obsidian_corpus, ObsidianLoader
+            except ImportError:
+                logger.warning("Obsidian loader not available")
+                return 0
+
+        vault_path = OBSIDIAN_VAULT_PATH
+        if not Path(vault_path).exists():
+            logger.info("Obsidian vault not found at %s, skipping", vault_path)
+            return 0
+
+        try:
+            loader = ObsidianLoader(vault_path=vault_path)
+            docs = loader.load_documents()
+
+            for doc in docs:
+                corpus.append(self._build_local_document(
+                    title=doc.get("title", "Obsidian Note"),
+                    content=doc.get("content", ""),
+                    doc_type=doc.get("doc_type", "note"),
+                    source=doc.get("source", "Obsidian Vault"),
+                    section=doc.get("section"),
+                    act=doc.get("act"),
+                    url=doc.get("url"),
+                    metadata=doc.get("metadata", {}),
+                ))
+
+            if loader.loaded_files:
+                self.loaded_corpus_files.extend(
+                    [f"obsidian:{f}" for f in loader.loaded_files]
+                )
+
+            return len(docs)
+        except Exception as e:
+            logger.warning("Error loading Obsidian corpus: %s", e)
+            return 0
 
     def _get_cloud_corpus_files(self) -> List[str]:
         """Get configured cloud corpus object keys."""
@@ -808,8 +942,25 @@ class JurisGPTRAG:
 
     # ─── Retrieval Methods ───────────────────────────────────────────
 
+    def _candidate_doc_indices(self, query_tokens: List[str]) -> List[int]:
+        """Use the inverted index to limit lexical scoring to a candidate set.
+
+        Falls back to the full corpus only when the inverted index has not been
+        built yet (e.g. when hybrid_search is disabled).
+        """
+        index = getattr(self, "_inverted_index", None)
+        if not index:
+            return list(range(len(self.local_corpus)))
+        candidates: set[int] = set()
+        for token in set(query_tokens):
+            candidates.update(index.get(token, []))
+        return list(candidates)
+
     def _retrieve_from_local_corpus(self, query: str, top_k: int) -> List[Citation]:
-        """Retrieve citations using lexical token matching."""
+        """Retrieve citations using lexical token matching with O(candidates)
+        scanning powered by the inverted index. Uses the precomputed
+        ``token_set`` for O(1) intersection.
+        """
         if not self.local_corpus:
             self._init_local_corpus()
 
@@ -817,21 +968,26 @@ class JurisGPTRAG:
         if not query_tokens:
             return []
 
-        scored_results = []
-        for document in self.local_corpus:
-            matched_tokens = {
-                query_token
-                for query_token in query_tokens
-                if any(self._token_matches(query_token, doc_token) for doc_token in document["tokens"])
-            }
-            if not matched_tokens:
-                continue
+        query_token_set = set(query_tokens)
+        scored_results: List[tuple[float, Dict[str, Any]]] = []
+        for doc_idx in self._candidate_doc_indices(query_tokens):
+            document = self.local_corpus[doc_idx]
+            doc_token_set = document.get("token_set") or set(document.get("tokens", []))
+            title_token_set = document.get("title_token_set") or set(
+                document.get("title_tokens", [])
+            )
 
-            matched_title_tokens = {
-                query_token
-                for query_token in query_tokens
-                if any(self._token_matches(query_token, doc_token) for doc_token in document["title_tokens"])
-            }
+            matched_tokens = query_token_set & doc_token_set
+            if not matched_tokens:
+                # Loose match fallback for stems / partials
+                matched_tokens = {
+                    qt for qt in query_token_set
+                    if any(self._token_matches(qt, dt) for dt in doc_token_set)
+                }
+                if not matched_tokens:
+                    continue
+
+            matched_title_tokens = query_token_set & title_token_set
 
             coverage = len(matched_tokens) / len(query_tokens)
             title_coverage = len(matched_title_tokens) / len(query_tokens)
@@ -950,20 +1106,33 @@ class JurisGPTRAG:
         processed_query = self.preprocess_query(query)
 
         if self.vector_store == "lexical":
-            # Hybrid: BM25 + lexical token matching → RRF
-            if self.hybrid_search and self._bm25_index is not None:
-                candidates_k = self.rerank_top_n if self.use_reranker else k
-                lexical_results = self._retrieve_from_local_corpus(processed_query, candidates_k)
+            # When BM25 is available it is strictly better than the
+            # coverage-based lexical scorer (it has TF/IDF + length norm), so
+            # prefer it as the primary signal. The coverage scorer is only
+            # used as a fallback or as a secondary signal in hybrid mode.
+            candidates_k = self.rerank_top_n if self.use_reranker else max(k, 10)
+
+            if self._bm25_index is not None:
                 bm25_results = self._retrieve_bm25(processed_query, candidates_k)
-                fused = self._reciprocal_rank_fusion(
-                    lexical_results, bm25_results, top_k=candidates_k
-                )
+                if self.hybrid_search:
+                    lexical_results = self._retrieve_from_local_corpus(
+                        processed_query, candidates_k
+                    )
+                    # Weighted RRF — BM25 gets the heavier weight because it
+                    # already accounts for term frequency and document length.
+                    fused = self._reciprocal_rank_fusion(
+                        bm25_results,
+                        bm25_results,  # double-count BM25 to weight it higher
+                        lexical_results,
+                        top_k=candidates_k,
+                    )
+                else:
+                    fused = bm25_results
             else:
-                candidates_k = self.rerank_top_n if self.use_reranker else k
                 fused = self._retrieve_from_local_corpus(processed_query, candidates_k)
 
-            # Re-rank with cross-encoder
-            if self.use_reranker and len(fused) > k:
+            # Re-rank with cross-encoder when configured.
+            if self.use_reranker:
                 return self._rerank(processed_query, fused, k)
             return fused[:k]
 
@@ -1016,8 +1185,8 @@ class JurisGPTRAG:
                     metadata=doc.metadata
                 ))
 
-        # Re-rank semantic results with cross-encoder
-        if self.use_reranker and len(results) > k:
+        # Re-rank semantic results with cross-encoder when configured.
+        if self.use_reranker:
             return self._rerank(processed_query, results, k)
 
         return results[:k]
@@ -1083,8 +1252,7 @@ class JurisGPTRAG:
         if confidence == "low":
             return "Limited relevant sources were found. This information should be verified with primary legal sources or a qualified professional."
 
-        doc_types = set(c.doc_type for c in citations)
-        sources = set(c.source for c in citations)
+        doc_types = {c.doc_type for c in citations}
 
         limitations = []
 
@@ -1191,7 +1359,7 @@ ANSWER:"""
             except Exception as e:
                 logger.error("Local LLM generation failed: %s", e)
 
-        # ── OpenAI fallback ──────────────────────────────────────────
+        # ── Anthropic / OpenAI LLM ────────────────────────────────────
         if self.llm is not None and self.llm != "local_legal_llama":
             try:
                 system_prompt = f"""You are JurisGPT, a citation-grounded legal research assistant specializing in Indian law for startups and corporate matters.
@@ -1202,6 +1370,8 @@ CRITICAL RULES:
 3. If the citations don't contain relevant information, say so explicitly.
 4. Never invent or hallucinate legal information.
 5. Be precise about legal terminology, sections, and acts.
+6. Structure your response with clear headings when appropriate.
+7. Provide actionable advice when the question warrants it.
 
 CONTEXT FROM LEGAL CORPUS:
 {context}
@@ -1217,6 +1387,7 @@ CONTEXT FROM LEGAL CORPUS:
                 answer = response.content
 
                 follow_ups = self._generate_follow_ups(query, citations)
+                model_name = "anthropic" if self.llm_type == "anthropic" else "openai"
                 return RAGResponse(
                     answer=answer,
                     citations=citations,
@@ -1224,10 +1395,11 @@ CONTEXT FROM LEGAL CORPUS:
                     limitations=limitations,
                     follow_up_questions=follow_ups,
                     query=query,
-                    model_used="openai",
+                    model_used=model_name,
                     grounded=confidence in ["high", "medium"]
                 )
-            except Exception:
+            except Exception as e:
+                logger.error("LLM generation failed: %s", e)
                 fallback_limitations = (
                     f"{limitations} Live answer generation is currently unavailable, so a retrieval-only response is shown."
                 )
@@ -1238,24 +1410,67 @@ CONTEXT FROM LEGAL CORPUS:
     def stream_answer(self, query: str, citations: List[Citation]) -> Iterator[str]:
         """
         Stream a citation-grounded answer token-by-token.
-        Only available with local LLM. Falls back to full generate for OpenAI.
+        Uses OpenAI streaming when available, falls back to retrieval-only.
         """
-        if self.local_llm is None:
-            # Non-streaming fallback
-            response = self.generate_answer(query, citations)
+        confidence = self._assess_confidence(query, citations)
+        limitations = self._generate_limitations(query, citations, confidence)
+
+        # If no citations or insufficient confidence, return retrieval-only
+        if not citations or confidence == "insufficient":
+            response = self._format_retrieval_only_response(query, citations, confidence, limitations)
             yield response.answer
             return
 
+        # Build context from citations
         context = "\n\n---\n\n".join([
             f"[{i+1}] {c.title} ({c.doc_type}, {c.source})\nRelevance: {c.relevance:.0%}\n{c.content}"
             for i, c in enumerate(citations)
         ])
-        prompt = self._build_legal_prompt(query, context)
 
-        try:
-            yield from self.local_llm.stream_generate(prompt, max_tokens=2048, temperature=0.3)
-        except Exception as e:
-            yield f"[Error: generation failed — {e}]"
+        # Try Anthropic/OpenAI streaming (best quality)
+        if self.llm is not None and self.llm != "local_legal_llama":
+            try:
+                system_prompt = f"""You are JurisGPT, a citation-grounded legal research assistant specializing in Indian law for startups and MSMEs.
+
+CRITICAL RULES:
+1. ONLY answer based on the provided citations. Do not use external knowledge.
+2. ALWAYS cite your sources using [1], [2], etc. format in your answer.
+3. If the citations don't contain relevant information, say so explicitly.
+4. Never invent or hallucinate legal information.
+5. Be precise about legal terminology, sections, and acts.
+6. Structure your answer clearly with headings if needed.
+7. Provide practical, actionable advice when possible.
+8. Reference specific sections, acts, and legal provisions from the citations.
+
+CONTEXT FROM LEGAL CORPUS:
+{context}
+"""
+                from langchain_core.prompts import ChatPromptTemplate
+                prompt = ChatPromptTemplate.from_messages([
+                    ("system", system_prompt),
+                    ("human", "{query}")
+                ])
+
+                chain = prompt | self.llm
+
+                # Try streaming if supported
+                try:
+                    for chunk in chain.stream({"query": query}):
+                        if hasattr(chunk, 'content') and chunk.content:
+                            yield chunk.content
+                    return
+                except Exception as stream_error:
+                    logger.warning("Streaming not supported, falling back to invoke: %s", stream_error)
+                    # Fall back to non-streaming
+                    response = chain.invoke({"query": query})
+                    yield response.content
+                    return
+            except Exception as e:
+                logger.error("LLM streaming failed: %s", e)
+
+        # Fall back to retrieval-only format
+        response = self._format_retrieval_only_response(query, citations, confidence, limitations)
+        yield response.answer
 
     # ─── Retrieval-Only Formatting ───────────────────────────────────
 
@@ -1491,7 +1706,7 @@ CONTEXT FROM LEGAL CORPUS:
         output += f"\n{'='*60}\n"
         output += f"LIMITATIONS:\n{response.limitations}\n"
         output += f"{'='*60}\n"
-        output += f"FOLLOW-UP QUESTIONS:\n"
+        output += "FOLLOW-UP QUESTIONS:\n"
         for q in response.follow_up_questions:
             output += f"  - {q}\n"
 

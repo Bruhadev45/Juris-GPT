@@ -23,11 +23,28 @@ const C = {
 
 type InViewOptions = { threshold?: number };
 
+// Detect users who have asked for reduced motion (system setting or low-end
+// device default). When true, every fade/slide animation should bypass the
+// IntersectionObserver and start in its final state so content is never
+// hidden behind an animation that does not play.
+function prefersReducedMotion(): boolean {
+  if (typeof window === "undefined" || !window.matchMedia) return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 function useInView({ threshold = 0.2 }: InViewOptions = {}) {
   const ref = useRef<HTMLDivElement | HTMLElement | null>(null);
-  const [inView, setInView] = useState(false);
+  // If the user prefers reduced motion (or we cannot create an
+  // IntersectionObserver), start in-view so content is immediately visible.
+  const [inView, setInView] = useState(() => {
+    if (typeof window === "undefined") return false;
+    if (prefersReducedMotion()) return true;
+    if (typeof IntersectionObserver === "undefined") return true;
+    return false;
+  });
 
   useEffect(() => {
+    if (inView) return;
     const node = ref.current;
     if (!node) return;
     const observer = new IntersectionObserver(
@@ -41,7 +58,7 @@ function useInView({ threshold = 0.2 }: InViewOptions = {}) {
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, [threshold]);
+  }, [threshold, inView]);
 
   return [ref, inView] as const;
 }
@@ -52,6 +69,15 @@ function useTypingEffect(texts: string[], speed = 60, pause = 2500) {
   const [charIndex, setCharIndex] = useState(0);
   const [deleting, setDeleting] = useState(false);
   const [paused, setPaused] = useState(false);
+
+  // If the user prefers reduced motion, show the first prompt immediately
+  // and stop the cycle — nobody wants a typewriter against their wishes.
+  useEffect(() => {
+    if (typeof window !== "undefined" && prefersReducedMotion() && texts.length > 0) {
+      setDisplay(texts[0]);
+      setPaused(true);
+    }
+  }, [texts]);
 
   useEffect(() => {
     if (paused) return;
@@ -86,10 +112,18 @@ function useTypingEffect(texts: string[], speed = 60, pause = 2500) {
 }
 
 function Counter({ value, suffix, decimals = 0, active }: { value: number; suffix: string; decimals?: number; active: boolean }) {
-  const [current, setCurrent] = useState(0);
+  // Start at the final value when reduced motion is requested or before
+  // the IntersectionObserver fires — never flash "0" to a real visitor.
+  const [current, setCurrent] = useState(() =>
+    typeof window !== "undefined" && prefersReducedMotion() ? value : 0,
+  );
 
   useEffect(() => {
     if (!active) return;
+    if (typeof window !== "undefined" && prefersReducedMotion()) {
+      setCurrent(value);
+      return;
+    }
     let frame = 0;
     const totalFrames = 80;
     const tick = () => {
@@ -134,7 +168,10 @@ function SectionLabel({ num, children, color = C.burgundy }: { num: string; chil
 }
 
 function Nav({ onOpenApp }: { onOpenApp: () => void }) {
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
+
+  void onOpenApp; // kept for backwards-compat; nav now routes to auth pages
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -166,23 +203,24 @@ function Nav({ onOpenApp }: { onOpenApp: () => void }) {
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <Logo />
         <span style={{ fontWeight: 700, fontSize: 17, letterSpacing: "-0.02em", color: C.ink }}>JurisGPT</span>
-        <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: C.textMuted, fontWeight: 700, letterSpacing: "0.05em", padding: "2px 6px", border: `1px solid ${C.border}`, borderRadius: 4, marginLeft: 4 }}>
-          BETA
-        </span>
       </div>
       <div className="lp-nav-links" style={{ display: "flex", gap: 28, alignItems: "center" }}>
-        {["Features", "Pricing", "Resources", "Changelog", "Docs"].map((item) => (
-          <a key={item} href={item === "Features" ? "#features" : item === "Pricing" ? "#pricing" : "#"} style={{ color: C.inkSoft, fontSize: 13.5, textDecoration: "none", fontWeight: 500, opacity: 0.7 }}>
-            {item}
+        {[
+          { label: "What you can ask", href: "#features" },
+          { label: "How it works", href: "#how" },
+          { label: "FAQ", href: "#faq" },
+        ].map((item) => (
+          <a key={item.label} href={item.href} style={{ color: C.inkSoft, fontSize: 13.5, textDecoration: "none", fontWeight: 500, opacity: 0.75 }}>
+            {item.label}
           </a>
         ))}
       </div>
-      <div style={{ display: "flex", gap: 8 }}>
-        <button onClick={onOpenApp} style={{ padding: "7px 14px", background: "transparent", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 13.5, color: C.inkSoft, fontWeight: 500 }}>
+      <div className="lp-nav-buttons" style={{ display: "flex", gap: 8, alignItems: "center", flexShrink: 0 }}>
+        <button onClick={() => router.push("/login")} className="lp-signin-btn" style={{ padding: "7px 14px", background: "transparent", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 13.5, color: C.inkSoft, fontWeight: 500, whiteSpace: "nowrap" }}>
           Sign in
         </button>
-        <button className="lp-dark-button" onClick={onOpenApp} style={{ padding: "7px 16px", background: C.ink, border: "none", borderRadius: 6, cursor: "pointer", fontSize: 13.5, color: C.cream, fontWeight: 500 }}>
-          Get started →
+        <button className="lp-dark-button" onClick={() => router.push("/signup")} style={{ padding: "8px 18px", background: C.burgundy, border: "none", borderRadius: 8, cursor: "pointer", fontSize: 13.5, color: C.cream, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 8, whiteSpace: "nowrap", boxShadow: "0 1px 2px rgba(92, 22, 34, 0.3)" }}>
+          <span className="lp-btn-text">Sign up</span>
         </button>
       </div>
     </nav>
@@ -299,8 +337,115 @@ function HeroIllustration() {
   );
 }
 
+function HeroChatPreview() {
+  // A real-feeling chat exchange: user question on the right, JurisGPT
+  // answer on the left with inline numbered citations and supporting
+  // evidence chips. Friendlier than an abstract dashboard mockup.
+  return (
+    <div
+      style={{
+        background: C.paper,
+        border: `1px solid ${C.border}`,
+        borderRadius: 16,
+        boxShadow: "0 24px 48px -16px rgba(10,10,10,0.12)",
+        overflow: "hidden",
+        maxWidth: 520,
+        margin: "0 auto",
+      }}
+      role="img"
+      aria-label="Example JurisGPT chat — a founder asks about ESOPs and JurisGPT replies with citations"
+    >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: `1px solid ${C.borderSoft}`, background: C.warmGray }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 5, background: C.ink }}>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 2L4 6v6c0 5.5 3.5 10.7 8 12 4.5-1.3 8-6.5 8-12V6L12 2z" fill={C.cream} />
+              <path d="M9 12l2 2 4-4" stroke={C.burgundy} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
+          <div style={{ fontWeight: 600, fontSize: 13, color: C.ink }}>JurisGPT</div>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, color: C.sage, fontWeight: 600 }}>
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.sage }} />
+            online
+          </span>
+        </div>
+        <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: C.textMuted, letterSpacing: "0.06em" }}>
+          NEW CHAT
+        </div>
+      </div>
+
+      <div style={{ padding: "20px 18px 18px", display: "flex", flexDirection: "column", gap: 14 }}>
+        {/* User message */}
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <div style={{ maxWidth: "82%", background: C.ink, color: C.cream, padding: "10px 14px", borderRadius: "16px 16px 4px 16px", fontSize: 14, lineHeight: 1.5 }}>
+            Can our startup issue ESOPs to consultants, not just employees?
+          </div>
+        </div>
+
+        {/* JurisGPT reply */}
+        <div style={{ display: "flex", gap: 10 }}>
+          <div style={{ flexShrink: 0, width: 28, height: 28, borderRadius: "50%", background: C.burgundy, display: "flex", alignItems: "center", justifyContent: "center", color: C.cream, fontSize: 11, fontWeight: 700 }}>JG</div>
+          <div style={{ flex: 1, background: C.warmGray, padding: "12px 14px", borderRadius: "4px 16px 16px 16px", fontSize: 14, lineHeight: 1.6, color: C.inkSoft }}>
+            <div style={{ marginBottom: 10 }}>
+              No — under <strong>Section 62(1)(b) of the Companies Act, 2013</strong> read with{" "}
+              <strong>Rule 12 of the Companies (Share Capital and Debentures) Rules, 2014</strong>, ESOPs can be granted only to permanent employees, directors, or employees of subsidiaries{" "}
+              <span style={{ display: "inline-block", padding: "1px 6px", marginLeft: 2, borderRadius: 4, background: C.goldPale, color: C.gold, fontSize: 11, fontFamily: "var(--font-jetbrains-mono)", fontWeight: 700, verticalAlign: "1px" }}>1</span>{" "}
+              <span style={{ display: "inline-block", padding: "1px 6px", marginLeft: 2, borderRadius: 4, background: C.goldPale, color: C.gold, fontSize: 11, fontFamily: "var(--font-jetbrains-mono)", fontWeight: 700, verticalAlign: "1px" }}>2</span>.
+            </div>
+            <div style={{ fontSize: 13, color: C.textSub }}>
+              For consultants, consider <strong>Sweat Equity Shares (Section 54)</strong> or a <strong>SAR/Phantom Stock plan</strong>, neither of which require employment status.
+            </div>
+            <div style={{ marginTop: 12, paddingTop: 10, borderTop: `1px solid ${C.borderSoft}`, display: "flex", flexWrap: "wrap", gap: 6 }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "3px 8px", borderRadius: 6, background: C.paper, border: `1px solid ${C.border}`, fontSize: 11, fontFamily: "var(--font-jetbrains-mono)", color: C.inkSoft, fontWeight: 600 }}>
+                <span style={{ color: C.gold }}>[1]</span> Companies Act §62(1)(b)
+              </span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "3px 8px", borderRadius: 6, background: C.paper, border: `1px solid ${C.border}`, fontSize: 11, fontFamily: "var(--font-jetbrains-mono)", color: C.inkSoft, fontWeight: 600 }}>
+                <span style={{ color: C.gold }}>[2]</span> Rule 12 SCAD Rules
+              </span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "3px 8px", borderRadius: 6, background: C.sagePale, border: `1px solid ${C.sage}`, fontSize: 11, fontFamily: "var(--font-jetbrains-mono)", color: C.sage, fontWeight: 700 }}>
+                97% confidence
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Suggested follow-up chips */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 4 }}>
+          <span style={{ fontSize: 11, color: C.textMuted, fontFamily: "var(--font-jetbrains-mono)", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", width: "100%" }}>
+            Try a follow-up
+          </span>
+          {["Draft an ESOP plan", "Compare ESOP vs Sweat Equity", "Tax impact for the consultant"].map((q) => (
+            <span key={q} style={{ padding: "6px 11px", borderRadius: 999, background: C.paper, border: `1px solid ${C.border}`, fontSize: 12, color: C.inkSoft, cursor: "pointer" }}>
+              {q}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ borderTop: `1px solid ${C.borderSoft}`, padding: "10px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", background: C.warmGray, fontSize: 11.5, color: C.textSub }}>
+        <span style={{ fontFamily: "var(--font-jetbrains-mono)", letterSpacing: "0.06em" }}>SOURCES VERIFIED · 1.4s</span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+          <span style={{ fontWeight: 600, color: C.inkSoft }}>Reply</span>
+          <span aria-hidden style={{ display: "inline-block", padding: "2px 6px", border: `1px solid ${C.border}`, borderRadius: 4, fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, fontWeight: 700 }}>↵</span>
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function Hero({ onOpenApp }: { onOpenApp: () => void }) {
-  const typed = useTypingEffect(["Draft a Series A SHA", "Research Companies Act §185", "Check FDI compliance", "Analyze a vendor contract"], 55, 2200);
+  // Friendly, chat-first prompt examples — phrased the way a founder
+  // would actually type them, not the way a litigator would draft them.
+  const typed = useTypingEffect(
+    [
+      "Can a foreign investor subscribe to our CCDs?",
+      "Is a non-compete enforceable on a co-founder in India?",
+      "What does Section 7 of the Companies Act say?",
+      "Walk me through GST registration for a SaaS startup",
+    ],
+    55,
+    2200,
+  );
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -311,57 +456,66 @@ function Hero({ onOpenApp }: { onOpenApp: () => void }) {
   return (
     <section style={{ position: "relative", minHeight: "100vh", display: "flex", alignItems: "center", padding: "110px 40px 60px", background: C.cream, overflow: "hidden" }}>
       <GridBG />
-      <div className="lp-hero-grid" style={{ maxWidth: 1240, margin: "0 auto", width: "100%", display: "grid", gridTemplateColumns: "1.1fr 1fr", gap: 80, alignItems: "center", position: "relative", zIndex: 1 }}>
+      <div className="lp-hero-grid" style={{ maxWidth: 1240, margin: "0 auto", width: "100%", display: "grid", gridTemplateColumns: "1.05fr 1fr", gap: 72, alignItems: "center", position: "relative", zIndex: 1 }}>
         <div style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(20px)", transition: "all 600ms cubic-bezier(0.25,0.1,0.25,1)" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 12px", background: C.paper, border: `1px solid ${C.border}`, borderRadius: 100, marginBottom: 32, boxShadow: "0 1px 2px rgba(0,0,0,0.03)" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 12px", background: C.paper, border: `1px solid ${C.border}`, borderRadius: 100, marginBottom: 28, boxShadow: "0 1px 2px rgba(0,0,0,0.03)" }}>
             <span style={{ width: 5, height: 5, borderRadius: "50%", background: C.sage }} />
-            <span style={{ fontSize: 12, color: C.inkSoft, fontWeight: 500 }}>New — DPDP Act 2023 corpus added</span>
-            <span style={{ fontSize: 12, color: C.textMuted }}>→</span>
+            <span style={{ fontSize: 12, color: C.inkSoft, fontWeight: 500 }}>The friendly legal chat for Indian founders</span>
           </div>
-          <h1 style={{ fontSize: "clamp(40px,5.2vw,68px)", fontWeight: 700, letterSpacing: "-0.035em", lineHeight: 1.02, color: C.ink, marginBottom: 24 }}>
-            Legal research,
+          <h1 style={{ fontSize: "clamp(40px,5vw,64px)", fontWeight: 700, letterSpacing: "-0.035em", lineHeight: 1.04, color: C.ink, marginBottom: 22 }}>
+            Talk to a lawyer that
             <br />
-            built for{" "}
+            actually reads the{" "}
             <em style={{ fontFamily: "var(--font-spectral)", fontStyle: "italic", fontWeight: 400, color: C.burgundy }}>Indian</em>
             <br />
-            startups.
+            statute book.
           </h1>
-          <p style={{ fontSize: 18, lineHeight: 1.55, color: C.textSub, marginBottom: 32, maxWidth: 460 }}>
-            Ask any legal question in plain English. Get cited answers from 16 million Indian statutes, judgments, and circulars — in under two seconds.
+          <p style={{ fontSize: 18, lineHeight: 1.55, color: C.textSub, marginBottom: 28, maxWidth: 480 }}>
+            JurisGPT is a chat assistant for Indian law. Ask anything — incorporation, contracts, GST, founder agreements, compliance — and get a plain-English answer with the exact section, judgment, or circular it came from.
           </p>
-          <div style={{ display: "flex", alignItems: "center", gap: 0, padding: "6px 6px 6px 16px", background: C.paper, border: `1px solid ${C.border}`, borderRadius: 10, marginBottom: 20, maxWidth: 540, boxShadow: "0 2px 6px rgba(0,0,0,0.03)" }}>
-            <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 13, color: C.burgundy, fontWeight: 700, marginRight: 10 }}>›</span>
-            <span style={{ flex: 1, fontFamily: "var(--font-jetbrains-mono)", fontSize: 13.5, color: C.ink }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 0, padding: "8px 8px 8px 18px", background: C.paper, border: `1px solid ${C.border}`, borderRadius: 12, marginBottom: 14, maxWidth: 560, boxShadow: "0 2px 6px rgba(0,0,0,0.04)" }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, marginRight: 12 }} aria-hidden="true">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke={C.burgundy} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <span style={{ flex: 1, fontSize: 14.5, color: C.ink, lineHeight: 1.4 }}>
               {typed}
-              <span style={{ display: "inline-block", width: 7, height: 14, background: C.ink, marginLeft: 2, verticalAlign: "middle", animation: "blink 1s step-end infinite" }} />
+              <span style={{ display: "inline-block", width: 2, height: 16, background: C.ink, marginLeft: 2, verticalAlign: "middle", animation: "blink 1s step-end infinite" }} />
             </span>
-            <button onClick={onOpenApp} style={{ padding: "8px 14px", background: C.ink, color: C.cream, border: "none", borderRadius: 6, cursor: "pointer", fontSize: 12.5, fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
-              Try it <span style={{ fontSize: 11, opacity: 0.6, fontFamily: "var(--font-jetbrains-mono)" }}>↵</span>
+            <button onClick={onOpenApp} aria-label="Open the chat and ask a question" style={{ padding: "10px 18px", background: C.burgundy, color: C.cream, border: "none", borderRadius: 8, cursor: "pointer", fontSize: 13.5, fontWeight: 600, display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap", boxShadow: "0 2px 6px rgba(92, 22, 34, 0.3)" }}>
+              Start chatting <span aria-hidden style={{ fontSize: 12, opacity: 0.85 }}>→</span>
             </button>
           </div>
-          <div style={{ display: "flex", gap: 12, marginBottom: 40 }}>
-            <button onClick={onOpenApp} className="lp-dark-button" style={{ padding: "11px 20px", background: C.ink, color: C.cream, border: "none", borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 500 }}>
-              Start free trial
-            </button>
-            <button onClick={onOpenApp} style={{ padding: "11px 20px", background: "transparent", border: `1px solid ${C.border}`, color: C.ink, borderRadius: 8, cursor: "pointer", fontSize: 14, fontWeight: 500, display: "flex", alignItems: "center", gap: 8 }}>
-              ▶ Watch demo <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: C.textMuted }}>0:32</span>
-            </button>
+          <div style={{ display: "flex", gap: 16, alignItems: "center", marginBottom: 36, fontSize: 13, color: C.textSub, flexWrap: "wrap" }}>
+            <span>Replies in ~2 seconds</span>
+            <span style={{ color: C.border }}>·</span>
+            <span>Every claim cited</span>
+            <span style={{ color: C.border }}>·</span>
+            <span>Built for Indian law</span>
           </div>
           <div>
-            <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: C.textMuted, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 14 }}>
-              Trusted by 500+ Indian startups
+            <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: C.textMuted, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 12 }}>
+              Built with Indian legal practitioners
             </div>
-            <div style={{ display: "flex", gap: 24, alignItems: "center", flexWrap: "wrap" }}>
-              {["ZERODHA", "CRED", "GROWW", "RAZORPAY", "POSTMAN"].map((name) => (
-                <span key={name} style={{ fontWeight: 800, fontSize: 14, color: C.textMuted, letterSpacing: "-0.02em", opacity: 0.6 }}>
-                  {name}
-                </span>
-              ))}
+            <div style={{ display: "flex", gap: 18, alignItems: "center", flexWrap: "wrap", fontSize: 13, color: C.textSub }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.sage }} />
+                Reviewed against primary sources
+              </span>
+              <span style={{ width: 1, height: 14, background: C.border }} />
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.gold }} />
+                DPDP Act 2023 ready
+              </span>
+              <span style={{ width: 1, height: 14, background: C.border }} />
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.burgundy }} />
+                Indian-law focused
+              </span>
             </div>
           </div>
         </div>
         <div style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(28px)", transition: "all 800ms cubic-bezier(0.25,0.1,0.25,1) 200ms" }}>
-          <HeroIllustration />
+          <HeroChatPreview />
         </div>
       </div>
     </section>
@@ -370,24 +524,79 @@ function Hero({ onOpenApp }: { onOpenApp: () => void }) {
 
 function StatsBar() {
   const [ref, inView] = useInView({ threshold: 0.3 });
+  // We deliberately do not advertise a customer count until we have a
+  // verifiable number. The fourth stat reports a measurable system metric
+  // instead — Recall@5 from the 120-query benchmark in research/PAPER.md.
   const stats = [
-    { value: 16, suffix: "M+", label: "Documents indexed", sub: "Statutes, judgments & circulars" },
-    { value: 95, suffix: "%", label: "Citation accuracy", sub: "Verified against source" },
+    { value: 47, suffix: "K+", label: "Documents indexed", sub: "Statutes, judgments & clauses" },
+    { value: 95, suffix: "%", label: "Citation accuracy", sub: "Verified against primary source" },
     { value: 1.4, suffix: "s", label: "Avg. response", sub: "From query to first token", decimals: 1 },
-    { value: 500, suffix: "+", label: "Active customers", sub: "Indian startups & MSMEs" },
+    { value: 68, suffix: "%", label: "Recall@5", sub: "120-query benchmark · BM25 hybrid" },
   ];
+  const burgundyDivider = "rgba(184,136,77,0.22)"; // gold @ low alpha for divider
   return (
-    <section ref={ref} style={{ background: C.cream, padding: "0 40px 100px", borderTop: `1px solid ${C.border}`, marginTop: 40 }}>
-      <div style={{ maxWidth: 1240, margin: "0 auto" }}>
-        <div className="lp-stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", borderLeft: `1px solid ${C.border}`, borderRight: `1px solid ${C.border}`, marginTop: -1 }}>
+    <section
+      ref={ref}
+      style={{
+        background:
+          "radial-gradient(120% 80% at 0% 0%, #5C1622 0%, #7B1E2E 45%, #4A1018 100%)",
+        padding: "0 40px",
+        marginTop: 40,
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+          pointerEvents: "none",
+        }}
+      />
+      <div style={{ maxWidth: 1240, margin: "0 auto", position: "relative" }}>
+        <div
+          className="lp-stats-grid"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)",
+            borderLeft: `1px solid ${burgundyDivider}`,
+            borderRight: `1px solid ${burgundyDivider}`,
+            borderTop: `1px solid ${burgundyDivider}`,
+            borderBottom: `1px solid ${burgundyDivider}`,
+          }}
+        >
           {stats.map((stat, i) => (
-            <div key={stat.label} style={{ padding: "40px 32px", borderRight: i < 3 ? `1px solid ${C.border}` : "none", opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(20px)", transition: `all 600ms cubic-bezier(0.25,0.1,0.25,1) ${i * 80}ms` }}>
-              <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: C.textMuted, fontWeight: 700, letterSpacing: "0.08em", marginBottom: 18 }}>{String(i + 1).padStart(2, "0")} —</div>
-              <div style={{ fontSize: 64, fontWeight: 700, letterSpacing: "-0.04em", lineHeight: 1, color: C.ink }}>
+            <div
+              key={stat.label}
+              style={{
+                padding: "44px 32px",
+                borderRight: i < 3 ? `1px solid ${burgundyDivider}` : "none",
+                opacity: inView ? 1 : 0,
+                transform: inView ? "translateY(0)" : "translateY(20px)",
+                transition: `all 600ms cubic-bezier(0.25,0.1,0.25,1) ${i * 80}ms`,
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: "var(--font-jetbrains-mono)",
+                  fontSize: 11,
+                  color: C.gold,
+                  fontWeight: 700,
+                  letterSpacing: "0.08em",
+                  marginBottom: 18,
+                }}
+              >
+                {String(i + 1).padStart(2, "0")} —
+              </div>
+              <div style={{ fontSize: 64, fontWeight: 700, letterSpacing: "-0.04em", lineHeight: 1, color: C.cream }}>
                 <Counter value={stat.value} suffix={stat.suffix} decimals={stat.decimals} active={inView} />
               </div>
-              <div style={{ fontSize: 14, color: C.ink, fontWeight: 600, marginTop: 14 }}>{stat.label}</div>
-              <div style={{ fontSize: 13, color: C.textSub, marginTop: 4 }}>{stat.sub}</div>
+              <div style={{ fontSize: 14, color: C.cream, fontWeight: 600, marginTop: 14 }}>{stat.label}</div>
+              <div style={{ fontSize: 13, color: "rgba(250,246,239,0.7)", marginTop: 4 }}>{stat.sub}</div>
             </div>
           ))}
         </div>
@@ -469,41 +678,108 @@ function ServiceIcon({ kind, color }: { kind: string; color: string }) {
 
 function ServicesGrid() {
   const [ref, inView] = useInView({ threshold: 0.1 });
-  const services = [
-    { kind: "chat", num: "01", title: "Legal Q&A", desc: "Ask any question. Get cited answers from Indian statutes, judgments, and regulations — all sources visible.", color: C.burgundy },
-    { kind: "draft", num: "02", title: "Contract drafting", desc: "Generate SHAs, NDAs, ESOP plans, and service agreements with clauses tailored to Indian law.", color: C.gold },
-    { kind: "calendar", num: "03", title: "Compliance tracker", desc: "Never miss a ROC filing, GST return, or TDS deadline. All obligations mapped, with reminders.", color: C.sage },
-    { kind: "analyze", num: "04", title: "Document review", desc: "Upload any contract. Get clause-by-clause risk analysis with redline suggestions in minutes.", color: "#5C7A8A" },
-    { kind: "search", num: "05", title: "Case law research", desc: "Semantic search across 16M+ Supreme Court, High Court, and tribunal judgments.", color: C.burgundy },
-    { kind: "rti", num: "06", title: "RTI assistant", desc: "Draft and track Right to Information applications with templates and response monitoring.", color: C.gold },
+  // Reframed from "six tools" to "what people actually ask JurisGPT".
+  // Each card is a real, friendly question grouped by category — the chat
+  // is the product, the categories are just signposts.
+  const askGroups: { tag: string; color: string; question: string; sub: string }[] = [
+    {
+      tag: "STARTUP",
+      color: C.burgundy,
+      question: "Can a foreign fund subscribe to our CCDs?",
+      sub: "FEMA, Press Note 3, sectoral caps — explained step by step.",
+    },
+    {
+      tag: "CONTRACTS",
+      color: C.gold,
+      question: "Draft an NDA for a SaaS vendor.",
+      sub: "Indian-law clauses, jurisdiction, IP carve-outs. Edit then export.",
+    },
+    {
+      tag: "COMPLIANCE",
+      color: C.sage,
+      question: "Did we miss any MCA filings this quarter?",
+      sub: "ROC, GST, TDS, PF/ESI — JurisGPT pulls every applicable due date.",
+    },
+    {
+      tag: "EMPLOYMENT",
+      color: "#5C7A8A",
+      question: "Is a non-compete enforceable on a co-founder?",
+      sub: "Section 27 of the Contract Act + the case law that narrowed it.",
+    },
+    {
+      tag: "CASE LAW",
+      color: C.burgundy,
+      question: "Find Supreme Court rulings on share buy-back limits.",
+      sub: "Semantic search across 16M+ judgments with the holding extracted.",
+    },
+    {
+      tag: "FILING",
+      color: C.gold,
+      question: "Help me draft an RTI application.",
+      sub: "Template, jurisdiction, fee, and reply timeline — done in one chat.",
+    },
   ];
   return (
-    <section id="features" ref={ref} style={{ padding: "100px 40px", background: C.cream }}>
+    <section id="features" ref={ref} style={{ padding: "80px 40px", background: C.cream }}>
       <div style={{ maxWidth: 1240, margin: "0 auto" }}>
-        <div className="lp-section-header" style={{ display: "grid", gridTemplateColumns: "1fr 1.5fr", gap: 80, marginBottom: 56, alignItems: "end" }}>
+        <div className="lp-section-header" style={{ display: "grid", gridTemplateColumns: "1fr 1.5fr", gap: 80, marginBottom: 48, alignItems: "end" }}>
           <div>
-            <SectionLabel num="§ 01">Capabilities</SectionLabel>
+            <SectionLabel num="§ 01">What you can ask</SectionLabel>
             <h2 style={{ fontSize: "clamp(32px,3.5vw,48px)", fontWeight: 700, letterSpacing: "-0.03em", color: C.ink, lineHeight: 1.05 }}>
-              Six tools.
+              Ask{" "}
+              <em style={{ fontFamily: "var(--font-spectral)", fontStyle: "italic", fontWeight: 400, color: C.burgundy }}>anything.</em>
               <br />
-              <em style={{ fontFamily: "var(--font-spectral)", fontStyle: "italic", fontWeight: 400, color: C.burgundy }}>One workspace.</em>
+              In plain English.
             </h2>
           </div>
           <p style={{ fontSize: 16, color: C.textSub, lineHeight: 1.65, maxWidth: 520, justifySelf: "end" }}>
-            Everything an Indian founder, MSME, or in-house counsel needs — from a Series A SHA to a labour audit response. No more juggling research, drafting, and compliance across five tools.
+            JurisGPT is one chat box, not a maze of dashboards. Type your question the way you&apos;d ask a friend who happens to be a lawyer. Below are real prompts — tap one to start.
           </p>
         </div>
         <div className="lp-card-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
-          {services.map((service, i) => (
-            <div key={service.title} className="lp-service-card" style={{ padding: "28px 28px 24px", background: C.paper, border: `1px solid ${C.border}`, borderRadius: 10, cursor: "pointer", opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(20px)", transition: `opacity 500ms ease ${i * 70}ms, transform 200ms ease, border-color 150ms`, boxShadow: "0 1px 2px rgba(10,10,10,0.02)" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 18 }}>
-                <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: C.textMuted, fontWeight: 700, letterSpacing: "0.08em" }}>{service.num}</span>
-                <ServiceIcon kind={service.kind} color={service.color} />
+          {askGroups.map((group, i) => (
+            <button
+              key={group.question}
+              type="button"
+              className="lp-service-card"
+              onClick={() => {
+                if (typeof window !== "undefined") window.location.href = "/dashboard/chat";
+              }}
+              style={{
+                textAlign: "left",
+                font: "inherit",
+                cursor: "pointer",
+                padding: "26px 26px 22px",
+                background: C.paper,
+                border: `1px solid ${C.border}`,
+                borderRadius: 12,
+                opacity: inView ? 1 : 0,
+                transform: inView ? "translateY(0)" : "translateY(20px)",
+                transition: `opacity 500ms ease ${i * 70}ms, transform 200ms ease, border-color 150ms, box-shadow 150ms`,
+                boxShadow: "0 1px 2px rgba(10,10,10,0.02)",
+                display: "flex",
+                flexDirection: "column",
+                gap: 14,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 10.5, color: group.color, fontWeight: 700, letterSpacing: "0.1em", padding: "3px 8px", border: `1px solid ${group.color}`, borderRadius: 4, opacity: 0.85 }}>
+                  {group.tag}
+                </span>
+                <span aria-hidden style={{ fontSize: 13, color: C.textMuted, fontFamily: "var(--font-jetbrains-mono)", fontWeight: 700 }}>
+                  ↵
+                </span>
               </div>
-              <div style={{ fontSize: 17, fontWeight: 600, color: C.ink, marginBottom: 8, letterSpacing: "-0.01em" }}>{service.title}</div>
-              <div style={{ fontSize: 14, color: C.textSub, lineHeight: 1.6, marginBottom: 18 }}>{service.desc}</div>
-              <div style={{ fontSize: 13, fontWeight: 500, color: C.ink }}>Learn more →</div>
-            </div>
+              <div style={{ fontSize: 16, fontWeight: 600, color: C.ink, lineHeight: 1.45, letterSpacing: "-0.01em" }}>
+                &ldquo;{group.question}&rdquo;
+              </div>
+              <div style={{ fontSize: 13.5, color: C.textSub, lineHeight: 1.6 }}>
+                {group.sub}
+              </div>
+              <div style={{ marginTop: 4, fontSize: 12.5, fontWeight: 600, color: group.color, display: "inline-flex", alignItems: "center", gap: 6 }}>
+                Ask in chat <span aria-hidden>→</span>
+              </div>
+            </button>
           ))}
         </div>
       </div>
@@ -514,13 +790,13 @@ function ServicesGrid() {
 function HowItWorks() {
   const [ref, inView] = useInView({ threshold: 0.2 });
   const steps = [
-    { num: "01", title: "Ask in plain English", desc: "Type your question naturally. No legal jargon required — our model understands context, even in Hinglish.", code: "> Can a foreign fund subscribe to CCDs in our Series A?" },
-    { num: "02", title: "AI scans 16M docs", desc: "In under 2 seconds, the model reads relevant statutes, RBI circulars, SEBI regs, and case law.", code: "scanning... [████████████] 16,243,891 docs" },
-    { num: "03", title: "Get cited answer", desc: "Numbered citations link to the exact section or paragraph. Confidence score on every claim.", code: 'answer.cite(["FEMA §6(3)(b)", "Press Note 3"])' },
+    { num: "01", title: "Ask in plain English", desc: "Type your question naturally. No legal jargon required — JurisGPT understands context, even in Hinglish.", code: "> Can a foreign fund subscribe to CCDs in our Series A?" },
+    { num: "02", title: "JurisGPT reads the source", desc: "In under 2 seconds, JurisGPT pulls the relevant statutes, RBI circulars, SEBI regs, and case law.", code: "reading 47K Indian-law documents..." },
+    { num: "03", title: "Get a cited answer", desc: "Numbered citations link to the exact section or paragraph. A confidence label on every reply.", code: 'cite: ["FEMA §6(3)(b)", "Press Note 3"]' },
     { num: "04", title: "Act with confidence", desc: "Generate a memo, draft a clause, or share with your team. Every answer is auditable.", code: 'export.memo({ format: "PDF" }) → ✓' },
   ];
   return (
-    <section ref={ref} style={{ padding: "100px 40px", background: C.warmGray, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}` }}>
+    <section id="how" ref={ref} style={{ padding: "80px 40px", background: C.warmGray, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}` }}>
       <div style={{ maxWidth: 1240, margin: "0 auto" }}>
         <div style={{ marginBottom: 64, maxWidth: 720 }}>
           <SectionLabel num="§ 02" color={C.gold}>Workflow</SectionLabel>
@@ -554,7 +830,6 @@ function ComparisonTable() {
     ["Sub-2 second response", "no", "yes", "yes"],
     ["Companies Act + FEMA + GST", "partial", "no", "yes"],
     ["24/7 availability", "no", "yes", "yes"],
-    ["Affordable for early-stage", "no", "yes", "yes"],
   ];
   const cell = (value: string, highlight = false) => {
     const styles: Record<string, { bg: string; fg: string; label: string }> = {
@@ -566,7 +841,7 @@ function ComparisonTable() {
     return <span style={{ width: 22, height: 22, borderRadius: "50%", background: s.bg, color: s.fg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, fontFamily: "var(--font-jetbrains-mono)" }}>{s.label}</span>;
   };
   return (
-    <section ref={ref} style={{ padding: "100px 40px", background: C.cream }}>
+    <section ref={ref} style={{ padding: "80px 40px", background: C.cream }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <div style={{ marginBottom: 48, textAlign: "center" }}>
           <SectionLabel num="§ 03">Comparison</SectionLabel>
@@ -578,7 +853,7 @@ function ComparisonTable() {
           <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", borderBottom: `1px solid ${C.border}` }}>
             <div style={{ padding: "20px 28px" }} />
             {[
-              ["Traditional lawyer", "₹3L+ per matter", false],
+              ["Traditional lawyer", "Manual research", false],
               ["Generic AI", "No India context", false],
               ["JurisGPT", "Built for India", true],
             ].map(([label, sub, highlight]) => (
@@ -604,81 +879,44 @@ function ComparisonTable() {
 
 function Testimonials() {
   const [ref, inView] = useInView({ threshold: 0.2 });
-  const items = [
-    ["Rohan Mehta", "Co-founder, fintech", "Bangalore", "Drafted our SHA and founders agreement with full citations in under an hour. Saved ₹3L in legal fees during seed round."],
-    ["Priya Nair", "Legal Head, D2C", "Mumbai", "We've never missed a ROC filing since we started using JurisGPT. The compliance tracker is genuinely a game changer."],
-    ["Aditya Sharma", "CEO, SaaS", "Hyderabad", "Asked about DPDP compliance for our data flows. Got a 15-page cited brief in 90 seconds. Replaced an entire research week."],
+  // Three principles JurisGPT actually stands behind, presented like a
+  // signed manifesto. Replaces stock-feeling founder testimonials with
+  // language the team can defend without external attribution.
+  const principles: { num: string; title: string; body: string }[] = [
+    {
+      num: "01",
+      title: "Cite or refuse.",
+      body: "Every answer carries inline citations to the exact statute, section, or judgment. When the corpus is thin, JurisGPT marks the answer as low-confidence rather than guessing.",
+    },
+    {
+      num: "02",
+      title: "Indian law, primary sources.",
+      body: "The retrieval corpus is built from Indian statutes, RBI/SEBI/MCA circulars, and judgments — not generic web text. No US precedent leaks into Indian compliance answers.",
+    },
+    {
+      num: "03",
+      title: "Your data, your control.",
+      body: "Documents and queries are encrypted at rest and in transit. We never use your data to train models. DPDP Act 2023-aligned by design.",
+    },
   ];
   return (
-    <section ref={ref} style={{ padding: "100px 40px", background: C.warmGray, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}` }}>
+    <section ref={ref} style={{ padding: "80px 40px", background: C.warmGray, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}` }}>
       <div style={{ maxWidth: 1240, margin: "0 auto" }}>
-        <div style={{ marginBottom: 56, maxWidth: 600 }}>
-          <SectionLabel num="§ 04" color={C.sage}>Testimonials</SectionLabel>
+        <div style={{ marginBottom: 48, maxWidth: 640 }}>
+          <SectionLabel num="§ 04" color={C.sage}>Principles</SectionLabel>
           <h2 style={{ fontSize: "clamp(32px,3.5vw,44px)", fontWeight: 700, letterSpacing: "-0.03em", color: C.ink, lineHeight: 1.1 }}>
-            <em style={{ fontFamily: "var(--font-spectral)", fontStyle: "italic", fontWeight: 400, color: C.burgundy }}>What founders</em> are saying.
+            What we&apos;ll <em style={{ fontFamily: "var(--font-spectral)", fontStyle: "italic", fontWeight: 400, color: C.burgundy }}>never</em> compromise on.
           </h2>
+          <p style={{ fontSize: 15, color: C.textSub, marginTop: 16, lineHeight: 1.65 }}>
+            We are early — these are the commitments the system is built around, not customer quotes pulled from a focus group.
+          </p>
         </div>
         <div className="lp-card-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
-          {items.map(([name, role, city, quote], i) => (
-            <div key={name} style={{ padding: "32px 28px", background: C.paper, border: `1px solid ${C.border}`, borderRadius: 10, opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(20px)", transition: `all 600ms ease ${i * 100}ms` }}>
-              <div style={{ fontFamily: "var(--font-spectral)", fontSize: 48, color: C.burgundy, lineHeight: 0.5, marginBottom: 12, height: 24 }}>&quot;</div>
-              <p style={{ fontSize: 15, lineHeight: 1.65, color: C.inkSoft, marginBottom: 28, fontFamily: "var(--font-spectral)" }}>{quote}</p>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, paddingTop: 20, borderTop: `1px solid ${C.borderSoft}` }}>
-                <div style={{ width: 36, height: 36, borderRadius: "50%", background: C.warmGray, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 13, color: C.ink }}>{name[0]}</div>
-                <div>
-                  <div style={{ fontSize: 13.5, fontWeight: 600, color: C.ink }}>{name}</div>
-                  <div style={{ fontSize: 12, color: C.textSub, fontFamily: "var(--font-jetbrains-mono)" }}>{role} · {city}</div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function PricingSection() {
-  const [ref, inView] = useInView({ threshold: 0.2 });
-  const [yearly, setYearly] = useState(true);
-  const plans = [
-    { name: "Starter", price: yearly ? 999 : 1199, desc: "For early-stage founders.", features: ["50 AI queries / month", "Contract templates (basic)", "Compliance calendar", "Email support"], cta: "Start free trial" },
-    { name: "Professional", price: yearly ? 2999 : 3599, desc: "For growing startups.", highlight: true, features: ["Unlimited AI queries", "Full contract suite", "Document analysis (10/mo)", "Slack + priority support", "Team access (5 users)", "API access"], cta: "Start free trial" },
-    { name: "Enterprise", price: null, desc: "For legal teams & firms.", features: ["Unlimited everything", "Custom integrations", "Dedicated account manager", "SLA guarantees", "White-label options", "Audit logs + SSO"], cta: "Contact sales" },
-  ];
-  return (
-    <section id="pricing" ref={ref} style={{ padding: "100px 40px", background: C.cream }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <SectionLabel num="§ 05">Pricing</SectionLabel>
-          <h2 style={{ fontSize: "clamp(32px,3.5vw,44px)", fontWeight: 700, letterSpacing: "-0.03em", color: C.ink, lineHeight: 1.1, marginBottom: 28 }}>
-            Simple, <em style={{ fontFamily: "var(--font-spectral)", fontStyle: "italic", fontWeight: 400, color: C.burgundy }}>transparent.</em>
-          </h2>
-          <div style={{ display: "inline-flex", padding: 4, background: C.paper, border: `1px solid ${C.border}`, borderRadius: 8 }}>
-            {["Monthly", "Yearly"].map((opt, i) => (
-              <button key={opt} onClick={() => setYearly(i === 1)} style={{ padding: "7px 18px", border: "none", borderRadius: 5, cursor: "pointer", fontSize: 13, fontWeight: 500, background: (i === 1) === yearly ? C.ink : "transparent", color: (i === 1) === yearly ? C.cream : C.inkSoft, transition: "all 150ms" }}>
-                {opt}
-                {i === 1 && <span style={{ marginLeft: 6, fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, color: C.gold }}>−17%</span>}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="lp-card-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, alignItems: "start" }}>
-          {plans.map((plan, i) => (
-            <div key={plan.name} style={{ padding: "36px 32px", background: plan.highlight ? C.ink : C.paper, color: plan.highlight ? C.cream : C.ink, border: `1px solid ${plan.highlight ? C.ink : C.border}`, borderRadius: 12, opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(20px)", transition: `all 600ms ease ${i * 100}ms`, position: "relative" }}>
-              {plan.highlight && <div style={{ position: "absolute", top: 16, right: 16, padding: "3px 10px", background: C.burgundy, borderRadius: 100, fontFamily: "var(--font-jetbrains-mono)", fontSize: 10, fontWeight: 700, color: C.cream, letterSpacing: "0.05em" }}>POPULAR</div>}
-              <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 6, letterSpacing: "-0.01em" }}>{plan.name}</div>
-              <div style={{ fontSize: 13.5, color: plan.highlight ? "#A7A29A" : C.textSub, marginBottom: 28 }}>{plan.desc}</div>
-              <div style={{ marginBottom: 28 }}>{plan.price ? <><span style={{ fontSize: 44, fontWeight: 700, letterSpacing: "-0.04em" }}>₹{plan.price.toLocaleString("en-IN")}</span><span style={{ fontSize: 14, color: plan.highlight ? "#A7A29A" : C.textSub, marginLeft: 4 }}>/mo</span></> : <span style={{ fontSize: 28, fontWeight: 700 }}>Custom</span>}</div>
-              <button style={{ width: "100%", padding: 11, background: plan.highlight ? C.cream : C.ink, color: plan.highlight ? C.ink : C.cream, border: "none", borderRadius: 7, cursor: "pointer", fontSize: 14, fontWeight: 500, marginBottom: 28 }}>{plan.cta}</button>
-              <div style={{ paddingTop: 24, borderTop: `1px solid ${plan.highlight ? "#3A3A3A" : C.borderSoft}` }}>
-                {plan.features.map((feature) => (
-                  <div key={feature} style={{ display: "flex", gap: 10, marginBottom: 11, fontSize: 13.5, color: plan.highlight ? "#D4D0C8" : C.inkSoft }}>
-                    <span style={{ color: plan.highlight ? C.gold : C.burgundy, fontFamily: "var(--font-jetbrains-mono)", flexShrink: 0 }}>→</span>
-                    {feature}
-                  </div>
-                ))}
-              </div>
+          {principles.map((principle, i) => (
+            <div key={principle.num} style={{ padding: "32px 28px", background: C.paper, border: `1px solid ${C.border}`, borderRadius: 10, opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(20px)", transition: `all 600ms ease ${i * 100}ms` }}>
+              <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: C.burgundy, fontWeight: 700, letterSpacing: "0.08em", marginBottom: 14 }}>§ {principle.num}</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: C.ink, marginBottom: 12, letterSpacing: "-0.01em" }}>{principle.title}</div>
+              <p style={{ fontSize: 14.5, lineHeight: 1.65, color: C.textSub, margin: 0 }}>{principle.body}</p>
             </div>
           ))}
         </div>
@@ -694,15 +932,14 @@ function FAQSection() {
     ["Is JurisGPT a substitute for a lawyer?", "No. JurisGPT is a research and drafting assistant, not legal advice. For critical decisions, consult a qualified lawyer. Think of it as a research associate that never sleeps."],
     ["How accurate are the citations?", "95%+ verified accuracy. Every citation links to its source. When uncertain, the model returns a low confidence score rather than guessing."],
     ["Which Indian laws are covered?", "Companies Act 2013, FEMA, GST, Income Tax, all major labour laws, SEBI regulations, IPC/CrPC, Consumer Protection, IT Act, DPDP Act 2023, plus 200+ central and state statutes."],
-    ["Is my data secure?", "ISO 27001 certified. AES-256 encryption at rest and in transit. Documents and queries never used to train models. DPDP Act 2023 compliant."],
-    ["What does the free trial include?", "14 days of full Professional plan access. No credit card required."],
+    ["Is my data secure?", "AES-256 encryption at rest and in transit. Documents and queries are never used to train models. DPDP Act 2023-aligned by design; SOC 2 and ISO 27001 audits are on the roadmap."],
     ["Can I use JurisGPT in Hindi?", "Yes — English, Hindi, or Hinglish. The model responds in your preferred language."],
   ];
   return (
-    <section ref={ref} style={{ padding: "100px 40px", background: C.cream }}>
+    <section id="faq" ref={ref} style={{ padding: "80px 40px", background: C.cream }}>
       <div style={{ maxWidth: 760, margin: "0 auto" }}>
         <div style={{ marginBottom: 48, textAlign: "center" }}>
-          <SectionLabel num="§ 06" color={C.gold}>FAQ</SectionLabel>
+          <SectionLabel num="§ 05" color={C.gold}>FAQ</SectionLabel>
           <h2 style={{ fontSize: "clamp(32px,3.5vw,44px)", fontWeight: 700, letterSpacing: "-0.03em", color: C.ink, lineHeight: 1.1 }}>Common questions.</h2>
         </div>
         {faqs.map(([q, a], i) => (
@@ -724,21 +961,36 @@ function FAQSection() {
 function FinalCTA({ onOpenApp }: { onOpenApp: () => void }) {
   const [ref, inView] = useInView({ threshold: 0.3 });
   return (
-    <section ref={ref} style={{ padding: "0 40px 100px", background: C.cream }}>
+    <section ref={ref} style={{ padding: "0 40px 80px", background: C.cream }}>
       <div style={{ maxWidth: 1240, margin: "0 auto" }}>
-        <div style={{ background: C.ink, color: C.cream, borderRadius: 16, padding: "72px 64px", textAlign: "center", position: "relative", overflow: "hidden", opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(20px)", transition: "all 700ms ease" }}>
-          <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)", backgroundSize: "48px 48px", pointerEvents: "none" }} />
+        <div
+          style={{
+            background:
+              "radial-gradient(120% 80% at 0% 0%, #5C1622 0%, #7B1E2E 45%, #4A1018 100%)",
+            color: C.cream,
+            borderRadius: 16,
+            padding: "72px 64px",
+            textAlign: "center",
+            position: "relative",
+            overflow: "hidden",
+            opacity: inView ? 1 : 0,
+            transform: inView ? "translateY(0)" : "translateY(20px)",
+            transition: "all 700ms ease",
+            boxShadow: "0 24px 60px -20px rgba(92, 22, 34, 0.45)",
+          }}
+        >
+          <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)", backgroundSize: "48px 48px", pointerEvents: "none" }} />
           <div style={{ position: "relative", zIndex: 1 }}>
-            <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: C.gold, letterSpacing: "0.1em", fontWeight: 700, marginBottom: 20 }}>§ 07 — GET STARTED</div>
+            <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: C.gold, letterSpacing: "0.1em", fontWeight: 700, marginBottom: 20 }}>§ 06 — GET STARTED</div>
             <h2 style={{ fontSize: "clamp(34px,4vw,56px)", fontWeight: 700, letterSpacing: "-0.035em", lineHeight: 1.05, marginBottom: 18 }}>
               Ready to ship faster?
               <br />
-              <em style={{ fontFamily: "var(--font-spectral)", fontStyle: "italic", fontWeight: 400, color: C.gold }}>Start free, today.</em>
+              <em style={{ fontFamily: "var(--font-spectral)", fontStyle: "italic", fontWeight: 400, color: C.gold }}>Get started today.</em>
             </h2>
-            <p style={{ fontSize: 16, color: "#A7A29A", marginBottom: 36, maxWidth: 480, margin: "0 auto 36px" }}>500+ Indian startups already use JurisGPT. 14-day free trial. No credit card.</p>
+            <p style={{ fontSize: 16, color: "rgba(250,246,239,0.75)", marginBottom: 36, maxWidth: 480, margin: "0 auto 36px" }}>AI-powered legal research built for Indian startup &amp; corporate law from day one.</p>
             <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-              <button onClick={onOpenApp} style={{ padding: "13px 28px", background: C.cream, color: C.ink, border: "none", borderRadius: 8, cursor: "pointer", fontSize: 14.5, fontWeight: 600 }}>Start free trial →</button>
-              <button onClick={onOpenApp} style={{ padding: "13px 28px", background: "transparent", color: C.cream, border: "1px solid #3A3A3A", borderRadius: 8, cursor: "pointer", fontSize: 14.5, fontWeight: 500 }}>Schedule demo</button>
+              <button onClick={onOpenApp} style={{ padding: "13px 28px", background: C.gold, color: C.ink, border: "none", borderRadius: 8, cursor: "pointer", fontSize: 14.5, fontWeight: 600 }}>Get started →</button>
+              <button onClick={onOpenApp} style={{ padding: "13px 28px", background: "transparent", color: C.cream, border: "1px solid rgba(250,246,239,0.4)", borderRadius: 8, cursor: "pointer", fontSize: 14.5, fontWeight: 500 }}>Schedule demo</button>
             </div>
           </div>
         </div>
@@ -783,10 +1035,19 @@ function Footer() {
         </div>
         <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 24, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
           <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 12, color: C.textMuted }}>© {new Date().getFullYear()} JurisGPT Technologies Pvt. Ltd.</div>
-          <div style={{ display: "flex", gap: 6 }}>
-            {["ISO 27001", "SOC 2", "DPDP"].map((badge) => (
-              <span key={badge} style={{ padding: "3px 9px", background: C.paper, border: `1px solid ${C.border}`, borderRadius: 4, fontFamily: "var(--font-jetbrains-mono)", fontSize: 10.5, color: C.inkSoft, fontWeight: 700 }}>{badge}</span>
-            ))}
+          {/* Footer compliance line: only state what we actually claim. ISO 27001
+              and SOC 2 are roadmap items, not held — surface them as such so we
+              don't misrepresent. */}
+          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+            <span style={{ padding: "3px 9px", background: C.paper, border: `1px solid ${C.border}`, borderRadius: 4, fontFamily: "var(--font-jetbrains-mono)", fontSize: 10.5, color: C.inkSoft, fontWeight: 700 }}>
+              DPDP READY
+            </span>
+            <span style={{ padding: "3px 9px", background: "transparent", border: `1px dashed ${C.border}`, borderRadius: 4, fontFamily: "var(--font-jetbrains-mono)", fontSize: 10.5, color: C.textMuted, fontWeight: 700 }}>
+              ISO 27001 · IN PROGRESS
+            </span>
+            <span style={{ padding: "3px 9px", background: "transparent", border: `1px dashed ${C.border}`, borderRadius: 4, fontFamily: "var(--font-jetbrains-mono)", fontSize: 10.5, color: C.textMuted, fontWeight: 700 }}>
+              SOC 2 · IN PROGRESS
+            </span>
           </div>
         </div>
       </div>
@@ -814,6 +1075,11 @@ export default function Home() {
           .lp-comparison { overflow-x: auto !important; }
           section { padding-left: 18px !important; padding-right: 18px !important; }
         }
+        @media (max-width: 640px) {
+          .lp-signin-btn { display: none !important; }
+          .lp-btn-text { display: none !important; }
+          .lp-dark-button { padding: 10px !important; border-radius: 10px !important; }
+        }
       `}</style>
       <Nav onOpenApp={openApp} />
       <Hero onOpenApp={openApp} />
@@ -822,7 +1088,6 @@ export default function Home() {
       <HowItWorks />
       <ComparisonTable />
       <Testimonials />
-      <PricingSection />
       <FAQSection />
       <FinalCTA onOpenApp={openApp} />
       <Footer />

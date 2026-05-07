@@ -26,6 +26,8 @@ from app.routes import (
     audit,
     contracts,
     eval as eval_routes,
+    cases,
+    lawyers,
 )
 
 # Import middleware
@@ -94,8 +96,7 @@ async def api_info():
             "document_versioning": True,
             "ai_chat": True,
             "document_generation": True,
-            "compliance_tracking": True,
-            "payment_integration": False
+            "compliance_tracking": True
         },
         "endpoints": {
             "auth": "/api/auth",
@@ -154,6 +155,10 @@ app.include_router(audit.router, prefix="/api/audit", tags=["audit"])
 
 # ============== Evaluation & Benchmarking ==============
 app.include_router(eval_routes.router, prefix="/api/eval", tags=["evaluation"])
+
+# ============== Cases & Lawyers (Real-time Legal Data) ==============
+app.include_router(cases.router, tags=["cases"])
+app.include_router(lawyers.router, tags=["lawyers"])
 
 
 # ============== Startup & Shutdown Events ==============

@@ -123,51 +123,58 @@ JurisGPT uses a RAG (Retrieval-Augmented Generation) architecture:
 
 ## Research
 
-JurisGPT is designed as a research system with reproducible configurations and evaluation.
+JurisGPT ships with a reproducible 120-query benchmark and a paper draft
+(`research/PAPER.md`). All metrics below were measured by
+`data/eval/run_paper_benchmarks.py` against an indexed corpus of
+**47,606 documents** spanning curated samples and HuggingFace-sourced
+statute chunks.
 
-### Research Corpus
+### Indexed Corpus (composition)
 
-| Dataset | Source | Documents | Purpose |
-|---------|--------|-----------|---------|
-| Indian Penal Code (IPC) | Government | 511 sections | Criminal law reference |
-| Code of Criminal Procedure (CrPC) | Government | 484 sections | Criminal procedure |
-| Code of Civil Procedure (CPC) | Government | 158 sections | Civil procedure |
-| Indian Evidence Act (IEA) | Government | 167 sections | Evidence rules |
-| Companies Act, 2013 | Government | 470 sections | Corporate law |
-| Motor Vehicles Act (MVA) | Government | 223 sections | Traffic law |
-| Supreme Court Judgments | OpenNyAI | 1,000+ cases | Case law |
-| High Court Cases | OpenNyAI | 500+ cases | State-level precedents |
+| Document type | Count |
+|---|---|
+| statute | 47,414 |
+| case | 62 |
+| faq | 60 |
+| compliance | 41 |
+| news | 25 |
+| clause | 4 |
 
-**Total**: 3,171 indexed documents, 15.2 GB raw data
+See `data/eval/results/figures/fig09_corpus_composition.png`.
 
-### Evaluation Metrics
+### 120-Query Benchmark
 
-The system is evaluated on:
+The benchmark covers six categories with 20 queries each, with explicit
+`expected_doc_types` and `expected_acts` metadata:
+company-formation, founder-agreements, compliance, contracts, tax-law,
+employment-law (`data/eval/benchmark_queries.json`).
 
-| Metric | Description | Target |
-|--------|-------------|--------|
-| **Retrieval Recall@5** | Relevant documents in top 5 | > 80% |
-| **Citation Precision** | Accuracy of cited sources | > 90% |
-| **Hallucination Rate** | Unsupported claims | < 5% |
-| **Response Latency** | P95 response time | < 3s |
-| **Groundedness Score** | Claims supported by sources | > 85% |
+### Aggregate Results — Three Configurations
 
-### Configuration Files
+| Configuration | Recall@5 | Precision@5 | MRR | nDCG@5 | Grounded | Hallucination Proxy | Latency (s) |
+|---|---|---|---|---|---|---|---|
+| `baseline_lexical` | 66.25% | **86.67%** | 0.886 | **0.778** | 100% | 0.0% | **0.053** |
+| `hybrid_bm25` | **68.33%** | 66.67% | **0.938** | 0.608 | 100% | 0.0% | 0.075 |
+| `hybrid_bm25_rerank` | 67.50% | 66.67% | 0.825 | 0.469 | 100% | 0.0% | 1.529 |
 
-Research configurations are versioned in `research/configs/`:
+Hybrid BM25 + lexical fusion is best on Recall@5 and MRR. The simple
+lexical baseline keeps the highest Precision@5 and nDCG@5 because the
+coverage scorer is harsh enough to keep junk out of the top-5. The
+generic ms-marco MiniLM cross-encoder *degrades* ranking quality on this
+corpus — see `research/PAPER.md` §6 for discussion.
 
-```yaml
-# research/configs/legal_assistant_v1.yaml
-corpus_version: "2024-03"
-embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
-chunk_size: 1000
-chunk_overlap: 200
-retriever_top_k: 5
-reranker_enabled: false
-llm_model: "gpt-4o-mini"
-llm_temperature: 0.3
-prompt_version: "v2.0"
+### Reproducing the Numbers
+
+```bash
+source backend/venv/bin/activate
+python data/eval/run_paper_benchmarks.py          # 120 queries × 3 configs
+python data/eval/generate_paper_artifacts.py      # 10 figures + 2 CSVs
+python -m pytest data/eval/test_rag_pipeline.py   # 13 unit/integration tests
 ```
+
+Artefacts land in `data/eval/results/` (per-config JSON, combined Markdown
+summary) and `data/eval/results/figures/` (PNG figures, CSV tables,
+`METRICS.md`).
 
 ## Installation
 

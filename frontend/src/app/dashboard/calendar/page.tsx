@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -9,11 +9,17 @@ import {
   CalendarDays,
   Clock,
   X,
+  RefreshCw,
+  Wifi,
+  WifiOff,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { complianceApi, type ComplianceDeadline } from "@/lib/api";
+import { toast } from "sonner";
+
+const AUTO_REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
 
 function urgencyDotColor(urgency: ComplianceDeadline["urgency"]) {
   switch (urgency) {
@@ -141,26 +147,74 @@ function isToday(date: Date) {
 export default function CalendarPage() {
   const [deadlines, setDeadlines] = useState<ComplianceDeadline[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentYear, setCurrentYear] = useState(() => new Date().getFullYear());
   const [currentMonth, setCurrentMonth] = useState(() => new Date().getMonth());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [isOnline, setIsOnline] = useState(true);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true);
-        setError(null);
-        const result = await complianceApi.getDeadlines({ limit: 500 });
-        setDeadlines(result.data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load deadlines");
-      } finally {
-        setLoading(false);
+  // Fetch deadlines function
+  const fetchDeadlines = useCallback(async (showToast = false) => {
+    try {
+      if (!loading) setRefreshing(true);
+      setError(null);
+      const result = await complianceApi.getDeadlines({ limit: 500 });
+      setDeadlines(result.data);
+      setLastUpdated(new Date());
+      setIsOnline(true);
+      if (showToast) {
+        toast.success("Compliance data refreshed");
       }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load deadlines");
+      setIsOnline(false);
+      if (showToast) {
+        toast.error("Failed to refresh data");
+      }
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
     }
-    fetchData();
-  }, []);
+  }, [loading]);
+
+  // Initial fetch
+  useEffect(() => {
+    fetchDeadlines();
+  }, [fetchDeadlines]);
+
+  // Auto-refresh every 5 minutes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchDeadlines();
+    }, AUTO_REFRESH_INTERVAL);
+    return () => clearInterval(interval);
+  }, [fetchDeadlines]);
+
+  // Online/offline detection
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      toast.success("Back online - refreshing data");
+      fetchDeadlines();
+    };
+    const handleOffline = () => {
+      setIsOnline(false);
+      toast.error("You're offline - data may be outdated");
+    };
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, [fetchDeadlines]);
+
+  // Manual refresh
+  const handleRefresh = () => {
+    fetchDeadlines(true);
+  };
 
   // Group deadlines by date key
   const deadlinesByDate = useMemo(() => {
@@ -258,7 +312,8 @@ export default function CalendarPage() {
               <AlertCircle className="h-8 w-8 text-destructive" />
               <p className="text-destructive font-medium">Failed to load calendar data</p>
               <p className="text-muted-foreground text-sm">{error}</p>
-              <Button variant="outline" onClick={() => window.location.reload()}>
+              <Button variant="outline" onClick={() => fetchDeadlines(true)}>
+                <RefreshCw className="h-4 w-4 mr-2" />
                 Retry
               </Button>
             </div>
@@ -273,11 +328,42 @@ export default function CalendarPage() {
       <div className="flex-1 flex flex-col">
         <header className="bg-card border-b border-border px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <CalendarDays className="h-5 w-5 text-primary" />
-              <h1 className="text-xl font-semibold text-foreground">Compliance Calendar</h1>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <CalendarDays className="h-5 w-5 text-primary" />
+                <h1 className="text-xl font-semibold text-foreground">Compliance Calendar</h1>
+              </div>
+              {/* Real-time status indicator */}
+              <div className="flex items-center gap-2">
+                {isOnline ? (
+                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800">
+                    <Wifi className="h-3 w-3 mr-1" />
+                    Live
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800">
+                    <WifiOff className="h-3 w-3 mr-1" />
+                    Offline
+                  </Badge>
+                )}
+                {lastUpdated && (
+                  <span className="text-xs text-muted-foreground">
+                    Updated {lastUpdated.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  </span>
+                )}
+              </div>
             </div>
             <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRefresh}
+                disabled={refreshing}
+                className="gap-1"
+              >
+                <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+                {refreshing ? "Refreshing..." : "Refresh"}
+              </Button>
               <Button variant="outline" size="sm" onClick={goToToday}>
                 Today
               </Button>

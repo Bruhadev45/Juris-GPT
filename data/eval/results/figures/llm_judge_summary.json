@@ -1,0 +1,12 @@
+{
+  "status": "stub",
+  "reason": "No OPENAI_API_KEY (or LITELLM_API_KEY) in environment.",
+  "configs_seen": [
+    "dense_minilm",
+    "dense_minilm_rerank",
+    "baseline_lexical",
+    "hybrid_bm25_rerank",
+    "hybrid_bm25"
+  ],
+  "next_action": "Set OPENAI_API_KEY in backend/.env and re-run data/eval/run_llm_as_judge.py to score citations."
+}

@@ -27,8 +27,8 @@ function loadState(): ChatState {
     if (stored) {
       return JSON.parse(stored);
     }
-  } catch {
-    // ignore
+  } catch (error) {
+    console.error("Failed to load chat state from localStorage:", error);
   }
   return EMPTY_STATE;
 }

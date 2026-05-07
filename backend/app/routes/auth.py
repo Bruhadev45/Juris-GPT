@@ -3,15 +3,23 @@ Authentication routes for JurisGPT
 Implements user authentication, registration, and session management
 """
 
+import logging
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime, timedelta, timezone
 import jwt
-import secrets
-import bcrypt
 from app.config import settings
+
+logger = logging.getLogger(__name__)
+from app.repositories import (
+    UserNotFoundError,
+    UserAlreadyExistsError,
+    hash_password,
+    verify_password,
+)
+from app.repositories import user_repository
 
 router = APIRouter()
 security = HTTPBearer(auto_error=False)
@@ -64,22 +72,7 @@ class PasswordChangeRequest(BaseModel):
     new_password: str
 
 
-# ============== In-Memory User Store (Replace with DB in production) ==============
-
-# Simulated user database — must be replaced with Supabase/PostgreSQL before production
-users_db: dict[str, dict] = {}
-sessions_db: dict[str, dict] = {}
-
-
-def hash_password(password: str) -> str:
-    """Securely hash password with bcrypt"""
-    salt = bcrypt.gensalt(rounds=12)
-    return bcrypt.hashpw(password.encode(), salt).decode()
-
-
-def verify_password(password: str, hashed: str) -> bool:
-    """Verify password against bcrypt hash"""
-    return bcrypt.checkpw(password.encode(), hashed.encode())
+# ============== Token Management ==============
 
 
 def create_access_token(user_id: str, email: str, role: str = "user") -> str:
@@ -117,11 +110,22 @@ async def get_current_user(
 
     try:
         payload = decode_token(credentials.credentials)
-        user_id = payload.get("sub")
-        if user_id and user_id in users_db:
-            return users_db[user_id]
+    except HTTPException:
+        # decode_token raises 401 for invalid/expired tokens — for the
+        # optional-auth dependency we just treat that as "not signed in".
         return None
-    except (jwt.InvalidTokenError, jwt.ExpiredSignatureError, HTTPException):
+
+    user_id = payload.get("sub")
+    if not user_id:
+        return None
+
+    try:
+        return await user_repository.get_user_by_id(user_id)
+    except Exception:
+        # Repository failure (DB outage, etc.) is logged by the repository
+        # itself; we surface "not signed in" to avoid leaking internal errors
+        # to anonymous callers.
+        logger.warning("get_current_user: repository lookup failed", exc_info=True)
         return None
 
 
@@ -135,10 +139,14 @@ async def require_auth(
     payload = decode_token(credentials.credentials)
     user_id = payload.get("sub")
 
-    if not user_id or user_id not in users_db:
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+    user = await user_repository.get_user_by_id(user_id)
+    if not user:
         raise HTTPException(status_code=401, detail="User not found")
 
-    return users_db[user_id]
+    return user
 
 
 async def require_admin(user: dict = Depends(require_auth)) -> dict:
@@ -153,69 +161,32 @@ async def require_admin(user: dict = Depends(require_auth)) -> dict:
 @router.post("/register", response_model=TokenResponse)
 async def register(request: UserRegisterRequest):
     """Register a new user"""
-    # Check if email already exists — use constant-time approach to prevent enumeration
-    for user in users_db.values():
-        if user["email"] == request.email:
-            raise HTTPException(status_code=400, detail="Email already registered")
-
     # Validate password strength
     if len(request.password) < 8:
         raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
 
-    # Create user
-    user_id = secrets.token_hex(16)
-    now = datetime.now(timezone.utc)
-    user = {
-        "id": user_id,
-        "email": request.email,
-        "password_hash": hash_password(request.password),
-        "full_name": request.full_name,
-        "company_name": request.company_name,
-        "phone": request.phone,
-        "role": "user",
-        "created_at": now,
-        "is_verified": False,
-    }
-    users_db[user_id] = user
-
-    # Create token
-    token = create_access_token(user_id, request.email)
-
-    return TokenResponse(
-        access_token=token,
-        expires_in=JWT_EXPIRATION_HOURS * 3600,
-        user=UserResponse(
-            id=user_id,
+    # Create user using repository
+    try:
+        user = await user_repository.create_user(
             email=request.email,
+            password=request.password,
             full_name=request.full_name,
             company_name=request.company_name,
             phone=request.phone,
             role="user",
-            created_at=user["created_at"],
-            is_verified=False,
-        ),
-    )
-
-
-@router.post("/login", response_model=TokenResponse)
-async def login(request: UserLoginRequest):
-    """Login with email and password"""
-    # Find user by email
-    user = None
-    for u in users_db.values():
-        if u["email"] == request.email:
-            user = u
-            break
-
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid email or password")
-
-    # Verify password
-    if not verify_password(request.password, user["password_hash"]):
-        raise HTTPException(status_code=401, detail="Invalid email or password")
+        )
+    except UserAlreadyExistsError:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create user: {str(e)}")
 
     # Create token
-    token = create_access_token(user["id"], user["email"], user.get("role", "user"))
+    token = create_access_token(user["id"], user["email"])
+
+    # Parse created_at if it's a string
+    created_at = user["created_at"]
+    if isinstance(created_at, str):
+        created_at = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
 
     return TokenResponse(
         access_token=token,
@@ -227,7 +198,47 @@ async def login(request: UserLoginRequest):
             company_name=user.get("company_name"),
             phone=user.get("phone"),
             role=user.get("role", "user"),
-            created_at=user["created_at"],
+            created_at=created_at,
+            is_verified=user.get("is_verified", False),
+        ),
+    )
+
+
+@router.post("/login", response_model=TokenResponse)
+async def login(request: UserLoginRequest):
+    """Login with email and password"""
+    # Find user by email
+    try:
+        user = await user_repository.get_user_by_email(request.email)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+
+    # Verify password
+    if not verify_password(request.password, user["password_hash"]):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+
+    # Create token
+    token = create_access_token(user["id"], user["email"], user.get("role", "user"))
+
+    # Parse created_at if it's a string
+    created_at = user["created_at"]
+    if isinstance(created_at, str):
+        created_at = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+
+    return TokenResponse(
+        access_token=token,
+        expires_in=JWT_EXPIRATION_HOURS * 3600,
+        user=UserResponse(
+            id=user["id"],
+            email=user["email"],
+            full_name=user["full_name"],
+            company_name=user.get("company_name"),
+            phone=user.get("phone"),
+            role=user.get("role", "user"),
+            created_at=created_at,
             is_verified=user.get("is_verified", False),
         ),
     )
@@ -242,6 +253,11 @@ async def logout(user: dict = Depends(require_auth)):
 @router.get("/me", response_model=UserResponse)
 async def get_current_user_info(user: dict = Depends(require_auth)):
     """Get current authenticated user info"""
+    # Parse created_at if it's a string
+    created_at = user["created_at"]
+    if isinstance(created_at, str):
+        created_at = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+
     return UserResponse(
         id=user["id"],
         email=user["email"],
@@ -249,7 +265,7 @@ async def get_current_user_info(user: dict = Depends(require_auth)):
         company_name=user.get("company_name"),
         phone=user.get("phone"),
         role=user.get("role", "user"),
-        created_at=user["created_at"],
+        created_at=created_at,
         is_verified=user.get("is_verified", False),
     )
 
@@ -262,15 +278,22 @@ async def update_current_user(
     user: dict = Depends(require_auth),
 ):
     """Update current user profile"""
-    updated = {**user}
-    if full_name:
-        updated["full_name"] = full_name
-    if company_name:
-        updated["company_name"] = company_name
-    if phone:
-        updated["phone"] = phone
+    try:
+        updated = await user_repository.update_user(
+            user["id"],
+            full_name=full_name,
+            company_name=company_name,
+            phone=phone,
+        )
+    except UserNotFoundError:
+        raise HTTPException(status_code=404, detail="User not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update user: {str(e)}")
 
-    users_db[updated["id"]] = updated
+    # Parse created_at if it's a string
+    created_at = updated["created_at"]
+    if isinstance(created_at, str):
+        created_at = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
 
     return UserResponse(
         id=updated["id"],
@@ -279,7 +302,7 @@ async def update_current_user(
         company_name=updated.get("company_name"),
         phone=updated.get("phone"),
         role=updated.get("role", "user"),
-        created_at=updated["created_at"],
+        created_at=created_at,
         is_verified=updated.get("is_verified", False),
     )
 
@@ -304,9 +327,13 @@ async def change_password(
     if len(request.new_password) < 8:
         raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
 
-    # Update password (immutable update)
-    updated = {**user, "password_hash": hash_password(request.new_password)}
-    users_db[updated["id"]] = updated
+    # Update password using repository
+    try:
+        await user_repository.update_password(user["id"], request.new_password)
+    except UserNotFoundError:
+        raise HTTPException(status_code=404, detail="User not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update password: {str(e)}")
 
     return {"message": "Password changed successfully"}
 
@@ -320,8 +347,13 @@ async def verify_email(token: str):
 # ============== Admin Routes ==============
 
 @router.get("/users", dependencies=[Depends(require_admin)])
-async def list_users():
+async def list_all_users(limit: int = 100, offset: int = 0):
     """List all users (admin only)"""
+    try:
+        users = await user_repository.list_users(limit=limit, offset=offset)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to list users: {str(e)}")
+
     return {
         "users": [
             UserResponse(
@@ -331,24 +363,26 @@ async def list_users():
                 company_name=u.get("company_name"),
                 phone=u.get("phone"),
                 role=u.get("role", "user"),
-                created_at=u["created_at"],
+                created_at=datetime.fromisoformat(u["created_at"].replace("Z", "+00:00")) if isinstance(u["created_at"], str) else u["created_at"],
                 is_verified=u.get("is_verified", False),
             )
-            for u in users_db.values()
+            for u in users
         ],
-        "total": len(users_db),
+        "total": len(users),
     }
 
 
 @router.put("/users/{user_id}/role", dependencies=[Depends(require_admin)])
 async def update_user_role(user_id: str, role: str):
     """Update user role (admin only)"""
-    if user_id not in users_db:
-        raise HTTPException(status_code=404, detail="User not found")
-
     if role not in ["user", "admin", "lawyer"]:
         raise HTTPException(status_code=400, detail="Invalid role")
 
-    updated = {**users_db[user_id], "role": role}
-    users_db[user_id] = updated
+    try:
+        await user_repository.update_user(user_id, role=role)
+    except UserNotFoundError:
+        raise HTTPException(status_code=404, detail="User not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update role: {str(e)}")
+
     return {"message": f"User role updated to {role}"}

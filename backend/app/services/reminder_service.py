@@ -19,7 +19,6 @@ class ReminderType(str, Enum):
     COMPLIANCE_DEADLINE = "compliance_deadline"
     DOCUMENT_REVIEW = "document_review"
     SUBSCRIPTION_EXPIRY = "subscription_expiry"
-    PAYMENT_DUE = "payment_due"
 
 
 @dataclass

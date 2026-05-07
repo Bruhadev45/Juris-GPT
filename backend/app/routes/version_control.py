@@ -3,7 +3,7 @@ Document Version Control routes for JurisGPT
 Implements document versioning, history, and comparison
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime, timezone
@@ -11,7 +11,9 @@ from uuid import UUID
 import secrets
 import difflib
 
-router = APIRouter()
+from app.routes.auth import require_auth
+
+router = APIRouter(dependencies=[Depends(require_auth)])
 
 
 # ============== Models ==============

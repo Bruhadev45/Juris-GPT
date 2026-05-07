@@ -618,5 +618,145 @@
     "summary": "Declined to constitute SIT for investigating Bhima Koregaon case arrests, trusting the investigating agency. Dissent emphasized the right of dissent in democracy and need for independent investigation.",
     "relevance": "Justice Chandrachud's dissent on dissent being the 'safety valve of democracy' became significant. Raised questions about investigative independence.",
     "category": "criminal"
+  },
+  {
+    "case_name": "M.C. Mehta v. Union of India (Oleum Gas Leak)",
+    "citation": "AIR 1987 SC 1086",
+    "court": "Supreme Court of India",
+    "year": 1987,
+    "principle": "Absolute Liability for Hazardous Industries",
+    "summary": "Following the Sriram oleum gas leak, the Supreme Court evolved the principle of 'absolute liability' for industries engaged in hazardous activities. Unlike 'strict liability' (Rylands v. Fletcher), absolute liability has no exceptions.",
+    "relevance": "Foundation of Indian environmental law. Influenced the Public Liability Insurance Act, 1991 and the Environmental Protection Act, 1986.",
+    "category": "environmental"
+  },
+  {
+    "case_name": "Vineeta Sharma v. Rakesh Sharma",
+    "citation": "(2020) 9 SCC 1",
+    "court": "Supreme Court of India",
+    "year": 2020,
+    "principle": "Daughters' Equal Coparcenary Rights",
+    "summary": "A 3-judge bench held that daughters have equal coparcenary rights in Hindu Undivided Family property by birth, irrespective of whether the father was alive on the date of the 2005 amendment to the Hindu Succession Act.",
+    "relevance": "Definitive ruling on retrospective application of HSA Section 6 (2005 amendment). Settled gender equality in coparcenary rights.",
+    "category": "civil"
+  },
+  {
+    "case_name": "Indian Young Lawyers Association v. State of Kerala",
+    "citation": "(2019) 11 SCC 1",
+    "court": "Supreme Court of India",
+    "year": 2018,
+    "principle": "Sabarimala Temple Entry",
+    "summary": "A 5-judge Constitution Bench held by 4:1 that the practice of barring women aged 10-50 from entering the Sabarimala Temple violated Articles 14, 15, and 25. The case has been referred to a 9-judge bench for review.",
+    "relevance": "Landmark on women's right to worship and the limits of essential religious practices doctrine. Currently under review.",
+    "category": "constitutional"
+  },
+  {
+    "case_name": "Anuradha Bhasin v. Union of India",
+    "citation": "(2020) 3 SCC 637",
+    "court": "Supreme Court of India",
+    "year": 2020,
+    "principle": "Internet as a Fundamental Right under Article 19",
+    "summary": "The Supreme Court held that internet shutdowns must be temporary, proportionate, and subject to judicial review. The freedom of expression and trade through the internet are protected under Articles 19(1)(a) and 19(1)(g).",
+    "relevance": "Lays down framework for evaluating internet shutdowns under proportionality test. Influences digital rights jurisprudence.",
+    "category": "constitutional"
+  },
+  {
+    "case_name": "Justice K.S. Puttaswamy (Aadhaar) v. Union of India",
+    "citation": "(2019) 1 SCC 1",
+    "court": "Supreme Court of India",
+    "year": 2018,
+    "principle": "Aadhaar Constitutionality",
+    "summary": "A 5-judge Constitution Bench by 4:1 upheld the Aadhaar Act, 2016 with modifications. Aadhaar is mandatory only for PAN, ITR filing, and welfare benefits, but cannot be required for bank accounts, mobile connections, or school admissions.",
+    "relevance": "Defines limits of state biometric collection. Foundation of subsequent data protection litigation.",
+    "category": "constitutional"
+  },
+  {
+    "case_name": "Swiss Ribbons Pvt. Ltd. v. Union of India",
+    "citation": "(2019) 4 SCC 17",
+    "court": "Supreme Court of India",
+    "year": 2019,
+    "principle": "IBC Constitutional Validity",
+    "summary": "The Supreme Court upheld the constitutional validity of the Insolvency and Bankruptcy Code, 2016, including Section 29A which bars promoters of defaulting companies from buying back their assets. The Code aims to maximize value of assets and revive distressed firms.",
+    "relevance": "Foundational judgment on IBC. Confirms IBC as a beneficial legislation that promotes economic regeneration.",
+    "category": "commercial"
+  },
+  {
+    "case_name": "Vodafone International Holdings v. Union of India",
+    "citation": "(2012) 6 SCC 613",
+    "court": "Supreme Court of India",
+    "year": 2012,
+    "principle": "Indirect Transfer of Assets and Tax Jurisdiction",
+    "summary": "The Supreme Court held that Indian tax authorities had no jurisdiction over Vodafone's offshore acquisition of Hutchison's Indian operations through an indirect share transfer. The judgment was nullified by retrospective amendment to the Income Tax Act, later reversed by the Taxation Laws (Amendment) Act, 2021.",
+    "relevance": "Major ruling on extraterritoriality of Indian tax law. Led to the controversial retrospective tax amendment, finally reversed in 2021.",
+    "category": "tax"
+  },
+  {
+    "case_name": "Indian Hotel and Restaurant Association v. State of Maharashtra (Dance Bars)",
+    "citation": "(2019) 3 SCC 429",
+    "court": "Supreme Court of India",
+    "year": 2019,
+    "principle": "Right to Profession under Article 19(1)(g)",
+    "summary": "The Supreme Court struck down restrictions on dance bars that effectively prevented them from operating, holding that women have the right to practice the profession of dancing. The Court balanced morality concerns with constitutional rights.",
+    "relevance": "Reinforces Article 19(1)(g) and limits state morality-based restrictions on professions.",
+    "category": "constitutional"
+  },
+  {
+    "case_name": "Common Cause v. Union of India (Passive Euthanasia)",
+    "citation": "(2018) 5 SCC 1",
+    "court": "Supreme Court of India",
+    "year": 2018,
+    "principle": "Right to Die with Dignity / Passive Euthanasia",
+    "summary": "A 5-judge Constitution Bench unanimously recognized the right to die with dignity as a fundamental right under Article 21. Permitted passive euthanasia (withdrawal of life support) and recognized advance directives ('living wills').",
+    "relevance": "Landmark on end-of-life decision making. Procedure simplified by 2023 SC modification.",
+    "category": "constitutional"
+  },
+  {
+    "case_name": "Internet & Mobile Association of India v. RBI",
+    "citation": "(2020) 10 SCC 274",
+    "court": "Supreme Court of India",
+    "year": 2020,
+    "principle": "Cryptocurrency Trading and RBI Powers",
+    "summary": "The Supreme Court struck down the RBI's 2018 circular prohibiting banks from providing services to cryptocurrency exchanges, holding it disproportionate. RBI must show proportionality between the harm and the restriction imposed.",
+    "relevance": "Landmark for crypto/digital assets in India. Affirms proportionality test for regulatory restrictions.",
+    "category": "regulatory"
+  },
+  {
+    "case_name": "ONGC v. Saw Pipes Ltd.",
+    "citation": "(2003) 5 SCC 705",
+    "court": "Supreme Court of India",
+    "year": 2003,
+    "principle": "Public Policy Ground for Setting Aside Arbitral Awards",
+    "summary": "The Supreme Court expanded the 'public policy of India' ground for setting aside arbitral awards under Section 34 of the Arbitration and Conciliation Act, 1996, including 'patent illegality'.",
+    "relevance": "Significantly debated ruling. Subsequently modified by Renusagar (2014) and the 2015 amendment to the Arbitration Act.",
+    "category": "civil"
+  },
+  {
+    "case_name": "ABC v. State (Delhi NCT)",
+    "citation": "(2015) 10 SCC 1",
+    "court": "Supreme Court of India",
+    "year": 2015,
+    "principle": "Unwed Mother's Guardianship Rights",
+    "summary": "The Supreme Court held that an unwed mother is the natural guardian of her child without requiring father's consent under the Hindu Minority and Guardianship Act. The welfare of the child is paramount.",
+    "relevance": "Recognizes parental rights of single mothers. Significant for family law and child welfare.",
+    "category": "civil"
+  },
+  {
+    "case_name": "Lily Thomas v. Union of India",
+    "citation": "(2013) 7 SCC 653",
+    "court": "Supreme Court of India",
+    "year": 2013,
+    "principle": "Disqualification of Convicted Legislators",
+    "summary": "The Supreme Court held that any sitting MP, MLA, or MLC convicted of an offence punishable with 2+ years imprisonment is immediately disqualified, striking down Section 8(4) of the Representation of the People Act, 1951.",
+    "relevance": "Major electoral reform. Removed protective shield for convicted legislators.",
+    "category": "constitutional"
+  },
+  {
+    "case_name": "P.V. Narsimha Rao v. State (CBI/SPE)",
+    "citation": "(1998) 4 SCC 626",
+    "court": "Supreme Court of India",
+    "year": 1998,
+    "principle": "Parliamentary Immunity for Bribery (now overruled)",
+    "summary": "A 5-judge Constitution Bench held that legislators who accepted bribes for casting votes in legislative proceedings were immune from prosecution under Articles 105(2) and 194(2). This was overruled by Sita Soren (2024).",
+    "relevance": "Now of historical significance. Overruled by 7-judge bench in Sita Soren v. Union of India (2024).",
+    "category": "constitutional"
   }
 ]

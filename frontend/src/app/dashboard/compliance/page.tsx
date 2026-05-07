@@ -291,17 +291,17 @@ export default function CompliancePage() {
   return (
     <div className="flex h-screen bg-background">
       <div className="flex-1 flex flex-col">
-        <header className="bg-card border-b border-border px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
+        <header className="bg-card border-b border-border px-4 py-4 sm:px-6">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="min-w-0">
               <h1 className="text-xl font-semibold text-foreground">Indian Regulatory Compliance</h1>
               <p className="text-sm text-muted-foreground mt-0.5">
                 Track ROC/MCA, GST, TDS, PF/ESI and other statutory deadlines under Indian law
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <Select value={companyType} onValueChange={setCompanyType}>
-                <SelectTrigger className="w-[220px]">
+                <SelectTrigger className="w-full sm:w-[220px]">
                   <SelectValue placeholder="Company Type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -324,10 +324,11 @@ export default function CompliancePage() {
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto p-6 bg-background">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-background">
           <div className="max-w-7xl mx-auto space-y-6">
-            {/* Quick Stats Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {/* Quick Stats Cards — single column on phones so neighbouring
+                cards never get clipped at the right edge. */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
               <Card className="shadow-sm border-border">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-1">

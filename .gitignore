@@ -87,3 +87,4 @@ cloud_config.json
 # Model files (too large for GitHub)
 *.gguf
 backend/models/*.gguf
+.coverage

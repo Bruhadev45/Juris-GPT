@@ -19,6 +19,7 @@ import {
   Check,
   X,
   Archive,
+  Home,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useChatOptional } from "@/app/dashboard/chat/chat-context";
@@ -118,7 +119,7 @@ function ConversationItem({
 
   if (isEditing) {
     return (
-      <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary/50">
+      <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-sidebar-accent/40">
         <MessageSquare className="h-4 w-4 flex-shrink-0 text-primary/60" />
         <input
           ref={inputRef}
@@ -137,7 +138,7 @@ function ConversationItem({
         </button>
         <button
           onClick={handleCancel}
-          className="p-1 rounded hover:bg-destructive/10 text-muted-foreground"
+          className="p-1 rounded hover:bg-destructive/10 text-sidebar-foreground/70"
         >
           <X className="h-3.5 w-3.5" />
         </button>
@@ -151,7 +152,7 @@ function ConversationItem({
         "group flex items-center gap-2 rounded-lg px-3 py-2 text-[13px] cursor-pointer transition-colors",
         isActive
           ? "bg-primary/10 text-primary"
-          : "text-foreground/80 hover:bg-secondary"
+          : "text-foreground/80 hover:bg-sidebar-accent"
       )}
       onClick={onSelect}
     >
@@ -163,7 +164,7 @@ function ConversationItem({
           <button
             onClick={(e) => e.stopPropagation()}
             className={cn(
-              "h-6 w-6 flex items-center justify-center rounded text-muted-foreground hover:text-foreground hover:bg-secondary transition-all",
+              "h-6 w-6 flex items-center justify-center rounded text-sidebar-foreground/70 hover:text-foreground hover:bg-sidebar-accent transition-all",
               "opacity-0 group-hover:opacity-100",
               isActive && "opacity-100"
             )}
@@ -231,11 +232,11 @@ export function LeftSidebar({ collapsed = false, onToggle }: LeftSidebarProps) {
 
   if (collapsed) {
     return (
-      <div className="flex h-full w-14 flex-col border-r border-border bg-background">
+      <div className="flex h-full w-14 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
         <div className="flex items-center justify-center py-4">
           <button
             onClick={onToggle}
-            className="rounded-lg p-2 text-muted-foreground hover:bg-secondary hover:text-primary transition-colors"
+            className="rounded-lg p-2 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-primary transition-colors"
           >
             <ChevronRight className="h-5 w-5" strokeWidth={2.5} />
           </button>
@@ -254,26 +255,26 @@ export function LeftSidebar({ collapsed = false, onToggle }: LeftSidebarProps) {
   }
 
   return (
-    <div className="flex h-full w-64 flex-col border-r border-border bg-background">
+    <div className="flex h-full w-64 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-4 border-b border-border">
+      <div className="flex items-center justify-between px-4 py-4 border-b border-sidebar-border">
         <Link href="/dashboard" className="flex items-center gap-2">
           <Image src="/logo.png" alt="JurisGPT" width={26} height={26} />
           <span className="text-xl font-bold tracking-tight text-primary">JurisGPT</span>
         </Link>
         <button
           onClick={onToggle}
-          className="rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-primary transition-colors"
+          className="rounded-lg p-1.5 text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-primary transition-colors"
         >
           <ChevronLeft className="h-4 w-4" strokeWidth={2.5} />
         </button>
       </div>
 
       {/* New Chat Button */}
-      <div className="p-3 border-b border-border">
+      <div className="p-3 border-b border-sidebar-border">
         <button
           onClick={handleNewChat}
-          className="flex w-full items-center gap-2 rounded-lg border border-border px-3 py-2.5 text-sm font-medium text-foreground hover:bg-secondary transition-colors"
+          className="flex w-full items-center gap-2 rounded-lg border border-border px-3 py-2.5 text-sm font-medium text-foreground hover:bg-sidebar-accent transition-colors"
         >
           <Plus className="h-4 w-4" />
           New chat
@@ -282,15 +283,15 @@ export function LeftSidebar({ collapsed = false, onToggle }: LeftSidebarProps) {
 
       {/* Search */}
       {sortedConversations.length > 3 && (
-        <div className="px-3 py-2 border-b border-border">
+        <div className="px-3 py-2 border-b border-sidebar-border">
           <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-sidebar-foreground/70" />
             <input
               type="text"
               placeholder="Search chats..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-lg border border-border bg-background pl-8 pr-3 py-1.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-lg border border-border bg-background pl-8 pr-3 py-1.5 text-sm placeholder:text-sidebar-foreground/70 focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
         </div>
@@ -301,16 +302,16 @@ export function LeftSidebar({ collapsed = false, onToggle }: LeftSidebarProps) {
         <div className="py-2">
           {groupedConversations.length === 0 ? (
             <div className="px-3 py-8 text-center">
-              <MessageSquare className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
-              <p className="text-sm text-muted-foreground">No conversations yet</p>
-              <p className="text-xs text-muted-foreground/70 mt-1">
+              <MessageSquare className="h-10 w-10 mx-auto text-sidebar-foreground/70/30 mb-3" />
+              <p className="text-sm text-sidebar-foreground/70">No conversations yet</p>
+              <p className="text-xs text-sidebar-foreground/70/70 mt-1">
                 Start a new chat to get legal assistance
               </p>
             </div>
           ) : (
             groupedConversations.map((group) => (
               <div key={group.label} className="mb-4">
-                <div className="px-3 py-2 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                <div className="px-3 py-2 text-[11px] font-medium text-sidebar-foreground/70 uppercase tracking-wider">
                   {group.label}
                 </div>
                 <div className="space-y-1">
@@ -332,7 +333,7 @@ export function LeftSidebar({ collapsed = false, onToggle }: LeftSidebarProps) {
       </ScrollArea>
 
       {/* Bottom Navigation */}
-      <div className="border-t border-border p-2 space-y-1">
+      <div className="border-t border-sidebar-border p-2 space-y-1">
         <NavItem
           icon={Search}
           label="Legal Search"
@@ -354,20 +355,29 @@ export function LeftSidebar({ collapsed = false, onToggle }: LeftSidebarProps) {
 
         {sortedConversations.length > 0 && (
           <>
-            <div className="my-2 border-t border-border" />
+            <div className="my-2 border-t border-sidebar-border" />
             <button
               onClick={() => {
                 if (confirm("Are you sure you want to clear all conversations?")) {
                   chat?.clearAllConversations();
                 }
               }}
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-secondary hover:text-destructive transition-colors"
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-destructive transition-colors"
             >
               <Archive className="h-4 w-4" />
               Clear all chats
             </button>
           </>
         )}
+
+        <div className="my-2 border-t border-sidebar-border" />
+        <Link
+          href="/dashboard"
+          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground/70 hover:bg-sidebar-accent hover:text-foreground transition-colors"
+        >
+          <Home className="h-4 w-4" />
+          Back to dashboard
+        </Link>
       </div>
     </div>
   );
@@ -388,7 +398,7 @@ function NavItem({
     "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
     active
       ? "bg-primary/10 text-primary font-medium"
-      : "text-foreground/70 hover:bg-secondary hover:text-foreground"
+      : "text-foreground/70 hover:bg-sidebar-accent hover:text-foreground"
   );
 
   if (href) {

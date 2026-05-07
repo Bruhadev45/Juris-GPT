@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Search,
   FileText,
@@ -18,6 +19,13 @@ import {
   ArrowRight,
   Info,
   ExternalLink,
+  Bookmark,
+  BookmarkCheck,
+  Copy,
+  Check,
+  Clock,
+  X,
+  Radio,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -32,8 +40,87 @@ import {
   type CompaniesActSection,
   type LawSection,
 } from "@/lib/api";
+import { Highlight } from "@/lib/legal-search/highlight";
+import {
+  loadRecentSearches,
+  addRecentSearch,
+  removeRecentSearch,
+  clearRecentSearches,
+  loadBookmarks,
+  toggleBookmark,
+  bookmarkId,
+  buildCitation,
+  type RecentSearch,
+  type BookmarkedResult,
+} from "@/lib/legal-search/storage";
+import { LiveUpdatesPanel } from "@/components/legal-search/live-updates-panel";
+import { cn } from "@/lib/utils";
 
 type FilterType = "all" | "cases" | "statutes" | "companies_act";
+
+/* ─── Bookmark + Copy citation buttons (shared) ─── */
+function ResultActions({
+  bookmarkPayload,
+  citation,
+}: {
+  bookmarkPayload: Omit<BookmarkedResult, "savedAt">;
+  citation: string;
+}) {
+  const [bookmarked, setBookmarked] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    setBookmarked(loadBookmarks().some((b) => b.id === bookmarkPayload.id));
+  }, [bookmarkPayload.id]);
+
+  const handleBookmark = () => {
+    const isNow = toggleBookmark(bookmarkPayload);
+    setBookmarked(isNow);
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(citation);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-1">
+      <Button
+        variant="ghost"
+        size="sm"
+        className="h-8 w-8 p-0"
+        onClick={handleBookmark}
+        title={bookmarked ? "Remove bookmark" : "Bookmark this result"}
+        aria-label={bookmarked ? "Remove bookmark" : "Bookmark this result"}
+      >
+        {bookmarked ? (
+          <BookmarkCheck className="h-4 w-4 text-amber-600" />
+        ) : (
+          <Bookmark className="h-4 w-4 text-muted-foreground" />
+        )}
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="h-8 w-8 p-0"
+        onClick={handleCopy}
+        title="Copy citation"
+        aria-label="Copy citation"
+      >
+        {copied ? (
+          <Check className="h-4 w-4 text-emerald-600" />
+        ) : (
+          <Copy className="h-4 w-4 text-muted-foreground" />
+        )}
+      </Button>
+    </div>
+  );
+}
 
 function typeIcon(type: string) {
   switch (type) {
@@ -87,8 +174,28 @@ function relevanceProgressColor(score: number) {
 }
 
 // Expandable Search Result Card Component
-function SearchResultCard({ result, idx }: { result: SearchResult; idx: number }) {
+function SearchResultCard({
+  result,
+  idx,
+  query,
+}: {
+  result: SearchResult;
+  idx: number;
+  query: string;
+}) {
   const [expanded, setExpanded] = useState(false);
+
+  const id = bookmarkId({
+    type: result.type,
+    title: result.title,
+    section: undefined,
+    source: result.source,
+  });
+  const citation = buildCitation({
+    type: result.type,
+    title: result.title,
+    source: result.source,
+  });
 
   return (
     <Card
@@ -101,14 +208,14 @@ function SearchResultCard({ result, idx }: { result: SearchResult; idx: number }
             <div className="flex items-center gap-2 mb-2">
               {typeIcon(result.type)}
               <h3 className="text-base font-semibold text-foreground truncate">
-                {result.title}
+                <Highlight text={result.title} query={query} />
               </h3>
             </div>
             <p className="text-sm text-muted-foreground mb-3">
-              {result.subtitle}
+              <Highlight text={result.subtitle} query={query} />
             </p>
             <p className={`text-sm text-muted-foreground leading-relaxed ${!expanded ? "line-clamp-3" : ""}`}>
-              {result.content}
+              <Highlight text={result.content} query={query} />
             </p>
 
             {/* Expanded Details */}
@@ -201,6 +308,16 @@ function SearchResultCard({ result, idx }: { result: SearchResult; idx: number }
                 {Math.round(result.relevance_score * 100)}%
               </span>
             </div>
+            <ResultActions
+              bookmarkPayload={{
+                id,
+                type: result.type,
+                title: result.title,
+                subtitle: result.subtitle,
+                source: result.source,
+              }}
+              citation={citation}
+            />
           </div>
         </div>
       </CardContent>
@@ -209,8 +326,27 @@ function SearchResultCard({ result, idx }: { result: SearchResult; idx: number }
 }
 
 // Expandable Case Card Component
-function CaseCard({ caseData, idx }: { caseData: CaseSummary; idx: number }) {
+function CaseCard({
+  caseData,
+  idx,
+  query,
+}: {
+  caseData: CaseSummary;
+  idx: number;
+  query: string;
+}) {
   const [expanded, setExpanded] = useState(false);
+  const id = bookmarkId({
+    type: "case",
+    title: caseData.case_name,
+    source: caseData.citation,
+  });
+  const citation = buildCitation({
+    type: "case",
+    title: caseData.case_name,
+    citation: caseData.citation,
+    court: caseData.court,
+  });
 
   return (
     <Card
@@ -223,7 +359,7 @@ function CaseCard({ caseData, idx }: { caseData: CaseSummary; idx: number }) {
             <div className="flex items-center gap-2 mb-2">
               <Scale className="h-4 w-4 text-primary" />
               <h3 className="text-base font-semibold text-foreground">
-                {caseData.case_name}
+                <Highlight text={caseData.case_name} query={query} />
               </h3>
             </div>
             <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
@@ -234,7 +370,10 @@ function CaseCard({ caseData, idx }: { caseData: CaseSummary; idx: number }) {
               <span>{caseData.citation}</span>
             </div>
             <p className={`text-sm text-muted-foreground ${!expanded ? "line-clamp-3" : ""}`}>
-              {caseData.summary || caseData.principle}
+              <Highlight
+                text={caseData.summary || caseData.principle || ""}
+                query={query}
+              />
             </p>
 
             {/* Expanded Details */}
@@ -275,9 +414,19 @@ function CaseCard({ caseData, idx }: { caseData: CaseSummary; idx: number }) {
               )}
             </Button>
           </div>
-          <Badge className="bg-blue-50 text-blue-700 border-blue-200 ml-4 flex-shrink-0">
-            Case Law
-          </Badge>
+          <div className="ml-4 flex-shrink-0 flex flex-col items-end gap-2">
+            <Badge className="bg-blue-50 text-blue-700 border-blue-200">Case Law</Badge>
+            <ResultActions
+              bookmarkPayload={{
+                id,
+                type: "case",
+                title: caseData.case_name,
+                source: caseData.citation,
+                citation: caseData.citation,
+              }}
+              citation={citation}
+            />
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -285,8 +434,28 @@ function CaseCard({ caseData, idx }: { caseData: CaseSummary; idx: number }) {
 }
 
 // Expandable Companies Act Card Component
-function CompaniesActCard({ section, idx }: { section: CompaniesActSection; idx: number }) {
+function CompaniesActCard({
+  section,
+  idx,
+  query,
+}: {
+  section: CompaniesActSection;
+  idx: number;
+  query: string;
+}) {
   const [expanded, setExpanded] = useState(false);
+  const id = bookmarkId({
+    type: "companies_act",
+    title: section.title,
+    section: section.section,
+    source: section.act,
+  });
+  const citation = buildCitation({
+    type: "companies_act",
+    title: section.title,
+    section: section.section,
+    act: section.act,
+  });
 
   return (
     <Card
@@ -299,11 +468,12 @@ function CompaniesActCard({ section, idx }: { section: CompaniesActSection; idx:
             <div className="flex items-center gap-2 mb-2">
               <Building2 className="h-4 w-4 text-primary" />
               <h3 className="text-base font-semibold text-foreground">
-                Section {section.section}: {section.title}
+                Section {section.section}:{" "}
+                <Highlight text={section.title} query={query} />
               </h3>
             </div>
             <p className={`text-sm text-muted-foreground ${!expanded ? "line-clamp-3" : ""}`}>
-              {section.content}
+              <Highlight text={section.content} query={query} />
             </p>
 
             {/* Expanded Details */}
@@ -340,9 +510,19 @@ function CompaniesActCard({ section, idx }: { section: CompaniesActSection; idx:
               )}
             </Button>
           </div>
-          <Badge className="bg-green-50 text-green-700 border-green-200 ml-4 flex-shrink-0">
-            Companies Act
-          </Badge>
+          <div className="ml-4 flex-shrink-0 flex flex-col items-end gap-2">
+            <Badge className="bg-green-50 text-green-700 border-green-200">Companies Act</Badge>
+            <ResultActions
+              bookmarkPayload={{
+                id,
+                type: "companies_act",
+                title: section.title,
+                section: section.section,
+                source: section.act,
+              }}
+              citation={citation}
+            />
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -350,8 +530,31 @@ function CompaniesActCard({ section, idx }: { section: CompaniesActSection; idx:
 }
 
 // Expandable Law Section Card Component
-function LawSectionCard({ section, lawName, idx }: { section: LawSection; lawName: string; idx: number }) {
+function LawSectionCard({
+  section,
+  lawName,
+  idx,
+  query,
+}: {
+  section: LawSection;
+  lawName: string;
+  idx: number;
+  query: string;
+}) {
   const [expanded, setExpanded] = useState(false);
+  const sectionNo = String(section.section);
+  const id = bookmarkId({
+    type: "statute",
+    title: section.title,
+    section: sectionNo,
+    source: lawName,
+  });
+  const citation = buildCitation({
+    type: "statute",
+    title: section.title,
+    section: sectionNo,
+    act: lawName.toUpperCase(),
+  });
 
   return (
     <Card
@@ -364,11 +567,12 @@ function LawSectionCard({ section, lawName, idx }: { section: LawSection; lawNam
             <div className="flex items-center gap-2 mb-2">
               <BookOpen className="h-4 w-4 text-primary" />
               <h3 className="text-base font-semibold text-foreground">
-                Section {section.section}: {section.title}
+                Section {section.section}:{" "}
+                <Highlight text={section.title} query={query} />
               </h3>
             </div>
             <p className={`text-sm text-muted-foreground ${!expanded ? "line-clamp-3" : ""}`}>
-              {section.description}
+              <Highlight text={section.description} query={query} />
             </p>
 
             {/* Expanded Details */}
@@ -405,9 +609,21 @@ function LawSectionCard({ section, lawName, idx }: { section: LawSection; lawNam
               )}
             </Button>
           </div>
-          <Badge className="bg-purple-50 text-purple-700 border-purple-200 ml-4 flex-shrink-0">
-            {lawName.toUpperCase()}
-          </Badge>
+          <div className="ml-4 flex-shrink-0 flex flex-col items-end gap-2">
+            <Badge className="bg-purple-50 text-purple-700 border-purple-200">
+              {lawName.toUpperCase()}
+            </Badge>
+            <ResultActions
+              bookmarkPayload={{
+                id,
+                type: "statute",
+                title: section.title,
+                section: sectionNo,
+                source: lawName,
+              }}
+              citation={citation}
+            />
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -415,10 +631,16 @@ function LawSectionCard({ section, lawName, idx }: { section: LawSection; lawNam
 }
 
 export default function SearchPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState<FilterType>("all");
+  const router = useRouter();
+  const params = useSearchParams();
+
+  // Initial state seeded from URL search params for deeplinking
+  const [searchQuery, setSearchQuery] = useState(() => params?.get("q") ?? "");
+  const [selectedFilter, setSelectedFilter] = useState<FilterType>(
+    () => (params?.get("type") as FilterType) ?? "all"
+  );
   const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(() => Number(params?.get("page") ?? "0") || 0);
   const [hasSearched, setHasSearched] = useState(false);
 
   // Unified search state
@@ -431,17 +653,76 @@ export default function SearchPage() {
   const [cases, setCases] = useState<CaseSummary[]>([]);
   const [companiesAct, setCompaniesAct] = useState<CompaniesActSection[]>([]);
   const [laws, setLaws] = useState<string[]>([]);
-  const [selectedLaw, setSelectedLaw] = useState<string>("");
+  const [selectedLaw, setSelectedLaw] = useState<string>(
+    () => params?.get("law") ?? ""
+  );
   const [lawSections, setLawSections] = useState<LawSection[]>([]);
+
+  // Recent + bookmarks
+  const [recentSearches, setRecentSearches] = useState<RecentSearch[]>([]);
+  const [bookmarks, setBookmarks] = useState<BookmarkedResult[]>([]);
+  const [showBookmarks, setShowBookmarks] = useState(false);
 
   const LIMIT = 15;
   const abortControllerRef = useRef<AbortController | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     apiClient.listAvailableLaws().then(setLaws).catch(console.error);
+    setRecentSearches(loadRecentSearches());
+    setBookmarks(loadBookmarks());
   }, []);
 
-  const handleSearch = useCallback(async () => {
+  // Keyboard shortcut: "/" focuses the search input
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (
+        e.key === "/" &&
+        !(e.target instanceof HTMLInputElement) &&
+        !(e.target instanceof HTMLTextAreaElement)
+      ) {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
+  // Sync URL with search state — debounced so we don't thrash history during typing
+  useEffect(() => {
+    if (!searchQuery && !selectedLaw) return;
+    const timeout = setTimeout(() => {
+      const next = new URLSearchParams();
+      if (searchQuery.trim()) next.set("q", searchQuery.trim());
+      if (selectedFilter !== "all") next.set("type", selectedFilter);
+      if (selectedLaw) next.set("law", selectedLaw);
+      if (page > 0) next.set("page", String(page));
+      router.replace(`/dashboard/search?${next.toString()}`, { scroll: false });
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [searchQuery, selectedFilter, selectedLaw, page, router]);
+
+  // Per-type counts for filter button badges (computed from current results)
+  const counts = useMemo(() => {
+    const c: Record<string, number> = { all: 0, cases: 0, statutes: 0, companies_act: 0 };
+    if (searchResults.length > 0) {
+      c.all = searchResults.length;
+      for (const r of searchResults) {
+        if (r.type === "case") c.cases++;
+        else if (r.type === "statute") c.statutes++;
+        else if (r.type === "companies_act") c.companies_act++;
+      }
+    } else {
+      c.cases = cases.length;
+      c.companies_act = companiesAct.length;
+      c.statutes = lawSections.length;
+      c.all = c.cases + c.statutes + c.companies_act;
+    }
+    return c;
+  }, [searchResults, cases, companiesAct, lawSections]);
+
+  const handleSearch = useCallback(async (signal?: AbortSignal) => {
     if (!searchQuery.trim() && !selectedLaw) return;
 
     // Cancel any in-flight search request
@@ -451,8 +732,17 @@ export default function SearchPage() {
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
+    // Use provided signal or controller's signal
+    const abortSignal = signal || controller.signal;
+
     setLoading(true);
     setHasSearched(true);
+
+    // Record into recent searches (debounce-aware: only if it's a real new query, not just pagination)
+    if (searchQuery.trim().length >= 2) {
+      addRecentSearch(searchQuery.trim(), selectedFilter, selectedLaw || undefined);
+      setRecentSearches(loadRecentSearches());
+    }
 
     // Try unified search first
     if (useUnifiedSearch && searchQuery.trim()) {
@@ -474,7 +764,7 @@ export default function SearchPage() {
         });
 
         // Don't update state if this request was aborted
-        if (controller.signal.aborted) return;
+        if (abortSignal.aborted) return;
 
         setSearchResults(response.results);
         setTotalResults(response.total);
@@ -485,7 +775,7 @@ export default function SearchPage() {
         setLoading(false);
         return;
       } catch (unifiedErr) {
-        if (controller.signal.aborted) return;
+        if (abortSignal.aborted) return;
         console.warn("Unified search unavailable, falling back:", unifiedErr);
         // Fall back to old search if unified fails
         setUseUnifiedSearch(false);
@@ -505,7 +795,7 @@ export default function SearchPage() {
               limit: LIMIT,
               offset: page * LIMIT,
             })
-            .then((data) => { if (!controller.signal.aborted) setCases(data); })
+            .then((data) => { if (!abortSignal.aborted) setCases(data); })
         );
       } else {
         setCases([]);
@@ -519,7 +809,7 @@ export default function SearchPage() {
               limit: LIMIT,
               offset: page * LIMIT,
             })
-            .then((data) => { if (!controller.signal.aborted) setCompaniesAct(data); })
+            .then((data) => { if (!abortSignal.aborted) setCompaniesAct(data); })
         );
       } else {
         setCompaniesAct([]);
@@ -532,7 +822,7 @@ export default function SearchPage() {
         promises.push(
           apiClient
             .getLawSections(selectedLaw, { limit: LIMIT, offset: page * LIMIT })
-            .then((data) => { if (!controller.signal.aborted) setLawSections(data); })
+            .then((data) => { if (!abortSignal.aborted) setLawSections(data); })
         );
       } else {
         setLawSections([]);
@@ -540,36 +830,36 @@ export default function SearchPage() {
 
       await Promise.all(promises);
     } catch (error) {
-      if (controller.signal.aborted) return;
+      if (abortSignal.aborted) return;
       console.error("Search error:", error);
     } finally {
-      if (!controller.signal.aborted) {
+      if (!abortSignal.aborted) {
         setLoading(false);
       }
     }
   }, [searchQuery, selectedFilter, selectedLaw, page, useUnifiedSearch]);
 
   useEffect(() => {
+    const controller = new AbortController();
     const debounce = setTimeout(() => {
       if (searchQuery.trim().length >= 2 || selectedLaw) {
-        handleSearch();
+        handleSearch(controller.signal);
       }
     }, 400);
     return () => {
       clearTimeout(debounce);
-      // Abort in-flight request when deps change
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
+      controller.abort();
     };
   }, [searchQuery, selectedFilter, selectedLaw, page, handleSearch]);
 
   const fallbackTotal = cases.length + companiesAct.length + lawSections.length;
   const displayTotal = searchResults.length > 0 ? totalResults : fallbackTotal;
 
+  const [showLiveFeed, setShowLiveFeed] = useState(true);
+
   return (
     <div className="flex h-screen bg-background">
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         <header className="bg-card border-b border-border px-6 py-4">
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -583,16 +873,47 @@ export default function SearchPage() {
                 Use manual source search to verify or deepen assistant answers with statutes, cases, and regulations
               </p>
             </div>
-            <Link href={searchQuery.trim() ? `/dashboard/chat?q=${encodeURIComponent(searchQuery.trim())}` : "/dashboard/chat"}>
-              <Button variant="outline" className="gap-1.5">
-                <Scale className="h-4 w-4" />
-                Ask JurisGPT
+            <div className="flex items-center gap-2">
+              <Button
+                variant={showLiveFeed ? "default" : "outline"}
+                className="gap-1.5 hidden xl:inline-flex"
+                onClick={() => setShowLiveFeed((v) => !v)}
+                title={showLiveFeed ? "Hide live feed" : "Show live feed"}
+              >
+                <Radio className="h-4 w-4" />
+                Live Feed
               </Button>
-            </Link>
+              <Button
+                variant={showBookmarks ? "default" : "outline"}
+                className="gap-1.5"
+                onClick={() => {
+                  setBookmarks(loadBookmarks());
+                  setShowBookmarks((v) => !v);
+                }}
+                title={showBookmarks ? "Hide bookmarks" : "Show saved bookmarks"}
+              >
+                <Bookmark className="h-4 w-4" />
+                Bookmarks{bookmarks.length > 0 ? ` (${bookmarks.length})` : ""}
+              </Button>
+              <Link href={searchQuery.trim() ? `/dashboard/chat?q=${encodeURIComponent(searchQuery.trim())}` : "/dashboard/chat"}>
+                <Button variant="outline" className="gap-1.5">
+                  <Scale className="h-4 w-4" />
+                  Ask JurisGPT
+                </Button>
+              </Link>
+            </div>
           </div>
         </header>
         <div className="flex-1 overflow-y-auto p-6 bg-background">
-          <div className="max-w-5xl mx-auto space-y-6">
+          <div
+            className={cn(
+              "mx-auto grid gap-6",
+              showLiveFeed
+                ? "max-w-7xl xl:grid-cols-[1fr_360px]"
+                : "max-w-5xl"
+            )}
+          >
+            <div className="space-y-6 min-w-0">
             {/* Search Bar */}
             <Card className="shadow-sm border-border">
               <CardContent className="p-6">
@@ -600,7 +921,8 @@ export default function SearchPage() {
                   <div className="relative">
                     <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                     <Input
-                      placeholder="Search case law, statutes, regulations... (e.g., 'contract breach', 'director duties')"
+                      ref={inputRef}
+                      placeholder='Search case law, statutes, regulations… ("director duties", "Section 149"). Press / to focus.'
                       value={searchQuery}
                       onChange={(e) => {
                         setSearchQuery(e.target.value);
@@ -609,8 +931,11 @@ export default function SearchPage() {
                       onKeyDown={(e) => {
                         if (e.key === "Enter") handleSearch();
                       }}
-                      className="pl-12 h-12 text-lg bg-background border-border"
+                      className="pl-12 pr-24 h-12 text-lg bg-background border-border"
                     />
+                    <kbd className="hidden md:inline-flex absolute right-12 top-1/2 -translate-y-1/2 items-center gap-1 rounded border border-border bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground pointer-events-none">
+                      /
+                    </kbd>
                     {searchQuery && (
                       <Button
                         variant="ghost"
@@ -649,8 +974,20 @@ export default function SearchPage() {
                           setSelectedFilter(f.key);
                           setPage(0);
                         }}
+                        className="gap-1.5"
                       >
                         {f.label}
+                        {hasSearched && counts[f.key] > 0 && (
+                          <span
+                            className={`text-[10px] font-bold rounded-full px-1.5 py-0 ${
+                              selectedFilter === f.key
+                                ? "bg-primary-foreground/20 text-primary-foreground"
+                                : "bg-muted text-muted-foreground"
+                            }`}
+                          >
+                            {counts[f.key]}
+                          </span>
+                        )}
                       </Button>
                     ))}
 
@@ -676,6 +1013,133 @@ export default function SearchPage() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Recent Searches */}
+            {recentSearches.length > 0 && !showBookmarks && (
+              <div className="flex items-center gap-2 flex-wrap">
+                <Clock className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <span className="text-sm text-muted-foreground">Recent:</span>
+                {recentSearches.slice(0, 6).map((r, i) => (
+                  <Badge
+                    key={`recent-${i}`}
+                    variant="outline"
+                    className="cursor-pointer hover:bg-primary/5 transition-colors group gap-1"
+                  >
+                    <span
+                      onClick={() => {
+                        setSearchQuery(r.query);
+                        setSelectedFilter(r.filter as FilterType);
+                        if (r.law) setSelectedLaw(r.law);
+                        setPage(0);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      {r.query}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeRecentSearch(r.query, r.filter, r.law);
+                        setRecentSearches(loadRecentSearches());
+                      }}
+                      aria-label="Remove recent search"
+                      className="opacity-50 hover:opacity-100 hover:text-rose-600"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+                {recentSearches.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      clearRecentSearches();
+                      setRecentSearches([]);
+                    }}
+                    className="text-xs text-muted-foreground hover:text-rose-600 underline underline-offset-2"
+                  >
+                    Clear all
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Bookmarks Panel */}
+            {showBookmarks && (
+              <Card className="shadow-sm border-amber-200 bg-amber-50/30 dark:bg-amber-950/10 dark:border-amber-900/40">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-base font-semibold flex items-center gap-2">
+                      <Bookmark className="h-4 w-4 text-amber-600" />
+                      Saved Bookmarks ({bookmarks.length})
+                    </h2>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setShowBookmarks(false)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  {bookmarks.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-6">
+                      No bookmarks yet. Click the bookmark icon on any result to save it.
+                    </p>
+                  ) : (
+                    <div className="space-y-2">
+                      {bookmarks.map((b) => {
+                        const cite = buildCitation({
+                          type: b.type,
+                          title: b.title,
+                          source: b.source,
+                          citation: b.citation,
+                          section: b.section,
+                        });
+                        return (
+                          <div
+                            key={b.id}
+                            className="flex items-start justify-between gap-3 p-3 rounded-md bg-card border border-border/50 hover:border-amber-200 transition-colors"
+                          >
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                {typeIcon(b.type)}
+                                <span className="text-sm font-semibold truncate">
+                                  {b.title}
+                                </span>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                                {cite}
+                              </p>
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-8 w-8 p-0 flex-shrink-0"
+                              onClick={() => {
+                                toggleBookmark({
+                                  id: b.id,
+                                  type: b.type,
+                                  title: b.title,
+                                  subtitle: b.subtitle,
+                                  source: b.source,
+                                  citation: b.citation,
+                                  section: b.section,
+                                });
+                                setBookmarks(loadBookmarks());
+                              }}
+                              title="Remove bookmark"
+                            >
+                              <X className="h-4 w-4 text-muted-foreground hover:text-rose-600" />
+                            </Button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
             {/* AI Search Suggestions */}
             {suggestions.length > 0 && hasSearched && (
@@ -746,7 +1210,12 @@ export default function SearchPage() {
                 </div>
 
                 {searchResults.map((result, idx) => (
-                  <SearchResultCard key={`result-${idx}`} result={result} idx={idx} />
+                  <SearchResultCard
+                    key={`result-${idx}`}
+                    result={result}
+                    idx={idx}
+                    query={searchQuery}
+                  />
                 ))}
               </div>
             )}
@@ -785,15 +1254,21 @@ export default function SearchPage() {
                   </div>
 
                   {cases.map((c, idx) => (
-                    <CaseCard key={`case-${idx}`} caseData={c} idx={idx} />
+                    <CaseCard key={`case-${idx}`} caseData={c} idx={idx} query={searchQuery} />
                   ))}
 
                   {companiesAct.map((s, idx) => (
-                    <CompaniesActCard key={`ca-${idx}`} section={s} idx={idx} />
+                    <CompaniesActCard key={`ca-${idx}`} section={s} idx={idx} query={searchQuery} />
                   ))}
 
                   {lawSections.map((s, idx) => (
-                    <LawSectionCard key={`law-${idx}`} section={s} lawName={selectedLaw} idx={idx} />
+                    <LawSectionCard
+                      key={`law-${idx}`}
+                      section={s}
+                      lawName={selectedLaw}
+                      idx={idx}
+                      query={searchQuery}
+                    />
                   ))}
                 </div>
               )}
@@ -827,7 +1302,6 @@ export default function SearchPage() {
               </Card>
             )}
 
-            {/* Empty State */}
             {!hasSearched && (
               <Card className="shadow-sm border-border">
                 <CardContent className="py-12 text-center">
@@ -864,6 +1338,16 @@ export default function SearchPage() {
                   </div>
                 </CardContent>
               </Card>
+            )}
+            </div>
+
+            {/* Right sidebar — Live legal feed (judgments + news, polls every 60s) */}
+            {showLiveFeed && (
+              <aside className="hidden xl:block">
+                <div className="sticky top-0">
+                  <LiveUpdatesPanel maxItems={10} />
+                </div>
+              </aside>
             )}
           </div>
         </div>

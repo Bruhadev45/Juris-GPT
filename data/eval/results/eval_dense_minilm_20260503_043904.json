@@ -1,0 +1,159 @@
+{
+  "config": {
+    "name": "dense_minilm",
+    "description": "Dense neural retrieval over the 28k-vector Chroma store (all-MiniLM-L6-v2, 384d)",
+    "hybrid_search": false,
+    "use_reranker": false,
+    "vector_store": "chroma",
+    "llm": "none"
+  },
+  "timestamp": "2026-05-03T04:39:41.195357+00:00",
+  "total_queries": 6,
+  "total_elapsed_seconds": 1.694,
+  "aggregate": {
+    "recall_at_5": 0.6667,
+    "precision_at_5": 1.0,
+    "mrr": 1.0,
+    "ndcg_at_5": 0.5867,
+    "groundedness_rate": 1.0,
+    "hallucination_proxy_rate": 0.0,
+    "avg_response_time": 0.282
+  },
+  "confidence_distribution": {
+    "medium": 6
+  },
+  "category_metrics": {
+    "company_formation": {
+      "count": 6,
+      "recall_at_5": 0.6667,
+      "precision_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 0.5867,
+      "groundedness_rate": 1.0,
+      "hallucination_proxy_rate": 0.0,
+      "avg_response_time": 0.282
+    }
+  },
+  "corpus": {
+    "source": "uninitialized",
+    "total_documents": 0,
+    "by_doc_type": {},
+    "loaded_files_count": 0
+  },
+  "per_query": [
+    {
+      "query_id": "CF-001",
+      "category": "company_formation",
+      "query": "What is Section 7 of the Companies Act, 2013?",
+      "recall_at_5": 1.0,
+      "precision_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 0.6241,
+      "grounded": true,
+      "hallucination_proxy": 0.0,
+      "confidence": "medium",
+      "model_used": "local-lexical",
+      "num_citations": 5,
+      "elapsed_seconds": 0.899,
+      "retrieved_doc_types": [
+        "statute"
+      ],
+      "retrieved_acts": []
+    },
+    {
+      "query_id": "CF-002",
+      "category": "company_formation",
+      "query": "What are the requirements for incorporating a private limited company in India?",
+      "recall_at_5": 0.5,
+      "precision_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 0.6125,
+      "grounded": true,
+      "hallucination_proxy": 0.0,
+      "confidence": "medium",
+      "model_used": "local-lexical",
+      "num_citations": 5,
+      "elapsed_seconds": 0.223,
+      "retrieved_doc_types": [
+        "statute"
+      ],
+      "retrieved_acts": []
+    },
+    {
+      "query_id": "CF-003",
+      "category": "company_formation",
+      "query": "What is the minimum number of directors required for a private limited company?",
+      "recall_at_5": 1.0,
+      "precision_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 0.6243,
+      "grounded": true,
+      "hallucination_proxy": 0.0,
+      "confidence": "medium",
+      "model_used": "local-lexical",
+      "num_citations": 5,
+      "elapsed_seconds": 0.123,
+      "retrieved_doc_types": [
+        "statute"
+      ],
+      "retrieved_acts": []
+    },
+    {
+      "query_id": "CF-004",
+      "category": "company_formation",
+      "query": "What is the difference between authorized and paid-up capital?",
+      "recall_at_5": 0.5,
+      "precision_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 0.503,
+      "grounded": true,
+      "hallucination_proxy": 0.0,
+      "confidence": "medium",
+      "model_used": "local-lexical",
+      "num_citations": 5,
+      "elapsed_seconds": 0.213,
+      "retrieved_doc_types": [
+        "statute"
+      ],
+      "retrieved_acts": []
+    },
+    {
+      "query_id": "CF-005",
+      "category": "company_formation",
+      "query": "How to convert a partnership into a private limited company?",
+      "recall_at_5": 0.5,
+      "precision_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 0.5802,
+      "grounded": true,
+      "hallucination_proxy": 0.0,
+      "confidence": "medium",
+      "model_used": "local-lexical",
+      "num_citations": 5,
+      "elapsed_seconds": 0.01,
+      "retrieved_doc_types": [
+        "statute"
+      ],
+      "retrieved_acts": []
+    },
+    {
+      "query_id": "CF-006",
+      "category": "company_formation",
+      "query": "What is the role of the Registrar of Companies?",
+      "recall_at_5": 0.5,
+      "precision_at_5": 1.0,
+      "mrr": 1.0,
+      "ndcg_at_5": 0.5764,
+      "grounded": true,
+      "hallucination_proxy": 0.0,
+      "confidence": "medium",
+      "model_used": "local-lexical",
+      "num_citations": 5,
+      "elapsed_seconds": 0.224,
+      "retrieved_doc_types": [
+        "statute"
+      ],
+      "retrieved_acts": []
+    }
+  ]
+}

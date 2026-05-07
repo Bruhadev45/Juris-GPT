@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 import uuid
 import json
 from datetime import datetime, timezone
@@ -7,7 +7,9 @@ import aiofiles
 import aiofiles.os
 import asyncio
 
-router = APIRouter()
+from app.routes.auth import require_auth
+
+router = APIRouter(dependencies=[Depends(require_auth)])
 
 # Lock for thread-safe file operations
 _team_lock = asyncio.Lock()

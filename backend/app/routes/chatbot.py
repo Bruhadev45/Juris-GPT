@@ -9,7 +9,7 @@ Supports:
 """
 
 import json
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from typing import List, Dict, Any, Optional
@@ -21,8 +21,9 @@ from app.services.chatbot_service import (
     ChatMessage as ChatMessageModel,
     CitationModel
 )
+from app.routes.auth import require_auth
 
-router = APIRouter(tags=["Chatbot"])
+router = APIRouter(tags=["Chatbot"], dependencies=[Depends(require_auth)])
 
 
 class ChatMessageRequest(BaseModel):

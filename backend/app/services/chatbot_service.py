@@ -552,11 +552,232 @@ Format responses in markdown for readability."""
 
     def _generate_document_response(self, request: ChatRequest) -> ChatResponse:
         """
-        Generate a legal document using OpenAI.
+        Agentic document generation using Claude via PageGrid.
 
         This is a SEPARATE workflow from legal Q&A.
-        Documents are clearly marked and should be reviewed by professionals.
+        The agent:
+        1. Detects document type
+        2. Checks if required information is provided
+        3. Asks for missing information OR generates the document
+        4. Returns professional legal document with explanations
         """
+        doc_type = self._detect_document_type(request.message)
+
+        # Check if we need to gather more information (agentic behavior)
+        missing_info = self._check_missing_document_info(request.message, doc_type)
+        if missing_info:
+            return self._ask_for_document_info(doc_type, missing_info)
+
+        # Try to use RAG pipeline's LLM (Claude via PageGrid)
+        self._lazy_init()
+        if self._initialized and self.rag and self.rag.llm is not None:
+            return self._generate_document_with_claude(request, doc_type)
+
+        # Fallback to OpenAI if PageGrid not available
+        client = self._get_openai_client()
+        if client:
+            return self._generate_document_with_openai(request, doc_type)
+
+        return self._get_fallback_response(request.message)
+
+    def _check_missing_document_info(self, message: str, doc_type: str) -> List[str]:
+        """Check what information is missing for document generation."""
+        message_lower = message.lower()
+        missing = []
+
+        # Document-specific required information
+        required_info = {
+            "nda": ["parties", "confidential_info", "duration"],
+            "employment_letter": ["employee_name", "designation", "salary", "start_date"],
+            "service_agreement": ["service_provider", "client", "services", "payment"],
+            "consulting_agreement": ["consultant", "client", "scope", "fees"],
+            "founder_agreement": ["founders", "equity_split", "vesting"],
+            "shareholders_agreement": ["shareholders", "company", "shares"],
+            "mou": ["parties", "purpose", "terms"],
+            "partnership_deed": ["partners", "business", "profit_sharing"],
+            "lease_agreement": ["landlord", "tenant", "property", "rent", "duration"],
+            "legal_notice": ["sender", "recipient", "subject", "demands"],
+            "privacy_policy": ["company", "data_collected", "purpose"],
+            "terms_of_service": ["company", "services", "user_obligations"],
+        }
+
+        # Check for party names (most documents need this)
+        has_party_info = any(indicator in message_lower for indicator in [
+            "between", "party", "name:", "company:", "mr.", "ms.", "m/s",
+            "pvt ltd", "private limited", "llp", "partnership"
+        ])
+
+        # For simple drafts, don't ask for info - generate with placeholders
+        simple_request = any(word in message_lower for word in [
+            "simple", "basic", "template", "sample", "standard", "generic"
+        ])
+
+        if simple_request:
+            return []  # Generate with placeholders
+
+        # Only ask for critical missing info for complex documents
+        if doc_type in ["founder_agreement", "shareholders_agreement", "investment_agreement"]:
+            if not has_party_info and "founder" not in message_lower:
+                missing.append("party_names")
+
+        return missing
+
+    def _ask_for_document_info(self, doc_type: str, missing_info: List[str]) -> ChatResponse:
+        """Ask user for missing information before generating document."""
+        doc_type_names = {
+            "nda": "Non-Disclosure Agreement",
+            "employment_letter": "Employment Offer Letter",
+            "service_agreement": "Service Agreement",
+            "consulting_agreement": "Consulting Agreement",
+            "founder_agreement": "Founder Agreement",
+            "shareholders_agreement": "Shareholders Agreement",
+            "mou": "Memorandum of Understanding",
+            "lease_agreement": "Lease Agreement",
+            "legal_notice": "Legal Notice",
+        }
+
+        doc_name = doc_type_names.get(doc_type, "Legal Document")
+
+        questions_map = {
+            "party_names": "the names of the parties involved",
+            "parties": "the names of both parties",
+            "founders": "the names of all founders and their equity percentages",
+            "equity_split": "how equity should be split among founders",
+            "duration": "the duration/term of the agreement",
+            "salary": "the salary/compensation details",
+            "services": "the scope of services to be provided",
+        }
+
+        info_needed = [questions_map.get(info, info) for info in missing_info]
+
+        answer = f"""I'll help you create a **{doc_name}**. To generate a customized document, please provide:
+
+{chr(10).join(f"• {info.title()}" for info in info_needed)}
+
+**Or**, if you'd like a standard template with placeholders, just say:
+> "Generate a standard {doc_name.lower()} template"
+
+I'll then create a complete, legally-compliant document for Indian law."""
+
+        return ChatResponse(
+            success=True,
+            answer=answer,
+            citations=[],
+            confidence="high",
+            limitations="",
+            follow_up_questions=[
+                f"Generate a standard {doc_name.lower()} template",
+                "What clauses should I include?",
+                "What are the legal requirements for this document?"
+            ],
+            grounded=False,
+            model_used="agent",
+            message=answer,
+            sources=[],
+            suggestions=[],
+            is_document=False,
+            document_type=doc_type,
+        )
+
+    def _generate_document_with_claude(self, request: ChatRequest, doc_type: str) -> ChatResponse:
+        """Generate document using Claude via PageGrid."""
+        system_prompt = """You are JurisGPT, an expert legal document drafting assistant for Indian law.
+
+DOCUMENT GENERATION RULES:
+1. Generate COMPLETE, professional legal documents compliant with Indian law
+2. Use proper legal formatting with numbered clauses (1., 1.1, 1.2, etc.)
+3. Include ALL standard clauses for the document type
+4. Use placeholders like [PARTY A NAME], [DATE], [ADDRESS] for unspecified info
+5. Follow Indian Contract Act, 1872 and relevant statutes
+6. Include recitals (WHEREAS clauses), definitions, and boilerplate
+7. Add jurisdiction, dispute resolution, and governing law clauses
+8. Reference stamp duty and registration requirements at the end
+
+DOCUMENT STRUCTURE:
+1. **Title** in ALL CAPS
+2. **Parties** section with full legal names and addresses
+3. **Recitals** (WHEREAS clauses explaining background)
+4. **Definitions** section for key terms
+5. **Main clauses** with clear numbering
+6. **Boilerplate clauses** (confidentiality, notices, amendments, etc.)
+7. **Execution** section with signature blocks
+8. **Schedule/Annexures** if needed
+
+FORMAT:
+- Use markdown formatting
+- **Bold** for headings
+- Numbered lists for clauses
+- Clear paragraph separation
+
+After the document, provide:
+1. Key clauses explanation
+2. Relevant Indian laws
+3. Stamp duty requirements (state-wise if applicable)
+4. Important considerations"""
+
+        try:
+            from langchain_core.prompts import ChatPromptTemplate
+
+            # Build context
+            context_info = ""
+            if request.context:
+                if request.context.get("company_name"):
+                    context_info += f"\nCompany: {request.context['company_name']}"
+                if request.context.get("founders"):
+                    context_info += f"\nFounders: {request.context['founders']}"
+
+            full_prompt = request.message
+            if context_info:
+                full_prompt = f"{request.message}\n\nContext:{context_info}"
+
+            prompt = ChatPromptTemplate.from_messages([
+                ("system", system_prompt),
+                ("human", "{query}")
+            ])
+
+            chain = prompt | self.rag.llm
+            response = chain.invoke({"query": full_prompt})
+            answer = response.content
+
+            return ChatResponse(
+                success=True,
+                answer=answer,
+                citations=[],
+                confidence="high",
+                limitations="This document is AI-generated based on Indian law. Please have it reviewed by a qualified legal professional before execution.",
+                follow_up_questions=[
+                    "Would you like me to modify any clauses?",
+                    "Should I add any specific provisions?",
+                    "Do you need this document in a different format?",
+                    "Should I explain any clause in detail?"
+                ],
+                grounded=False,
+                model_used="anthropic",
+                message=answer,
+                sources=[],
+                suggestions=[],
+                is_document=True,
+                document_type=doc_type,
+            )
+
+        except Exception as e:
+            # Fallback to OpenAI
+            client = self._get_openai_client()
+            if client:
+                return self._generate_document_with_openai(request, doc_type)
+
+            return ChatResponse(
+                success=False,
+                answer=f"I encountered an error generating the document: {str(e)}",
+                message="Document generation failed.",
+                confidence="insufficient",
+                limitations="Document generation failed.",
+                grounded=False,
+                error=str(e),
+            )
+
+    def _generate_document_with_openai(self, request: ChatRequest, doc_type: str) -> ChatResponse:
+        """Fallback document generation using OpenAI."""
         client = self._get_openai_client()
         if not client:
             return self._get_fallback_response(request.message)
@@ -571,18 +792,6 @@ DOCUMENT GENERATION GUIDELINES:
 5. Follow Indian legal standards, conventions, and stamp duty requirements
 6. Include appropriate recitals, definitions, and boilerplate clauses
 7. Reference relevant Indian laws and acts in the document
-
-FORMATTING RULES:
-- Use PLAIN TEXT only with simple markdown formatting
-- Use **bold** for headings
-- Use numbered lists (1. 2. 3.) for clauses
-- Use ALL CAPS for document titles
-- Keep formatting clean and readable
-
-IMPORTANT: Wrap the document between these markers:
----DOCUMENT_START---
-[Document content here]
----DOCUMENT_END---
 
 After the document, briefly explain key clauses, relevant law, and stamp duty requirements."""
 
@@ -611,22 +820,20 @@ After the document, briefly explain key clauses, relevant law, and stamp duty re
             )
 
             answer = response.choices[0].message.content
-            doc_type = self._detect_document_type(request.message)
 
             return ChatResponse(
                 success=True,
                 answer=answer,
                 citations=[],
-                confidence="medium",  # Documents are generated, not retrieved
+                confidence="medium",
                 limitations="This document is AI-generated and should be reviewed by a qualified legal professional before use.",
                 follow_up_questions=[
                     "Would you like me to modify any clauses?",
                     "Do you need a different type of document?",
                     "Should I explain any specific clause in detail?"
                 ],
-                grounded=False,  # Documents are generated
+                grounded=False,
                 model_used="openai-gpt4o",
-                # Legacy fields
                 message=answer,
                 sources=[],
                 suggestions=[],

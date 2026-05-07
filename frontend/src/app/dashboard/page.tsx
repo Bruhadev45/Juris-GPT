@@ -33,6 +33,17 @@ import {
   type ComplianceDeadline,
   type DocumentReview,
 } from "@/lib/api";
+import { useAuth } from "@/contexts/auth-context";
+import { LogOut } from "lucide-react";
+
+function greeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 5) return "Working late";
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  if (hour < 21) return "Good evening";
+  return "Working late";
+}
 
 const starterPrompts = [
   "What are the annual compliance requirements for a private limited company in India?",
@@ -185,41 +196,73 @@ export default function DashboardPage() {
     ];
   }, [deadlines.length, stats]);
 
+  const { user, logout } = useAuth();
+
   const handleResearchSubmit = (value: string) => {
     const trimmed = value.trim();
     if (!trimmed) return;
     router.push(`/dashboard/chat?q=${encodeURIComponent(trimmed)}`);
   };
 
+  const handleLogout = () => {
+    logout();
+    router.replace("/login");
+  };
+
+  const greetingPrefix = greeting();
+  const firstName = user?.full_name?.split(" ")[0];
+
   const completedReviews = reviews.filter((review) => review.status === "completed").length;
 
   return (
     <div className="flex h-full flex-col bg-background">
-      <header className="border-b border-border bg-card px-6 py-4">
-        <div className="flex items-center justify-between gap-4">
-          <div>
+      <header className="border-b border-border bg-card px-4 py-4 sm:px-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0">
             <div className="mb-1 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
               <Database className="h-3.5 w-3.5" />
               Citation-grounded workspace
             </div>
-            <h1 className="text-xl font-semibold text-foreground">JurisGPT Dashboard</h1>
+            <h1 className="text-xl font-semibold text-foreground">
+              {greetingPrefix}
+              {firstName ? `, ${firstName}` : ""} — ready when you are.
+            </h1>
             <p className="mt-0.5 text-sm text-muted-foreground">
-              Legal Q&A first, with source search, compliance, contracts, analyzer, and calendar in reach.
+              Ask anything in plain English — JurisGPT cites every answer against Indian statutes, judgments, and circulars.
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <Link href="/dashboard/chat">
-              <Button className="gap-1.5">
+          <div className="flex flex-wrap items-center gap-2 lg:flex-nowrap">
+            <Link href="/dashboard/chat" className="flex-1 sm:flex-none">
+              <Button className="w-full gap-1.5 sm:w-auto">
                 <Scale className="h-4 w-4" />
                 Ask JurisGPT
               </Button>
             </Link>
-            <Link href="/dashboard/search">
-              <Button variant="outline" className="gap-1.5">
+            <Link href="/dashboard/search" className="flex-1 sm:flex-none">
+              <Button variant="outline" className="w-full gap-1.5 sm:w-auto">
                 <Search className="h-4 w-4" />
                 Search Sources
               </Button>
             </Link>
+            {user && (
+              <div className="hidden items-center gap-2 border-l border-border pl-3 lg:flex">
+                <div className="text-right leading-tight">
+                  <div className="text-sm font-medium text-foreground">
+                    {user.full_name}
+                  </div>
+                  <div className="text-xs text-muted-foreground">{user.email}</div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleLogout}
+                  className="gap-1.5 text-muted-foreground hover:text-destructive hover:border-destructive/40"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Log out
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </header>

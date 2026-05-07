@@ -8,7 +8,9 @@ from typing import Optional, List
 from datetime import datetime, timedelta, timezone
 from pydantic import BaseModel
 
-router = APIRouter()
+from app.routes.auth import require_admin
+
+router = APIRouter(dependencies=[Depends(require_admin)])
 
 
 # ============== Models ==============
