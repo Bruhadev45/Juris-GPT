@@ -50,7 +50,7 @@ const nextConfig: NextConfig = {
           // Content-Security-Policy. 'unsafe-inline' on style-src is required
           // for Tailwind's inline styles + Next.js dev injection; 'unsafe-eval'
           // is required for Next's dev runtime. connect-src allows API calls
-          // to the Render backend + Supabase. Tighten further once the app is
+          // to the Railway backend + Supabase. Tighten further once the app is
           // closer to a stable surface.
           {
             key: "Content-Security-Policy",
@@ -63,8 +63,8 @@ const nextConfig: NextConfig = {
               "font-src 'self' data: https://fonts.gstatic.com",
               // Clerk avatar images come from img.clerk.com; user uploads from Supabase + DO Spaces.
               "img-src 'self' data: blob: https://img.clerk.com https://images.clerk.dev https://*.clerk.accounts.dev https://*.clerk.com https://*.supabase.co https://*.digitaloceanspaces.com",
-              // API calls: our backend, Supabase, Clerk Frontend API + analytics.
-              "connect-src 'self' https://jurisgpt-backend.onrender.com https://*.supabase.co https://*.clerk.accounts.dev https://*.clerk.com https://*.vercel-insights.com",
+              // API calls: our backend (Railway), Supabase, Clerk Frontend API + analytics.
+              "connect-src 'self' https://jurisgpt-backend-production.up.railway.app https://*.supabase.co https://*.clerk.accounts.dev https://*.clerk.com https://*.vercel-insights.com",
               // Clerk shows captcha challenges in iframes from challenges.cloudflare.com.
               "frame-src 'self' https://*.clerk.accounts.dev https://*.clerk.com https://challenges.cloudflare.com",
               "worker-src 'self' blob:",
