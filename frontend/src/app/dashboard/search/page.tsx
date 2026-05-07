@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { Suspense, useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Search,
@@ -630,7 +630,10 @@ function LawSectionCard({
   );
 }
 
-export default function SearchPage() {
+// Renamed from SearchPage so we can wrap it in <Suspense> at the route level —
+// useSearchParams() forces this whole subtree onto the client and Next.js
+// requires it to be inside a Suspense boundary for static prerendering.
+function SearchPageContent() {
   const router = useRouter();
   const params = useSearchParams();
 
@@ -1353,5 +1356,19 @@ export default function SearchPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[60vh] items-center justify-center text-sm text-muted-foreground">
+          Loading search…
+        </div>
+      }
+    >
+      <SearchPageContent />
+    </Suspense>
   );
 }
