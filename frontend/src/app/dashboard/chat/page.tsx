@@ -55,6 +55,7 @@ import { useKeyboardShortcuts, formatShortcut, isMac, type ShortcutConfig } from
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useAuth as useClerkAuth } from "@clerk/nextjs";
 import ReactMarkdown from "react-markdown";
 import rehypeSanitize from "rehype-sanitize";
 import { toast } from "sonner";
@@ -69,19 +70,34 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-// Build the headers for direct fetch calls (SSE streaming + non-streamed
-// fallback below). The shared api.ts client auto-injects the JWT, but this
-// file talks to the backend directly, so we duplicate the logic here.
-function buildAuthHeaders(): Record<string, string> {
+/**
+ * Build headers for direct fetch calls (SSE streaming + JSON fallback).
+ *
+ * `getToken` comes from Clerk's `useAuth()` and resolves to a fresh JWT
+ * (Clerk's tokens are short-lived, default ~60s). We pass the function
+ * down rather than reading localStorage so we always get a non-expired
+ * token instead of whatever snapshot the auth context wrote earlier.
+ */
+async function buildAuthHeaders(
+  getToken?: () => Promise<string | null>,
+): Promise<Record<string, string>> {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (typeof window !== "undefined") {
+  let token: string | null = null;
+  if (getToken) {
     try {
-      const token = window.localStorage.getItem("jurisgpt.access_token");
-      if (token) headers["Authorization"] = `Bearer ${token}`;
+      token = await getToken();
     } catch {
-      // localStorage may be disabled (private mode); fall through.
+      // Clerk transient error — fall back to localStorage cache.
     }
   }
+  if (!token && typeof window !== "undefined") {
+    try {
+      token = window.localStorage.getItem("jurisgpt.access_token");
+    } catch {
+      // localStorage disabled (private mode).
+    }
+  }
+  if (token) headers["Authorization"] = `Bearer ${token}`;
   return headers;
 }
 
@@ -1552,6 +1568,7 @@ function ChatPageContent() {
   const { activeConversation, activeConversationId, addMessage, conversations, createNewConversation } = useChat();
   const searchParams = useSearchParams();
   const { theme, setTheme } = useTheme();
+  const { getToken } = useClerkAuth();
   const [input, setInput] = useState("");
   const [greeting, setGreeting] = useState("Good morning");
   const [isLoading, setIsLoading] = useState(false);
@@ -1722,7 +1739,7 @@ function ChatPageContent() {
 
       const response = await fetch(`${API_BASE}/api/chat/stream`, {
         method: "POST",
-        headers: buildAuthHeaders(),
+        headers: await buildAuthHeaders(getToken),
         body: JSON.stringify({
           message: savedInput,
           conversation_id: activeConversationId,
@@ -1849,7 +1866,7 @@ function ChatPageContent() {
       try {
         const response = await fetch(`${API_BASE}/api/chat/message`, {
           method: "POST",
-          headers: buildAuthHeaders(),
+          headers: await buildAuthHeaders(getToken),
           body: JSON.stringify({
             message: savedInput,
             conversation_id: activeConversationId,
@@ -1891,7 +1908,7 @@ function ChatPageContent() {
       abortControllerRef.current = null;
       setIsLoading(false);
     }
-  }, [input, isLoading, addMessage, activeConversationId]);
+  }, [input, isLoading, addMessage, activeConversationId, getToken]);
 
   const handleActionCard = (prompt: string) => {
     setInput(prompt);
