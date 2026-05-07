@@ -90,3 +90,4 @@ backend/models/*.gguf
 .coverage
 .render-secrets.txt
 .vercel-api-token
+.render-api-key
