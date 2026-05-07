@@ -2,6 +2,7 @@ import logging
 import os
 import secrets
 
+from pydantic import Field
 from pydantic_settings import BaseSettings
 from typing import Optional
 
@@ -60,8 +61,19 @@ class Settings(BaseSettings):
     do_spaces_region: Optional[str] = None
     do_spaces_endpoint: Optional[str] = None
 
-    # CORS settings
-    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002"]
+    # CORS settings.
+    # Stored as a comma-separated string so pydantic-settings doesn't try to
+    # parse CORS_ORIGINS as JSON. Use the `cors_origins` property to consume
+    # as a list. In production set
+    #   CORS_ORIGINS=https://your-vercel.app,https://www.yourdomain.com
+    cors_origins_csv: str = Field(
+        default="http://localhost:3000,http://localhost:3001,http://localhost:3002",
+        validation_alias="CORS_ORIGINS",
+    )
+
+    @property
+    def cors_origins(self) -> list[str]:
+        return [o.strip() for o in self.cors_origins_csv.split(",") if o.strip()]
 
     # ── Local LLM Configuration ──────────────────────────────────────
     local_llm_model_path: str = "./models/llama-3.2-1b-instruct.Q4_K_M.gguf"

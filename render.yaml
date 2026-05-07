@@ -1,35 +1,56 @@
 services:
   - type: web
     name: jurisgpt-backend
-    env: python
-    region: oregon
-    plan: free
+    runtime: python
+    region: singapore        # closest of {oregon, frankfurt, ohio, singapore} to India
+    plan: free               # upgrade to "starter" ($7/mo) for always-on; "free" sleeps after 15 min idle
     rootDir: backend
+    pythonVersion: "3.11"
 
     buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    # Render injects $PORT — must bind there, not a fixed port.
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+
+    healthCheckPath: /api/info
 
     envVars:
       - key: ENVIRONMENT
         value: production
-      - key: OPENAI_API_KEY
-        scope: build,runtime
-        sync: false
+
+      # === Auth — ALL required ===
       - key: JWT_SECRET
-        scope: build,runtime
+        sync: false          # set in dashboard; required at startup in production
+
+      # === LLM provider keys — set whichever you use ===
+      - key: OPENAI_API_KEY
         sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ANTHROPIC_BASE_URL
+        sync: false          # optional — used for PageGrid proxy etc.
+
+      # === Supabase — required ===
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+
+      # === DigitalOcean Spaces (file uploads) ===
       - key: DO_SPACES_KEY
-        scope: build,runtime
         sync: false
       - key: DO_SPACES_SECRET
-        scope: build,runtime
         sync: false
       - key: DO_SPACES_REGION
         value: sgp1
       - key: DO_SPACES_BUCKET
         value: jurisgpt-data
-      - key: SUPABASE_URL
-        value: https://placeholder.supabase.co
-      - key: SUPABASE_SERVICE_KEY
-        scope: build,runtime
+      - key: DO_SPACES_ENDPOINT
+        sync: false          # e.g. https://sgp1.digitaloceanspaces.com
+
+      # === Email (optional) ===
+      - key: RESEND_API_KEY
+        sync: false
+
+      # === External legal APIs (optional) ===
+      - key: INDIAN_KANOON_API_KEY
         sync: false
