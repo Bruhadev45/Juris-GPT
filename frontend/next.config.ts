@@ -1,5 +1,12 @@
 import type { NextConfig } from "next";
 
+const isDev = process.env.NODE_ENV !== "production";
+// In dev, allow connections to localhost backend ports (FastAPI) and the
+// Next dev server's own websocket/HMR origin. Production stays strict.
+const devConnectSrc = isDev
+  ? "http://localhost:8000 http://localhost:8001 http://127.0.0.1:8000 http://127.0.0.1:8001 ws://localhost:* ws://127.0.0.1:*"
+  : "";
+
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
@@ -64,7 +71,8 @@ const nextConfig: NextConfig = {
               // Clerk avatar images come from img.clerk.com; user uploads from Supabase + DO Spaces.
               "img-src 'self' data: blob: https://img.clerk.com https://images.clerk.dev https://*.clerk.accounts.dev https://*.clerk.com https://*.supabase.co https://*.digitaloceanspaces.com",
               // API calls: our backend (Railway), Supabase, Clerk Frontend API + analytics.
-              "connect-src 'self' https://jurisgpt-backend-production.up.railway.app https://*.supabase.co https://*.clerk.accounts.dev https://*.clerk.com https://*.vercel-insights.com",
+              // In dev, also allow localhost backend ports + HMR websockets.
+              `connect-src 'self' https://jurisgpt-backend-production.up.railway.app https://*.supabase.co https://*.clerk.accounts.dev https://*.clerk.com https://*.vercel-insights.com ${devConnectSrc}`.trim(),
               // Clerk shows captcha challenges in iframes from challenges.cloudflare.com.
               "frame-src 'self' https://*.clerk.accounts.dev https://*.clerk.com https://challenges.cloudflare.com",
               "worker-src 'self' blob:",
