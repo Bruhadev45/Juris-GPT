@@ -79,43 +79,62 @@ def analyze_contract_with_ai(document_text: str, file_name: str) -> dict:
     if len(document_text) > max_chars:
         truncated += "\n\n[Document truncated for analysis — remaining text omitted]"
 
-    system_prompt = """You are an expert Indian corporate lawyer and contract analyst. 
-Analyze the provided contract clause by clause. You MUST return a valid JSON object (no markdown, no code fences).
+    system_prompt = """You are an expert Indian corporate lawyer and contract analyst.
+Analyze the provided legal document end-to-end. You MUST return a valid JSON object (no markdown, no code fences).
 
-Analyze these 8 key clause types:
-1. Indemnity
-2. Termination
-3. Non-Compete
-4. Intellectual Property
-5. Force Majeure
-6. Confidentiality
-7. Limitation of Liability
-8. Governing Law / Dispute Resolution
+Apply Indian law context: reference the Indian Contract Act 1872, Companies Act 2013,
+Arbitration and Conciliation Act 1996, IT Act 2000, DPDPA 2023, and Specific Relief Act 1963 where relevant.
 
-For each clause, determine:
-- Whether it is present, missing, or risky (has concerning provisions)
-- The risk level (Low, Medium, or High)
-- A brief description of what was found or what's concerning
-- Specific risk factors identified
-- Actionable suggestions for improvement
+Your output has FIVE top-level pillars:
 
-Apply Indian law context: reference the Indian Contract Act 1872, Companies Act 2013, 
-Arbitration and Conciliation Act 1996, IT Act 2000, and DPDPA 2023 where relevant.
+1. EXECUTIVE SUMMARY — a plain-English explanation a non-lawyer founder can read in 30 seconds:
+   what the document is, who is on each side, what they each agree to, and the single most
+   important thing the reader should worry about.
+
+2. PARTIES — extract the actual party names from the document and assign each a role
+   (e.g. "Customer", "Service Provider", "Disclosing Party", "Employee", "Lessor"). Do not
+   invent names — if the document is signed by template placeholders, return that placeholder.
+
+3. KEY DATES & TERMS — extract every concrete commercial term that appears: effective date,
+   term length, renewal date, notice period, payment amount + currency + cadence, late fees,
+   penalties, security deposit, governing law jurisdiction, arbitration seat. Include only
+   what is actually in the document.
+
+4. CLAUSE-BY-CLAUSE — for at least these 8 standard categories (Indemnity, Termination,
+   Non-Compete, Intellectual Property, Force Majeure, Confidentiality, Limitation of
+   Liability, Governing Law / Dispute Resolution), report whether the clause is present,
+   missing, or risky, the risk level, what the clause actually says, what's concerning,
+   and what to do.
+
+5. TOP RISKS & RECOMMENDATIONS — the 3-6 most important things, ranked.
 
 Return ONLY this JSON structure:
 {
-  "overall_risk_score": <number 0-10>,
-  "summary": "<2-3 sentence summary of the contract's overall risk posture>",
-  "contract_type": "<detected type: employment/nda/service/partnership/lease/other>",
+  "overall_risk_score": <integer 0-100, where 0 = squeaky clean and 100 = burn it>,
+  "summary": "<one-sentence headline assessment, e.g. 'Standard SaaS agreement with two
+              concerning gaps around IP assignment and unlimited indemnity.'>",
+  "executive_summary": "<4-6 plain-English sentences. No legalese. What it does, who's
+                        on each side, what each side gives and gets, the single biggest
+                        thing the reader should care about.>",
+  "contract_type": "<detected type: employment/nda/msa/sow/saas/service/partnership/lease/loan/share-purchase/other>",
+  "parties": [
+    { "name": "<actual party name from doc>", "role": "<Customer|Service Provider|Employee|Employer|Disclosing Party|Receiving Party|Lessor|Lessee|Licensor|Licensee|Buyer|Seller|other>" }
+  ],
+  "key_dates": [
+    { "label": "<e.g. Effective Date, Term, Notice Period, Renewal>", "value": "<e.g. 1 Jan 2026, 24 months, 30 days>", "note": "<short context if useful, else null>" }
+  ],
+  "key_terms": [
+    { "label": "<e.g. Annual Fee, Late Fee, Liability Cap, Governing Law, Arbitration Seat>", "value": "<the actual figure or text from the doc>", "note": "<short context if useful, else null>" }
+  ],
   "clauses": [
     {
       "name": "<clause name>",
       "status": "<Present|Missing|Risky>",
       "risk_level": "<Low|Medium|High>",
-      "description": "<1-2 sentence description of findings>",
-      "extracted_text": "<relevant excerpt from the document if found, or null>",
-      "risk_factors": ["<risk factor 1>", "<risk factor 2>"],
-      "suggestions": ["<suggestion 1>", "<suggestion 2>"]
+      "description": "<1-2 sentence summary of what the clause actually says or, if missing, why that matters>",
+      "extracted_text": "<short verbatim excerpt from the document, or null if missing>",
+      "risk_factors": ["<specific concern 1>", "<specific concern 2>"],
+      "suggestions": ["<specific fix 1>", "<specific fix 2>"]
     }
   ],
   "suggestions": [
@@ -125,13 +144,16 @@ Return ONLY this JSON structure:
     "<top-level actionable suggestion 4>"
   ],
   "risks": [
-    {
-      "title": "<risk title>",
-      "severity": "<high|medium|low>",
-      "description": "<description of the risk>"
-    }
+    { "title": "<risk title>", "severity": "<high|medium|low>", "description": "<one-paragraph explanation: what the risk is, why it matters, what the worst case looks like>" }
   ]
-}"""
+}
+
+Hard rules:
+- Do NOT hallucinate clauses, dates, party names, or amounts that aren't in the text.
+- If a field is genuinely absent from the document, say so explicitly (e.g. parties: [] is
+  fine; key_dates with note: "not specified" is fine).
+- Keep extracted_text short (<300 chars) and verbatim from the document.
+- overall_risk_score is on a 0-100 scale, NOT 0-10."""
 
     user_prompt = f"""Analyze the following contract document:
 
@@ -162,12 +184,22 @@ If the document text is empty or unreadable, still return the JSON structure wit
         analysis = json.loads(result_text)
 
         # Ensure required fields exist with defaults
-        analysis.setdefault("overall_risk_score", 5)
+        analysis.setdefault("overall_risk_score", 50)
         analysis.setdefault("summary", "Analysis complete.")
+        analysis.setdefault("executive_summary", analysis.get("summary", "Analysis complete."))
         analysis.setdefault("contract_type", "other")
+        analysis.setdefault("parties", [])
+        analysis.setdefault("key_dates", [])
+        analysis.setdefault("key_terms", [])
         analysis.setdefault("clauses", [])
         analysis.setdefault("suggestions", [])
         analysis.setdefault("risks", [])
+
+        # Normalize 0-10 → 0-100 if the model regressed to the old scale
+        score = analysis.get("overall_risk_score")
+        if isinstance(score, (int, float)) and 0 <= score <= 10 and score == int(score):
+            # Heuristic: if it looks like 0-10, scale it up. Otherwise leave it.
+            analysis["overall_risk_score"] = int(score) * 10
 
         # Normalize clause data
         for clause in analysis["clauses"]:
@@ -178,6 +210,18 @@ If the document text is empty or unreadable, still return the JSON structure wit
             clause.setdefault("extracted_text", None)
             clause.setdefault("risk_factors", [])
             clause.setdefault("suggestions", [])
+
+        # Normalize parties
+        for p in analysis.get("parties", []):
+            p.setdefault("name", "")
+            p.setdefault("role", "Party")
+
+        # Normalize key_dates / key_terms entries
+        for entry_list in (analysis.get("key_dates", []), analysis.get("key_terms", [])):
+            for e in entry_list:
+                e.setdefault("label", "")
+                e.setdefault("value", "")
+                e.setdefault("note", None)
 
         return analysis
 

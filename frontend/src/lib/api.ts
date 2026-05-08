@@ -37,6 +37,38 @@ function getAccessToken(): string | null {
   }
 }
 
+/**
+ * fetch() wrapper that auto-attaches the Bearer token (from Clerk-synced
+ * localStorage) and CSRF header on state-changing methods. Use this in
+ * `*Api` modules so we don't keep losing auth on new endpoints.
+ *
+ * Pass a path starting with `/api/...`; this prepends API_URL.
+ * If the caller supplies `Authorization` already, it wins.
+ */
+async function authFetch(path: string, init?: RequestInit): Promise<Response> {
+  const headers: Record<string, string> = {};
+  if (init?.headers) {
+    new Headers(init.headers).forEach((value, key) => {
+      headers[key] = value;
+    });
+  }
+  // Don't override Content-Type for FormData — the browser must set the boundary.
+  const isFormData = typeof FormData !== "undefined" && init?.body instanceof FormData;
+  if (!isFormData && !headers["Content-Type"] && init?.body !== undefined) {
+    headers["Content-Type"] = "application/json";
+  }
+  const method = (init?.method || "GET").toUpperCase();
+  if (["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
+    const csrf = getCsrfToken();
+    if (csrf && !headers["X-CSRF-Token"]) headers["X-CSRF-Token"] = csrf;
+  }
+  if (!headers["Authorization"]) {
+    const token = getAccessToken();
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+  }
+  return fetch(`${API_URL}${path}`, { ...init, headers });
+}
+
 export interface LawSection {
   section: number;
   title: string;
@@ -1038,7 +1070,7 @@ export const vaultApi = {
     if (options?.category) params.append("category", options.category);
     if (options?.tag) params.append("tag", options.tag);
     const query = params.toString();
-    const response = await fetch(`${API_URL}/api/vault${query ? `?${query}` : ""}`);
+    const response = await authFetch(`/api/vault${query ? `?${query}` : ""}`);
     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
     return response.json();
   },
@@ -1047,24 +1079,24 @@ export const vaultApi = {
     if (options?.category) params.append("category", options.category);
     if (options?.tag) params.append("tag", options.tag);
     const query = params.toString();
-    const response = await fetch(`${API_URL}/api/vault/graph${query ? `?${query}` : ""}`);
+    const response = await authFetch(`/api/vault/graph${query ? `?${query}` : ""}`);
     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
     return response.json();
   },
   async getLinks(id: string): Promise<{ data: VaultDocumentLinks }> {
-    const response = await fetch(`${API_URL}/api/vault/${id}/links`);
+    const response = await authFetch(`/api/vault/${id}/links`);
     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
     return response.json();
   },
   async get(id: string): Promise<{ data: VaultDocument }> {
-    const response = await fetch(`${API_URL}/api/vault/${id}`);
+    const response = await authFetch(`/api/vault/${id}`);
     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
     return response.json();
   },
   async linkSuggestions(query: string): Promise<{ data: VaultLinkSuggestion[] }> {
     const params = new URLSearchParams();
     if (query) params.append("q", query);
-    const response = await fetch(`${API_URL}/api/vault/link-suggestions?${params.toString()}`);
+    const response = await authFetch(`/api/vault/link-suggestions?${params.toString()}`);
     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
     return response.json();
   },
@@ -1072,54 +1104,53 @@ export const vaultApi = {
     id: string,
     data: { category?: string; tags?: string[]; description?: string }
   ): Promise<{ data: VaultDocument; message: string }> {
-    const response = await fetch(`${API_URL}/api/vault/${id}/metadata`, {
+    const response = await authFetch(`/api/vault/${id}/metadata`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json", ...csrfHeader() },
       body: JSON.stringify(data),
     });
     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
     return response.json();
   },
   async upload(formData: FormData) {
-    const response = await fetch(`${API_URL}/api/vault/upload`, {
+    const response = await authFetch(`/api/vault/upload`, {
       method: "POST",
-      headers: csrfHeader(),
       body: formData,
     });
     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
     return response.json();
   },
   async delete(id: string) {
-    const response = await fetch(`${API_URL}/api/vault/${id}`, {
-      method: "DELETE",
-      headers: csrfHeader(),
-    });
+    const response = await authFetch(`/api/vault/${id}`, { method: "DELETE" });
     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
     return response.json();
   },
   async getCategories() {
-    const response = await fetch(`${API_URL}/api/vault/categories`);
+    const response = await authFetch(`/api/vault/categories`);
     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
     return response.json();
   },
 };
 
 // Analyzer API
+// Backend returns { data: record, ... }; we unwrap to the record so callers get a flat shape.
 export const analyzerApi = {
   async upload(formData: FormData) {
-    const response = await fetch(`${API_URL}/api/analyzer/upload`, { method: "POST", body: formData });
+    const response = await authFetch(`/api/analyzer/upload`, { method: "POST", body: formData });
     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
-    return response.json();
+    const json = await response.json();
+    return json.data ?? json;
   },
   async analyze(id: string) {
-    const response = await fetch(`${API_URL}/api/analyzer/${id}/analyze`, { method: "POST" });
+    const response = await authFetch(`/api/analyzer/${id}/analyze`, { method: "POST" });
     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
-    return response.json();
+    const json = await response.json();
+    return json.data ?? json;
   },
   async get(id: string) {
-    const response = await fetch(`${API_URL}/api/analyzer/${id}`);
+    const response = await authFetch(`/api/analyzer/${id}`);
     if (!response.ok) throw new Error(`API error: ${response.statusText}`);
-    return response.json();
+    const json = await response.json();
+    return json.data ?? json;
   },
 };
 
