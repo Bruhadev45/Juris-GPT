@@ -463,12 +463,9 @@ function Hero({ onOpenApp }: { onOpenApp: () => void }) {
             <span style={{ fontSize: 12, color: C.inkSoft, fontWeight: 500 }}>The friendly legal chat for Indian founders</span>
           </div>
           <h1 style={{ fontSize: "clamp(40px,5vw,64px)", fontWeight: 700, letterSpacing: "-0.035em", lineHeight: 1.04, color: C.ink, marginBottom: 22 }}>
-            Talk to a lawyer that
+            <em style={{ fontFamily: "var(--font-spectral)", fontStyle: "italic", fontWeight: 400, color: C.burgundy }}>Indian</em> law,
             <br />
-            actually reads the{" "}
-            <em style={{ fontFamily: "var(--font-spectral)", fontStyle: "italic", fontWeight: 400, color: C.burgundy }}>Indian</em>
-            <br />
-            statute book.
+            in plain English.
           </h1>
           <p style={{ fontSize: 18, lineHeight: 1.55, color: C.textSub, marginBottom: 28, maxWidth: 480 }}>
             JurisGPT is a chat assistant for Indian law. Ask anything — incorporation, contracts, GST, founder agreements, compliance — and get a plain-English answer with the exact section, judgment, or circular it came from.
