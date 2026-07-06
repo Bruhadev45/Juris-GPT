@@ -5,6 +5,7 @@ node_modules/
 
 # Testing
 coverage/
+htmlcov/
 
 # Next.js
 .next/
@@ -20,6 +21,7 @@ dist/
 
 # Environment variables
 .env
+.env.bak*
 .env.local
 .env.development.local
 .env.test.local
@@ -35,6 +37,7 @@ dist/
 # OS
 .DS_Store
 Thumbs.db
+._*
 
 # Python
 __pycache__/
@@ -87,6 +90,7 @@ cloud_config.json
 # Model files (too large for GitHub)
 *.gguf
 backend/models/*.gguf
+backend/models/.cache/
 .coverage
 .render-secrets.txt
 .vercel-api-token
