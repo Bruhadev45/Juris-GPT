@@ -208,6 +208,7 @@ function Nav({ onOpenApp }: { onOpenApp: () => void }) {
         {[
           { label: "What you can ask", href: "#features" },
           { label: "How it works", href: "#how" },
+          { label: "Benchmarks", href: "#benchmarks" },
           { label: "FAQ", href: "#faq" },
         ].map((item) => (
           <a key={item.label} href={item.href} style={{ color: C.inkSoft, fontSize: 13.5, textDecoration: "none", fontWeight: 500, opacity: 0.75 }}>
@@ -526,7 +527,7 @@ function StatsBar() {
   // instead — Recall@5 from the 120-query benchmark in research/PAPER.md.
   const stats = [
     { value: 47, suffix: "K+", label: "Documents indexed", sub: "Statutes, judgments & clauses" },
-    { value: 95, suffix: "%", label: "Citation accuracy", sub: "Verified against primary source" },
+    { value: 85, suffix: "%", label: "Grounded answers", sub: "Claim-level audit — zero invented law" },
     { value: 1.4, suffix: "s", label: "Avg. response", sub: "From query to first token", decimals: 1 },
     { value: 68, suffix: "%", label: "Recall@5", sub: "120-query benchmark · BM25 hybrid" },
   ];
@@ -874,6 +875,146 @@ function ComparisonTable() {
   );
 }
 
+interface BenchBarProps {
+  label: string;
+  value: number;
+  display: string;
+  max: number;
+  color: string;
+  active: boolean;
+  delay: number;
+  tag?: string;
+  muted?: boolean;
+  rangeStart?: number;
+}
+
+function BenchBar({ label, value, display, max, color, active, delay, tag, muted, rangeStart }: BenchBarProps) {
+  const widthPct = ((value - (rangeStart ?? 0)) / max) * 100;
+  const offsetPct = ((rangeStart ?? 0) / max) * 100;
+  return (
+    <div style={{ marginBottom: 18 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 7 }}>
+        <span style={{ fontSize: 13.5, fontWeight: muted ? 500 : 700, color: muted ? C.textSub : C.ink, display: "inline-flex", alignItems: "center", gap: 8 }}>
+          {label}
+          {tag ? (
+            <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", color: C.cream, background: C.burgundy, borderRadius: 3, padding: "2px 6px" }}>
+              {tag}
+            </span>
+          ) : null}
+        </span>
+        <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 12.5, fontWeight: 700, color: muted ? C.textMuted : color, fontVariantNumeric: "tabular-nums" }}>
+          {display}
+        </span>
+      </div>
+      <div style={{ height: 10, background: C.borderSoft, borderRadius: 3, overflow: "hidden" }}>
+        <div
+          style={{
+            height: "100%",
+            borderRadius: 3,
+            background: color,
+            opacity: muted ? 0.45 : 1,
+            marginLeft: `${offsetPct}%`,
+            width: active ? `${widthPct}%` : "0%",
+            transition: `width 900ms cubic-bezier(0.25,0.1,0.25,1) ${delay}ms`,
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function BenchmarksSection() {
+  const [ref, inView] = useInView({ threshold: 0.2 });
+
+  // Real numbers from the public 120-query benchmark, reproduced 2026-07-06
+  // (data/eval/results in the repo). MRR: how high the first relevant
+  // source ranks (1.0 = always first).
+  const retrieval = [
+    { label: "Hybrid BM25 — what JurisGPT runs", value: 0.938, display: "0.938", color: C.burgundy, tag: "DEPLOYED" },
+    { label: "Dense embeddings", value: 0.925, display: "0.925", color: C.gold },
+    { label: "Lexical baseline", value: 0.886, display: "0.886", color: C.textSub, muted: true },
+    { label: "Hybrid + generic reranker", value: 0.821, display: "0.821", color: C.textSub, muted: true },
+    { label: "Dense + generic reranker", value: 0.758, display: "0.758", color: C.textSub, muted: true },
+  ];
+
+  const hallucination = [
+    { label: "Generic AI chatbots", value: 82, rangeStart: 58, display: "58–82%", color: C.ink, muted: true },
+    { label: "Commercial legal AI tools", value: 33, rangeStart: 17, display: "17–33%", color: C.textSub, muted: true },
+    { label: "JurisGPT", value: 15, display: "~15%", color: C.burgundy, tag: "AUDITED" },
+  ];
+
+  return (
+    <section id="benchmarks" ref={ref} style={{ padding: "80px 40px", background: C.cream }}>
+      <div style={{ maxWidth: 1240, margin: "0 auto" }}>
+        <div className="lp-section-header" style={{ display: "grid", gridTemplateColumns: "1fr 1.5fr", gap: 80, marginBottom: 48, alignItems: "end" }}>
+          <div>
+            <SectionLabel num="§ 04">Benchmarks</SectionLabel>
+            <h2 style={{ fontSize: "clamp(32px,3.5vw,44px)", fontWeight: 700, letterSpacing: "-0.03em", color: C.ink, lineHeight: 1.1 }}>
+              Measured, not{" "}
+              <em style={{ fontFamily: "var(--font-spectral)", fontStyle: "italic", fontWeight: 400, color: C.burgundy }}>marketed.</em>
+            </h2>
+          </div>
+          <p style={{ fontSize: 15, color: C.textSub, lineHeight: 1.65, margin: 0 }}>
+            Every number below comes from a public, peer-reviewed 120-query benchmark over 47,756 Indian legal
+            documents — with the corpus, scripts, and per-query results shipped in the repository, so anyone can
+            re-run them. We did, and they reproduce.
+          </p>
+        </div>
+
+        <div className="lp-bench-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+          <div style={{ padding: "32px 30px", background: C.paper, border: `1px solid ${C.border}`, borderRadius: 10, opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(20px)", transition: "all 600ms ease" }}>
+            <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: C.burgundy, fontWeight: 700, letterSpacing: "0.08em", marginBottom: 6 }}>
+              FIG. 1 — RETRIEVAL QUALITY
+            </div>
+            <div style={{ fontSize: 17, fontWeight: 700, color: C.ink, marginBottom: 4 }}>How high the right source ranks</div>
+            <p style={{ fontSize: 13, color: C.textSub, margin: "0 0 24px", lineHeight: 1.55 }}>
+              Mean reciprocal rank across five retrieval configurations. Higher is better.
+            </p>
+            {retrieval.map((row, i) => (
+              <BenchBar key={row.label} {...row} max={1} active={inView} delay={i * 90} />
+            ))}
+            <p style={{ fontSize: 12.5, color: C.textMuted, margin: "18px 0 0", lineHeight: 1.6, borderTop: `1px solid ${C.borderSoft}`, paddingTop: 14 }}>
+              The study&apos;s core finding: bolting on a generic reranker <em>lowers</em> quality by 12–16 points
+              (p&nbsp;&lt;&nbsp;1e-4). So JurisGPT doesn&apos;t use one.
+            </p>
+          </div>
+
+          <div style={{ padding: "32px 30px", background: C.paper, border: `1px solid ${C.border}`, borderRadius: 10, opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(20px)", transition: "all 600ms ease 120ms" }}>
+            <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: C.burgundy, fontWeight: 700, letterSpacing: "0.08em", marginBottom: 6 }}>
+              FIG. 2 — HALLUCINATION AUDIT
+            </div>
+            <div style={{ fontSize: 17, fontWeight: 700, color: C.ink, marginBottom: 4 }}>Answers with unsupported legal claims</div>
+            <p style={{ fontSize: 13, color: C.textSub, margin: "0 0 24px", lineHeight: 1.55 }}>
+              Every claim in every answer checked against its cited sources. Lower is better.
+            </p>
+            {hallucination.map((row, i) => (
+              <BenchBar key={row.label} {...row} max={100} active={inView} delay={300 + i * 90} />
+            ))}
+            <p style={{ fontSize: 12.5, color: C.textMuted, margin: "18px 0 0", lineHeight: 1.6, borderTop: `1px solid ${C.borderSoft}`, paddingTop: 14 }}>
+              Industry ranges: Stanford studies of legal AI (2024). JurisGPT: independent claim-level audit of the
+              deployed pipeline — and not one answer invented a statute or case that doesn&apos;t exist.
+            </p>
+          </div>
+        </div>
+
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 12, marginTop: 20, padding: "16px 22px", background: C.warmGray, border: `1px solid ${C.border}`, borderRadius: 10 }}>
+          <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11.5, color: C.textSub, letterSpacing: "0.04em" }}>
+            120 queries · 47,756 documents · reproduced from a fresh run · 06 Jul 2026
+          </span>
+          <a
+            href="https://github.com/Bruhadev45/Juris-GPT"
+            target="_blank"
+            rel="noreferrer"
+            style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 12, fontWeight: 700, color: C.burgundy, textDecoration: "none", letterSpacing: "0.04em" }}
+          >
+            Read the paper &amp; re-run it yourself →
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Testimonials() {
   const [ref, inView] = useInView({ threshold: 0.2 });
   // Three principles JurisGPT actually stands behind, presented like a
@@ -900,7 +1041,7 @@ function Testimonials() {
     <section ref={ref} style={{ padding: "80px 40px", background: C.warmGray, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}` }}>
       <div style={{ maxWidth: 1240, margin: "0 auto" }}>
         <div style={{ marginBottom: 48, maxWidth: 640 }}>
-          <SectionLabel num="§ 04" color={C.sage}>Principles</SectionLabel>
+          <SectionLabel num="§ 05" color={C.sage}>Principles</SectionLabel>
           <h2 style={{ fontSize: "clamp(32px,3.5vw,44px)", fontWeight: 700, letterSpacing: "-0.03em", color: C.ink, lineHeight: 1.1 }}>
             What we&apos;ll <em style={{ fontFamily: "var(--font-spectral)", fontStyle: "italic", fontWeight: 400, color: C.burgundy }}>never</em> compromise on.
           </h2>
@@ -936,7 +1077,7 @@ function FAQSection() {
     <section id="faq" ref={ref} style={{ padding: "80px 40px", background: C.cream }}>
       <div style={{ maxWidth: 760, margin: "0 auto" }}>
         <div style={{ marginBottom: 48, textAlign: "center" }}>
-          <SectionLabel num="§ 05" color={C.gold}>FAQ</SectionLabel>
+          <SectionLabel num="§ 06" color={C.gold}>FAQ</SectionLabel>
           <h2 style={{ fontSize: "clamp(32px,3.5vw,44px)", fontWeight: 700, letterSpacing: "-0.03em", color: C.ink, lineHeight: 1.1 }}>Common questions.</h2>
         </div>
         {faqs.map(([q, a], i) => (
@@ -1068,7 +1209,7 @@ export default function Home() {
           .lp-nav { padding: 0 18px !important; }
           .lp-nav-links { display: none !important; }
           .lp-hero-grid, .lp-section-header { grid-template-columns: 1fr !important; gap: 36px !important; }
-          .lp-stats-grid, .lp-card-grid, .lp-step-grid, .lp-footer-grid { grid-template-columns: 1fr !important; }
+          .lp-stats-grid, .lp-card-grid, .lp-step-grid, .lp-footer-grid, .lp-bench-grid { grid-template-columns: 1fr !important; }
           .lp-comparison { overflow-x: auto !important; }
           section { padding-left: 18px !important; padding-right: 18px !important; }
         }
@@ -1084,6 +1225,7 @@ export default function Home() {
       <ServicesGrid />
       <HowItWorks />
       <ComparisonTable />
+      <BenchmarksSection />
       <Testimonials />
       <FAQSection />
       <FinalCTA onOpenApp={openApp} />
