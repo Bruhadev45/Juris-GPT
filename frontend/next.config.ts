@@ -72,7 +72,7 @@ const nextConfig: NextConfig = {
               "img-src 'self' data: blob: https://img.clerk.com https://images.clerk.dev https://*.clerk.accounts.dev https://*.clerk.com https://*.supabase.co https://*.digitaloceanspaces.com",
               // API calls: our backend (Railway), Supabase, Clerk Frontend API + analytics.
               // In dev, also allow localhost backend ports + HMR websockets.
-              `connect-src 'self' https://jurisgpt-backend-production.up.railway.app https://*.supabase.co https://*.clerk.accounts.dev https://*.clerk.com https://*.vercel-insights.com ${devConnectSrc}`.trim(),
+              `connect-src 'self' https://jurisgpt-backend-production.up.railway.app https://jurisgpt-backend.fly.dev https://*.supabase.co https://*.clerk.accounts.dev https://*.clerk.com https://*.vercel-insights.com ${devConnectSrc}`.trim(),
               // Clerk shows captcha challenges in iframes from challenges.cloudflare.com.
               "frame-src 'self' https://*.clerk.accounts.dev https://*.clerk.com https://challenges.cloudflare.com",
               "worker-src 'self' blob:",

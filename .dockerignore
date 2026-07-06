@@ -3,12 +3,19 @@ backend/venv/
 backend/.venv/
 backend/__pycache__/
 backend/data/uploads/
+backend/models/
 data/raw/
 data/vectors/
-data/processed/
+data/processed/*
+# ...but the compressed corpus must ship (runtime decompresses it at boot)
+!data/processed/hf_legal_corpus.json.gz
+!data/processed/README.md
 data/cloud_cache/
 data/chroma_db/
+data/datasets/indian_legal/
+data/datasets/kaggle/
 data/eval/results/
+htmlcov/
 **/__pycache__/
 **/.next/
 **/node_modules/
@@ -18,7 +25,10 @@ data/eval/results/
 *.swp
 .DS_Store
 
-# Local secret files
+# Local secret files — NEVER bake into the image (fly/docker build from the
+# local directory, not git, so these exist at build time)
+**/.env
+**/.env.*
 .render-api-key
 .render-secrets.txt
 .vercel-api-token
