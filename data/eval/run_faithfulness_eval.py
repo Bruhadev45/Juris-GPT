@@ -130,7 +130,7 @@ def main() -> None:
     print(f"Generating + judging {len(queries)} answers "
           f"(config=hybrid_bm25, generator={rag.llm_type}, judge={JUDGE_MODEL})")
 
-    judge = anthropic.Anthropic()
+    judge = anthropic.Anthropic(max_retries=5)
 
     def evaluate(item: Dict[str, Any]) -> Dict[str, Any]:
         query = item["query"]
@@ -207,7 +207,12 @@ def main() -> None:
     with ThreadPoolExecutor(max_workers=6) as pool:
         list(pool.map(evaluate_and_persist, pending))
 
-    records = [json.loads(line) for line in progress_path.read_text().splitlines()]
+    records = []
+    for line in progress_path.read_text().splitlines():
+        try:
+            records.append(json.loads(line))
+        except ValueError:
+            continue  # truncated line from an interrupted earlier run
 
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     out = RESULTS_DIR / f"faithfulness_hybrid_bm25_{timestamp}.json"

@@ -527,7 +527,7 @@ function StatsBar() {
   // instead — Recall@5 from the 120-query benchmark in research/PAPER.md.
   const stats = [
     { value: 47, suffix: "K+", label: "Documents indexed", sub: "Statutes, judgments & clauses" },
-    { value: 85, suffix: "%", label: "Grounded answers", sub: "Claim-level audit — zero invented law" },
+    { value: 85, suffix: "%", label: "Core claims grounded", sub: "40-answer audit — no fabricated statutes" },
     { value: 1.4, suffix: "s", label: "Avg. response", sub: "From query to first token", decimals: 1 },
     { value: 68, suffix: "%", label: "Recall@5", sub: "120-query benchmark · BM25 hybrid" },
   ];
@@ -985,7 +985,7 @@ function BenchmarksSection() {
             </div>
             <div style={{ fontSize: 17, fontWeight: 700, color: C.ink, marginBottom: 4 }}>Answers with unsupported legal claims</div>
             <p style={{ fontSize: 13, color: C.textSub, margin: "0 0 24px", lineHeight: 1.55 }}>
-              Every claim in every answer checked against its cited sources. Lower is better.
+              Every claim in every answer checked against its cited sources (40-query audit). Lower is better.
             </p>
             {hallucination.map((row, i) => (
               <BenchBar key={row.label} {...row} max={100} active={inView} delay={300 + i * 90} />

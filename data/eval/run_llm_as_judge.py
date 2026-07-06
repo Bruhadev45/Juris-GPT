@@ -135,7 +135,9 @@ def _run_with_anthropic(results: Dict[str, dict], model: str, max_queries: int) 
 
     import anthropic
 
-    client = anthropic.Anthropic()
+    # Extra retries absorb 429s from the parallel workers so rate limits
+    # don't silently shrink the judged sample.
+    client = anthropic.Anthropic(max_retries=5)
 
     def judge_row(row: dict) -> dict:
         evidence_block = _build_evidence_block(row)

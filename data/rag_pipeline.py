@@ -406,7 +406,7 @@ class JurisGPTRAG:
 
                     self.llm = ChatAnthropic(**llm_kwargs)
                     self.llm_type = "anthropic"
-                    logger.info("Using %s Claude Sonnet 4 (primary)", provider_name)
+                    logger.info("Using %s %s (primary)", provider_name, model_name)
                     return
                 except ImportError:
                     logger.warning("langchain-anthropic not installed, trying OpenAI...")
@@ -657,6 +657,27 @@ class JurisGPTRAG:
         document["title_token_set"] = set(title_tokens)
         return document
 
+    @staticmethod
+    def _content_to_text(content: Any) -> str:
+        """Normalize LangChain message content to a plain string.
+
+        Claude models with thinking enabled return content as a list of
+        blocks (thinking + text); every downstream consumer (pydantic
+        response schemas, SSE token events, the evaluator's marker check)
+        requires a string.
+        """
+        if isinstance(content, str):
+            return content
+        if isinstance(content, list):
+            parts = []
+            for block in content:
+                if isinstance(block, str):
+                    parts.append(block)
+                elif isinstance(block, dict) and block.get("type") == "text":
+                    parts.append(block.get("text", ""))
+            return "".join(parts)
+        return str(content)
+
     # ─── Corpus Loading ──────────────────────────────────────────────
 
     @staticmethod
@@ -669,26 +690,50 @@ class JurisGPTRAG:
         REPRODUCIBILITY.json checksums) match the original file.
         """
         gz_path = path.with_name(path.name + ".gz")
-        if not path.exists() and gz_path.exists():
+
+        def _decompress() -> bool:
+            """Atomically decompress gz -> path via temp file + rename, so an
+            interrupted write can never leave a truncated corpus behind."""
             try:
                 import gzip
                 import shutil
 
-                with gzip.open(gz_path, "rb") as src, path.open("wb") as dst:
-                    shutil.copyfileobj(src, dst)
+                tmp_path = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+                try:
+                    with gzip.open(gz_path, "rb") as src, tmp_path.open("wb") as dst:
+                        shutil.copyfileobj(src, dst)
+                    os.replace(tmp_path, path)
+                finally:
+                    tmp_path.unlink(missing_ok=True)
                 logger.info("Decompressed corpus archive %s -> %s", gz_path, path)
+                return True
             except Exception as exc:
                 logger.warning("Could not decompress %s: %s", gz_path, exc)
-                return []
+                return False
+
+        if not path.exists() and gz_path.exists() and not _decompress():
+            return []
         if not path.exists():
             return []
-        try:
-            with path.open("r", encoding="utf-8") as handle:
-                data = json.load(handle)
-                return data if isinstance(data, list) else []
-        except Exception as exc:
-            logger.warning("Skipping corpus file %s: %s", path, exc)
-            return []
+        for attempt in range(2):
+            try:
+                with path.open("r", encoding="utf-8") as handle:
+                    data = json.load(handle)
+                    return data if isinstance(data, list) else []
+            except Exception as exc:
+                # A corrupt file left by an older, non-atomic writer (or disk
+                # fault) is recoverable if the archive is present: rebuild it
+                # once from the .gz instead of silently serving no corpus.
+                if attempt == 0 and gz_path.exists():
+                    logger.warning(
+                        "Corpus file %s unreadable (%s); rebuilding from %s",
+                        path, exc, gz_path,
+                    )
+                    if _decompress():
+                        continue
+                logger.warning("Skipping corpus file %s: %s", path, exc)
+                return []
+        return []
 
     def _init_local_corpus(self):
         """Load sample legal corpus for offline lexical retrieval."""
@@ -1403,7 +1448,10 @@ CONTEXT FROM LEGAL CORPUS:
 
                 chain = prompt | self.llm
                 response = chain.invoke({"context": context, "query": query})
-                answer = response.content
+                # Claude models with thinking return content as a list of
+                # blocks; downstream (pydantic schemas, SSE, evaluator) all
+                # require a plain string.
+                answer = self._content_to_text(response.content)
 
                 follow_ups = self._generate_follow_ups(query, citations)
                 model_name = "anthropic" if self.llm_type == "anthropic" else "openai"
@@ -1476,13 +1524,15 @@ CONTEXT FROM LEGAL CORPUS:
                 try:
                     for chunk in chain.stream({"query": query}):
                         if hasattr(chunk, 'content') and chunk.content:
-                            yield chunk.content
+                            text = self._content_to_text(chunk.content)
+                            if text:
+                                yield text
                     return
                 except Exception as stream_error:
                     logger.warning("Streaming not supported, falling back to invoke: %s", stream_error)
                     # Fall back to non-streaming
                     response = chain.invoke({"query": query})
-                    yield response.content
+                    yield self._content_to_text(response.content)
                     return
             except Exception as e:
                 logger.error("LLM streaming failed: %s", e)
