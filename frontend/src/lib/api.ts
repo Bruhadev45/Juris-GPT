@@ -265,6 +265,7 @@ export interface ChatMessageResponse {
   }>;
   suggestions: string[];
   model_used?: string;
+  corpus_as_of?: string;
   is_document?: boolean;
   document_type?: string;
   error?: string;
@@ -297,6 +298,7 @@ export interface StreamMetadataEvent {
   grounded: boolean;
   follow_up_questions: string[];
   model_used?: string;
+  corpus_as_of?: string;
   is_document?: boolean;
   document_type?: string;
 }

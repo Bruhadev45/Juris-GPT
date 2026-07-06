@@ -76,6 +76,7 @@ class ChatResponse(BaseModel):
 
     # Model provenance
     model_used: Optional[str] = None  # Which model generated the answer
+    corpus_as_of: Optional[str] = None  # How current the legal sources are
 
     # Document generation (separate workflow)
     is_document: bool = False
@@ -98,6 +99,30 @@ class JurisGPTChatbotService:
         self._initialization_error = None
         self._openai_client = None
         self._sample_faqs = None
+
+    def reload_corpus(self) -> Dict[str, Any]:
+        """Rebuild the RAG pipeline so newly ingested corpus files are indexed.
+
+        Used by the admin reload endpoint after data/ingest_updates.py runs,
+        so corpus refreshes don't require a redeploy.
+        """
+        self.rag = None
+        self._initialized = False
+        self._init_attempted = False
+        self._initialization_error = None
+        self._lazy_init()
+        if not (self._initialized and self.rag):
+            return {
+                "success": False,
+                "error": str(self._initialization_error or "RAG unavailable"),
+            }
+        stats = self.rag.get_corpus_stats()
+        return {
+            "success": True,
+            "total_documents": stats.total_documents,
+            "corpus_as_of": getattr(self.rag, "corpus_as_of", None),
+            "loaded_files": len(stats.loaded_files),
+        }
 
     def _lazy_init(self):
         """Lazy initialization of RAG pipeline"""
@@ -352,6 +377,7 @@ class JurisGPTChatbotService:
                 follow_up_questions=rag_response.follow_up_questions,
                 grounded=rag_response.grounded,
                 model_used=getattr(rag_response, "model_used", None),
+                corpus_as_of=getattr(self.rag, "corpus_as_of", None),
                 # Legacy fields
                 message=rag_response.answer,
                 sources=sources,

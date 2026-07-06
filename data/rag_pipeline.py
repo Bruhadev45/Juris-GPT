@@ -65,6 +65,9 @@ CURATED_SAMPLE_FILES = [
     "founder_agreement_clauses.json",
     "compliance_deadlines.json",
     "legal_news.json",
+    # Written by data/ingest_updates.py (Indian Kanoon refresh); absent until
+    # the first ingest run — the loader skips missing files.
+    "ingested_judgments.json",
 ]
 
 DEFAULT_CLOUD_CORPUS_FILES = [
@@ -198,6 +201,7 @@ class JurisGPTRAG:
         self.local_llm = None
         self.local_corpus: List[Dict[str, Any]] = []
         self.corpus_source = "uninitialized"
+        self.corpus_as_of: Optional[str] = None  # newest source-file date, "YYYY-MM-DD"
         self.corpus_error: Optional[str] = None
         self.loaded_corpus_files: List[str] = []
 
@@ -777,6 +781,27 @@ class JurisGPTRAG:
 
         self.local_corpus = corpus
         self.corpus_source = "local"
+        self.corpus_as_of = self._compute_corpus_as_of()
+
+    @staticmethod
+    def _compute_corpus_as_of() -> Optional[str]:
+        """Newest modification date across corpus source files ("YYYY-MM-DD").
+
+        Surfaced in chat responses so users know how current the sources are.
+        """
+        try:
+            from datetime import datetime, timezone
+
+            candidates = list(SAMPLES_DIR.glob("*.json"))
+            hf = PROCESSED_DIR / "hf_legal_corpus.json"
+            hf_gz = PROCESSED_DIR / "hf_legal_corpus.json.gz"
+            candidates.extend(p for p in (hf, hf_gz) if p.exists())
+            if not candidates:
+                return None
+            newest = max(p.stat().st_mtime for p in candidates)
+            return datetime.fromtimestamp(newest, tz=timezone.utc).strftime("%Y-%m-%d")
+        except Exception:
+            return None
 
     def _load_obsidian_corpus(self, corpus: List[Dict[str, Any]]) -> int:
         """Load notes from Obsidian vault into corpus."""

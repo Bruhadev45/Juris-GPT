@@ -987,6 +987,14 @@ function MessageBubble({
               {message?.modelUsed && (
                 <DataSourceBadge modelUsed={message.modelUsed} />
               )}
+              {message?.corpusAsOf && (
+                <span
+                  className="text-[11px] text-muted-foreground"
+                  title="Date of the newest document in the legal corpus these sources were retrieved from"
+                >
+                  Sources current to {message.corpusAsOf}
+                </span>
+              )}
             </div>
           )}
 
@@ -1773,6 +1781,7 @@ function ChatPageContent() {
         grounded?: boolean;
         follow_up_questions?: string[];
         model_used?: string;
+        corpus_as_of?: string;
         is_document?: boolean;
         document_type?: string;
       } = {};
@@ -1829,6 +1838,7 @@ function ChatPageContent() {
                 grounded: metadata.grounded || false,
                 followUpQuestions: metadata.follow_up_questions,
                 modelUsed: metadata.model_used || undefined,
+                corpusAsOf: metadata.corpus_as_of || undefined,
                 isDocument: metadata.is_document || false,
                 documentType: metadata.document_type || undefined,
               });
@@ -1890,6 +1900,7 @@ function ChatPageContent() {
           grounded: data.grounded || false,
           followUpQuestions: data.follow_up_questions || undefined,
           modelUsed: data.model_used || undefined,
+          corpusAsOf: data.corpus_as_of || undefined,
           suggestions: data.suggestions || undefined,
           sources: data.sources || undefined,
         });

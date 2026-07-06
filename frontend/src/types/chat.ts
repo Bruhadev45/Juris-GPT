@@ -34,6 +34,7 @@ export interface ChatMessage {
   grounded?: boolean;
   // Data source provenance
   modelUsed?: string;
+  corpusAsOf?: string; // how current the cited legal sources are (YYYY-MM-DD)
   // Legacy fields for backwards compatibility
   sources?: LegacySource[];
   suggestions?: string[];

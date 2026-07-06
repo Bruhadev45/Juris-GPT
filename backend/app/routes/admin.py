@@ -133,3 +133,18 @@ async def request_changes(
             logger.error("Failed to send changes-requested email for matter %s: %s", matter_id, e)
 
     return {"status": "changes_requested", "message": "Changes requested successfully"}
+
+
+@router.post("/reload-corpus")
+async def reload_corpus(admin: dict = Depends(require_admin)):
+    """Rebuild the RAG corpus and BM25 index without a redeploy.
+
+    Run data/ingest_updates.py (Indian Kanoon refresh) first, then call this
+    endpoint so the chatbot can cite the newly ingested judgments.
+    """
+    from app.services.chatbot_service import chatbot_service
+
+    result = chatbot_service.reload_corpus()
+    if not result.get("success"):
+        raise HTTPException(status_code=503, detail=result.get("error", "reload failed"))
+    return result

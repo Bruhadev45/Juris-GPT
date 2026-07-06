@@ -62,6 +62,7 @@ class ChatMessageResponse(BaseModel):
     grounded: bool = True  # Whether answer is supported by citations
     error: Optional[str] = None
     model_used: Optional[str] = None  # Which model generated the answer
+    corpus_as_of: Optional[str] = None  # How current the legal sources are
 
     # Legacy fields for backwards compatibility
     message: str = ""  # Alias for answer
@@ -119,6 +120,7 @@ def _response_to_api(response: ChatResponse) -> ChatMessageResponse:
         grounded=response.grounded,
         error=response.error,
         model_used=response.model_used,
+        corpus_as_of=response.corpus_as_of,
         # Legacy fields
         message=response.answer,
         sources=response.sources,
@@ -195,6 +197,7 @@ async def stream_chat_message(request: ChatMessageRequest):
                     "grounded": response.grounded,
                     "follow_up_questions": response.follow_up_questions,
                     "model_used": response.model_used,
+                    "corpus_as_of": response.corpus_as_of,
                     "is_document": response.is_document,
                     "document_type": response.document_type,
                 }
@@ -243,6 +246,7 @@ async def stream_chat_message(request: ChatMessageRequest):
                     "grounded": confidence in ("high", "medium"),
                     "follow_up_questions": follow_ups,
                     "model_used": "local_legal_llama",
+                    "corpus_as_of": getattr(rag, "corpus_as_of", None),
                     "is_document": False,
                     "document_type": None,
                 }
@@ -277,6 +281,7 @@ async def stream_chat_message(request: ChatMessageRequest):
                     "grounded": response.grounded,
                     "follow_up_questions": response.follow_up_questions,
                     "model_used": getattr(response, "model_used", None),
+                    "corpus_as_of": getattr(response, "corpus_as_of", None),
                     "is_document": response.is_document,
                     "document_type": response.document_type,
                 }
