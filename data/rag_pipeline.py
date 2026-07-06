@@ -387,11 +387,12 @@ class JurisGPTRAG:
                     # Build kwargs - add base_url if using PageGrid or custom endpoint
                     # PageGrid uses different model names: claude-sonnet-4-6, claude-haiku-4-5, claude-opus-4-6
                     is_pagegrid = anthropic_base_url and "pagegrid" in anthropic_base_url.lower()
-                    model_name = "claude-sonnet-4-6" if is_pagegrid else "claude-sonnet-4-20250514"
+                    # claude-sonnet-4-20250514 was retired 2026-06-15; Sonnet 5
+                    # rejects non-default sampling params, so no temperature here.
+                    model_name = "claude-sonnet-4-6" if is_pagegrid else "claude-sonnet-5"
 
                     llm_kwargs = {
                         "model": model_name,
-                        "temperature": 0.3,
                         "max_tokens": 4000,
                         "api_key": anthropic_key
                     }
@@ -660,7 +661,25 @@ class JurisGPTRAG:
 
     @staticmethod
     def _read_json_records(path: Path) -> List[Dict[str, Any]]:
-        """Read a JSON list from disk. Invalid or missing files are skipped."""
+        """Read a JSON list from disk. Invalid or missing files are skipped.
+
+        Large corpus files ship in the repository as ``.gz`` archives to stay
+        under GitHub's file-size limit; if ``path`` is absent but ``path.gz``
+        exists, it is decompressed once so the on-disk bytes (and their
+        REPRODUCIBILITY.json checksums) match the original file.
+        """
+        gz_path = path.with_name(path.name + ".gz")
+        if not path.exists() and gz_path.exists():
+            try:
+                import gzip
+                import shutil
+
+                with gzip.open(gz_path, "rb") as src, path.open("wb") as dst:
+                    shutil.copyfileobj(src, dst)
+                logger.info("Decompressed corpus archive %s -> %s", gz_path, path)
+            except Exception as exc:
+                logger.warning("Could not decompress %s: %s", gz_path, exc)
+                return []
         if not path.exists():
             return []
         try:
