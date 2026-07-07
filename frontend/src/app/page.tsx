@@ -527,7 +527,7 @@ function StatsBar() {
   // instead — Recall@5 from the 120-query benchmark in research/PAPER.md.
   const stats = [
     { value: 47, suffix: "K+", label: "Documents indexed", sub: "Statutes, judgments & clauses" },
-    { value: 85, suffix: "%", label: "Core claims grounded", sub: "40-answer audit — no fabricated statutes" },
+    { value: 90, suffix: "%", label: "Core claims grounded", sub: "40-answer audit — no fabricated statutes" },
     { value: 1.4, suffix: "s", label: "Avg. response", sub: "From query to first token", decimals: 1 },
     { value: 68, suffix: "%", label: "Recall@5", sub: "120-query benchmark · BM25 hybrid" },
   ];
@@ -940,7 +940,7 @@ function BenchmarksSection() {
   const hallucination = [
     { label: "Generic AI chatbots", value: 82, rangeStart: 58, display: "58–82%", color: C.ink, muted: true },
     { label: "Commercial legal AI tools", value: 33, rangeStart: 17, display: "17–33%", color: C.textSub, muted: true },
-    { label: "JurisGPT", value: 15, display: "~15%", color: C.burgundy, tag: "AUDITED" },
+    { label: "JurisGPT", value: 10, display: "~10%", color: C.burgundy, tag: "AUDITED" },
   ];
 
   return (

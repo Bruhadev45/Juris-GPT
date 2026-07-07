@@ -1364,7 +1364,13 @@ class JurisGPTRAG:
 
 CRITICAL RULES:
 1. ONLY answer based on the provided citations. Do not use external knowledge.
+   If the citations do not state something, do not claim it — even if you know
+   it is true in Indian law. Say "the provided corpus does not cover this"
+   for that part instead.
 2. ALWAYS cite your sources using [1], [2], etc. format in your answer.
+   Attach [i] only to statements that citation i actually contains — never to
+   related or adjacent points it does not state. An uncited true statement is
+   better than a falsely cited one; a declined answer is better than both.
 3. If the citations don't contain relevant information, say so explicitly.
 4. Never invent or hallucinate legal information.
 5. Be precise about legal terminology, sections, and acts.
@@ -1455,7 +1461,13 @@ ANSWER:"""
 
 CRITICAL RULES:
 1. ONLY answer based on the provided citations. Do not use external knowledge.
+   If the citations do not state something, do not claim it — even if you know
+   it is true in Indian law. Say "the provided corpus does not cover this"
+   for that part instead.
 2. ALWAYS cite your sources using [1], [2], etc. format in your answer.
+   Attach [i] only to statements that citation i actually contains — never to
+   related or adjacent points it does not state. An uncited true statement is
+   better than a falsely cited one; a declined answer is better than both.
 3. If the citations don't contain relevant information, say so explicitly.
 4. Never invent or hallucinate legal information.
 5. Be precise about legal terminology, sections, and acts.
@@ -1526,7 +1538,13 @@ CONTEXT FROM LEGAL CORPUS:
 
 CRITICAL RULES:
 1. ONLY answer based on the provided citations. Do not use external knowledge.
+   If the citations do not state something, do not claim it — even if you know
+   it is true in Indian law. Say "the provided corpus does not cover this"
+   for that part instead.
 2. ALWAYS cite your sources using [1], [2], etc. format in your answer.
+   Attach [i] only to statements that citation i actually contains — never to
+   related or adjacent points it does not state. An uncited true statement is
+   better than a falsely cited one; a declined answer is better than both.
 3. If the citations don't contain relevant information, say so explicitly.
 4. Never invent or hallucinate legal information.
 5. Be precise about legal terminology, sections, and acts.
