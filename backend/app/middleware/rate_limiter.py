@@ -9,8 +9,9 @@ from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from typing import Dict, Tuple
 
-from fastapi import Request, HTTPException
+from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import JSONResponse
 
 
 class RateLimiter:
@@ -141,9 +142,13 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         allowed, info = await rate_limiter.is_allowed(client_ip)
 
         if not allowed:
-            raise HTTPException(
+            # Return rather than raise: FastAPI's HTTPException handlers only
+            # run inside the routing layer, so raising here escapes as a bare
+            # 500 and the client loses both the 429 status and Retry-After —
+            # meaning it cannot back off correctly.
+            return JSONResponse(
                 status_code=429,
-                detail=info,
+                content={"detail": info},
                 headers={
                     "Retry-After": str(info.get("retry_after", 60)),
                     "X-RateLimit-Limit": str(info.get("requests_allowed", 60)),
