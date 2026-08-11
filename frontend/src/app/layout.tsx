@@ -105,7 +105,12 @@ export default function RootLayout({
         className={`${inter.variable} ${spectral.variable} ${jetBrainsMono.variable} antialiased font-sans`}
         style={{ fontFamily: "var(--font-inter), system-ui, -apple-system, sans-serif" }}
       >
-        <ClerkProvider appearance={clerkAppearance}>
+        {/*
+          Telemetry is disabled at the source: users type privileged legal questions,
+          so no usage data should leave the browser for clerk-telemetry.com. This also
+          avoids CSP violations, since connect-src intentionally omits that host.
+        */}
+        <ClerkProvider appearance={clerkAppearance} telemetry={{ disabled: true }}>
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
             <AuthProvider>
               <ErrorBoundary>{children}</ErrorBoundary>

@@ -1906,6 +1906,11 @@ function ChatPageContent() {
         });
       } catch (fallbackErr) {
         console.error("Chat fallback also failed:", fallbackErr);
+        // Only reached when the non-streaming fallback ALSO fails, so a toast here
+        // never fires for a stream failure that the fallback silently recovered from.
+        toast.error("Couldn't reach the server", {
+          description: "Your message wasn't answered. Check your connection and try again.",
+        });
         addMessage({
           id: aiMessageId,
           role: "assistant",

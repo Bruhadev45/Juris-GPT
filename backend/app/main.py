@@ -33,6 +33,7 @@ from app.routes import (
     eval as eval_routes,
     cases,
     lawyers,
+    demo,
 )
 
 # Import middleware
@@ -153,6 +154,11 @@ app.include_router(csrf_router, prefix="/api", tags=["csrf"])
 
 # ============== Authentication Routes ==============
 app.include_router(auth.router, prefix="/api/auth", tags=["authentication"])
+
+# ============== Public Demo Route ==============
+# Unauthenticated, rate-limited, read-only. Kept separate from /api/chat so the
+# authenticated surface keeps its require_auth dependency untouched.
+app.include_router(demo.router, prefix="/api/demo", tags=["demo"])
 
 # ============== Core Business Routes ==============
 app.include_router(companies.router, prefix="/api/companies", tags=["companies"])

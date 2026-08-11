@@ -22,6 +22,10 @@ UNSAFE_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
 # headers, so cookie-based CSRF is moot for chat. Removing the exemption
 # closes the cross-site-POST hole the security audit flagged.
 CSRF_EXEMPT_PATHS = {
+    # Public demo endpoint: unauthenticated and cookie-less, so there is no
+    # ambient credential for a cross-site POST to abuse. It has its own
+    # per-caller rate limit instead.
+    "/api/demo/",
     "/api/webhooks/",
     "/api/auth/login",
     "/api/auth/register",
