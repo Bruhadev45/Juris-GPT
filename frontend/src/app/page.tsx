@@ -540,7 +540,12 @@ function Hero({ onOpenApp }: { onOpenApp: () => void }) {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, marginRight: 12 }} aria-hidden="true">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke={C.burgundy} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            <span style={{ flex: 1, fontSize: 14.5, color: C.ink, lineHeight: 1.4 }}>
+            {/* nowrap + clip so the rotating placeholder behaves like a real
+                text field. Without this it wrapped to three lines on a 390px
+                screen, growing the pill ~60px and shifting the whole hero on
+                every rotation. minWidth:0 lets the flex child shrink below its
+                content width instead of forcing the wrap. */}
+            <span style={{ flex: 1, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", fontSize: 14.5, color: C.ink, lineHeight: 1.4 }}>
               {typed}
               <span style={{ display: "inline-block", width: 2, height: 16, background: C.ink, marginLeft: 2, verticalAlign: "middle", animation: "blink 1s step-end infinite" }} />
             </span>
@@ -1215,12 +1220,57 @@ function FinalCTA({ onOpenApp }: { onOpenApp: () => void }) {
   );
 }
 
+const REPO_URL = "https://github.com/Bruhadev45/Juris-GPT";
+
+// Footer entries carry an explicit href. Anything without a destination yet is
+// rendered as plain text rather than href="#" — a link that looks clickable and
+// does nothing is worse than no link, and the Legal column especially should
+// not imply policies exist before they're written.
+type FooterLink = { label: string; href?: string; external?: boolean };
+
 function Footer() {
-  const cols = [
-    { title: "Product", links: ["Legal Q&A", "Drafting", "Compliance", "Document analysis", "Case law", "RTI assistant"] },
-    { title: "Resources", links: ["Documentation", "API", "Blog", "Legal updates", "Case studies"] },
-    { title: "Company", links: ["About", "Careers", "Press", "Partners", "Contact"] },
-    { title: "Legal", links: ["Privacy", "Terms", "DPDP", "Security", "Cookies"] },
+  const cols: { title: string; links: FooterLink[] }[] = [
+    {
+      title: "Product",
+      links: [
+        { label: "Legal Q&A", href: "/chat" },
+        { label: "Drafting", href: "/dashboard/drafting" },
+        { label: "Compliance", href: "/dashboard/compliance" },
+        { label: "Document analysis", href: "/dashboard/analyzer" },
+        { label: "Case law", href: "/dashboard/cases" },
+        { label: "RTI assistant", href: "/dashboard/rti" },
+      ],
+    },
+    {
+      title: "Resources",
+      links: [
+        { label: "Documentation", href: REPO_URL, external: true },
+        { label: "API", href: `${REPO_URL}#api`, external: true },
+        { label: "Blog" },
+        { label: "Legal updates", href: "/dashboard/news" },
+        { label: "Case studies" },
+      ],
+    },
+    {
+      title: "Company",
+      links: [
+        { label: "About" },
+        { label: "Careers" },
+        { label: "Press" },
+        { label: "Partners" },
+        { label: "Contact", href: `${REPO_URL}/issues`, external: true },
+      ],
+    },
+    {
+      title: "Legal",
+      links: [
+        { label: "Privacy" },
+        { label: "Terms" },
+        { label: "DPDP" },
+        { label: "Security" },
+        { label: "Cookies" },
+      ],
+    },
   ];
   return (
     <footer style={{ background: C.cream, borderTop: `1px solid ${C.border}`, padding: "64px 40px 28px" }}>
@@ -1242,8 +1292,18 @@ function Footer() {
             <div key={col.title}>
               <div style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11, color: C.textMuted, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 16 }}>{col.title}</div>
               {col.links.map((link) => (
-                <div key={link} style={{ marginBottom: 9 }}>
-                  <a href="#" style={{ fontSize: 13.5, color: C.inkSoft, textDecoration: "none" }}>{link}</a>
+                <div key={link.label} style={{ marginBottom: 9 }}>
+                  {link.href ? (
+                    <a
+                      href={link.href}
+                      {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                      style={{ fontSize: 13.5, color: C.inkSoft, textDecoration: "none" }}
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <span style={{ fontSize: 13.5, color: C.textMuted }}>{link.label}</span>
+                  )}
                 </div>
               ))}
             </div>
