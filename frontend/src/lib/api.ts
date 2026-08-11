@@ -7,6 +7,25 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const TOKEN_STORAGE_KEY = "jurisgpt.access_token";
 
 /**
+ * Error that preserves the HTTP status so callers can tell "you need to sign
+ * in" (401/403) apart from "the server broke" (5xx). Throwing a plain Error
+ * loses that distinction and forces every caller into a generic message.
+ */
+export class ApiError extends Error {
+  readonly status: number;
+
+  constructor(status: number, statusText: string) {
+    super(`API error: ${statusText || status}`);
+    this.name = "ApiError";
+    this.status = status;
+  }
+
+  get isAuthError(): boolean {
+    return this.status === 401 || this.status === 403;
+  }
+}
+
+/**
  * Extract CSRF token from cookies
  */
 function getCsrfToken(): string | null {
@@ -317,18 +336,14 @@ export const chatApi = {
     context?: Record<string, unknown>,
     conversationHistory?: Array<{ role: string; content: string }>
   ): Promise<ChatMessageResponse> {
-    const headers: Record<string, string> = { "Content-Type": "application/json" };
-    const csrfToken = getCsrfToken();
-    if (csrfToken) {
-      headers["X-CSRF-Token"] = csrfToken;
-    }
-
-    const response = await fetch(`${API_URL}/api/chat/message`, {
+    // Use authFetch so the Bearer token goes out alongside the CSRF header.
+    // Hand-rolling the headers here meant signed-in users sent no
+    // Authorization at all, so every message was rejected by the backend.
+    const response = await authFetch("/api/chat/message", {
       method: "POST",
-      headers,
       body: JSON.stringify({ message, context, conversation_history: conversationHistory }),
     });
-    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    if (!response.ok) throw new ApiError(response.status, response.statusText);
     return response.json();
   },
 

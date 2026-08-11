@@ -6,7 +6,7 @@ import { Send, Scale, Loader2, BookOpen, ArrowLeft, Sparkles } from "lucide-reac
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { chatApi, ChatMessageResponse } from "@/lib/api";
+import { ApiError, chatApi, ChatMessageResponse } from "@/lib/api";
 
 interface Message {
   role: "user" | "assistant";
@@ -58,10 +58,18 @@ export default function ChatPage() {
         limitations: response.limitations,
       };
       setMessages((prev) => [...prev, assistantMsg]);
-    } catch {
+    } catch (error: unknown) {
+      // Tell the user which problem they actually have. "Try again" is useless
+      // advice when the real answer is "sign in first" — retrying never works.
+      const needsSignIn = error instanceof ApiError && error.isAuthError;
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Sorry, I encountered an error. Please try again." },
+        {
+          role: "assistant",
+          content: needsSignIn
+            ? "You need to be signed in to use the assistant. Sign in and ask again."
+            : "Sorry, I encountered an error. Please try again.",
+        },
       ]);
     } finally {
       setLoading(false);
