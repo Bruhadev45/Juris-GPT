@@ -523,7 +523,10 @@ function Hero({ onOpenApp }: { onOpenApp: () => void }) {
     <section style={{ position: "relative", minHeight: "100vh", display: "flex", alignItems: "center", padding: "110px 40px 60px", background: C.cream, overflow: "hidden" }}>
       <GridBG />
       <div className="lp-hero-grid" style={{ maxWidth: 1240, margin: "0 auto", width: "100%", display: "grid", gridTemplateColumns: "1.05fr 1fr", gap: 72, alignItems: "center", position: "relative", zIndex: 1 }}>
-        <div style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(20px)", transition: "all 600ms cubic-bezier(0.25,0.1,0.25,1)" }}>
+        {/* minWidth:0 — a grid item defaults to min-width:auto, which refuses to
+            shrink below its content. With the nowrap placeholder below, that let
+            the search pill push to 513px inside a 390px screen and clip the CTA. */}
+        <div style={{ minWidth: 0, opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(20px)", transition: "all 600ms cubic-bezier(0.25,0.1,0.25,1)" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 12px", background: C.paper, border: `1px solid ${C.border}`, borderRadius: 100, marginBottom: 28, boxShadow: "0 1px 2px rgba(0,0,0,0.03)" }}>
             <span style={{ width: 5, height: 5, borderRadius: "50%", background: C.sage }} />
             <span style={{ fontSize: 12, color: C.inkSoft, fontWeight: 500 }}>The friendly legal chat for Indian founders</span>
@@ -1163,17 +1166,43 @@ function FAQSection() {
           <SectionLabel num="§ 06" color={C.gold}>FAQ</SectionLabel>
           <h2 style={{ fontSize: "clamp(32px,3.5vw,44px)", fontWeight: 700, letterSpacing: "-0.03em", color: C.ink, lineHeight: 1.1 }}>Common questions.</h2>
         </div>
-        {faqs.map(([q, a], i) => (
-          <div key={q} style={{ borderBottom: `1px solid ${C.border}`, opacity: inView ? 1 : 0, transition: `opacity 500ms ease ${i * 60}ms` }}>
-            <button onClick={() => setOpen(open === i ? null : i)} style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "22px 0", background: "transparent", border: "none", cursor: "pointer", textAlign: "left" }}>
-              <span style={{ fontSize: 16, fontWeight: 500, color: C.ink, paddingRight: 20 }}>{q}</span>
-              <span style={{ flexShrink: 0, fontFamily: "var(--font-jetbrains-mono)", fontSize: 18, color: C.textSub, fontWeight: 400, transition: "transform 200ms", transform: open === i ? "rotate(45deg)" : "rotate(0deg)" }}>+</span>
-            </button>
-            <div style={{ overflow: "hidden", maxHeight: open === i ? 200 : 0, transition: "max-height 280ms ease" }}>
-              <p style={{ paddingBottom: 22, fontSize: 14.5, color: C.textSub, lineHeight: 1.7, maxWidth: 600 }}>{a}</p>
+        {faqs.map(([q, a], i) => {
+          const isOpen = open === i;
+          // Wire up the button/panel relationship so screen readers announce
+          // expanded state. Without aria-expanded these read as plain buttons
+          // and the answer's visibility is invisible to assistive tech.
+          const panelId = `faq-panel-${i}`;
+          const buttonId = `faq-button-${i}`;
+          return (
+            <div key={q} style={{ borderBottom: `1px solid ${C.border}`, opacity: inView ? 1 : 0, transition: `opacity 500ms ease ${i * 60}ms` }}>
+              <button
+                type="button"
+                id={buttonId}
+                aria-expanded={isOpen}
+                aria-controls={panelId}
+                onClick={() => setOpen(isOpen ? null : i)}
+                style={{ width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "22px 0", background: "transparent", border: "none", cursor: "pointer", textAlign: "left" }}
+              >
+                <span style={{ fontSize: 16, fontWeight: 500, color: C.ink, paddingRight: 20 }}>{q}</span>
+                <span aria-hidden="true" style={{ flexShrink: 0, fontFamily: "var(--font-jetbrains-mono)", fontSize: 18, color: C.textSub, fontWeight: 400, transition: "transform 200ms", transform: isOpen ? "rotate(45deg)" : "rotate(0deg)" }}>+</span>
+              </button>
+              <div
+                id={panelId}
+                role="region"
+                aria-labelledby={buttonId}
+                // Collapsed answers stay in the DOM for the height transition,
+                // so hide them from assistive tech too — otherwise a screen
+                // reader reads all five answers as if they were on screen.
+                // aria-hidden rather than `hidden`: the latter is display:none,
+                // which would kill the max-height animation.
+                aria-hidden={!isOpen}
+                style={{ overflow: "hidden", maxHeight: isOpen ? 200 : 0, transition: "max-height 280ms ease" }}
+              >
+                <p style={{ paddingBottom: 22, fontSize: 14.5, color: C.textSub, lineHeight: 1.7, maxWidth: 600 }}>{a}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );
