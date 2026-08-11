@@ -16,6 +16,9 @@ const C = {
   burgundy: "#7B1E2E",
   burgundyDark: "#5C1622",
   gold: "#B8884D",
+  // AA-compliant gold for small text on goldPale (5.0:1). Plain `gold` on
+  // `goldPale` is 2.67:1 and fails at 12px.
+  goldDeep: "#7F5C1D",
   goldPale: "#F5EBD8",
   sage: "#4A6B5C",
   sagePale: "#E8EFE9",
@@ -915,14 +918,28 @@ function ComparisonTable() {
     ["Companies Act + FEMA + GST", "partial", "no", "yes"],
     ["24/7 availability", "no", "yes", "yes"],
   ];
+  // Each cell carries its meaning three ways: glyph, accessible name, and the
+  // legend under the table. The glyph alone was undecodable — "◐" tells nobody
+  // it means "partial", and a screen reader announced nothing useful.
+  // C.gold on C.goldPale measured 2.67:1, below the 4.5:1 AA floor at 12px, so
+  // the partial state uses the deeper gold.
   const cell = (value: string, highlight = false) => {
-    const styles: Record<string, { bg: string; fg: string; label: string }> = {
-      yes: { bg: highlight ? C.ink : C.sagePale, fg: highlight ? C.cream : C.sage, label: "✓" },
-      no: { bg: "transparent", fg: C.textMuted, label: "—" },
-      partial: { bg: C.goldPale, fg: C.gold, label: "◐" },
+    const styles: Record<string, { bg: string; fg: string; label: string; text: string }> = {
+      yes: { bg: highlight ? C.ink : C.sagePale, fg: highlight ? C.cream : C.sage, label: "✓", text: "Yes" },
+      no: { bg: "transparent", fg: C.textMuted, label: "—", text: "No" },
+      partial: { bg: C.goldPale, fg: C.goldDeep, label: "◐", text: "Partial" },
     };
     const s = styles[value];
-    return <span style={{ width: 22, height: 22, borderRadius: "50%", background: s.bg, color: s.fg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, fontFamily: "var(--font-jetbrains-mono)" }}>{s.label}</span>;
+    return (
+      <span
+        role="img"
+        aria-label={s.text}
+        title={s.text}
+        style={{ width: 22, height: 22, borderRadius: "50%", background: s.bg, color: s.fg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, fontFamily: "var(--font-jetbrains-mono)" }}
+      >
+        {s.label}
+      </span>
+    );
   };
   return (
     <section ref={ref} style={{ padding: "80px 40px", background: C.cream }}>
@@ -954,6 +971,20 @@ function ComparisonTable() {
               <div style={{ padding: 14, borderLeft: `1px solid ${C.borderSoft}`, display: "flex", justifyContent: "center" }}>{cell(row[2])}</div>
               <div style={{ padding: 14, borderLeft: `1px solid ${C.border}`, background: C.cream, display: "flex", justifyContent: "center" }}>{cell(row[3], true)}</div>
             </div>
+          ))}
+        </div>
+        {/* Decodes the glyphs without needing a hover — the "◐" meant nothing
+            on its own, and hover is not available on touch at all. */}
+        <div style={{ display: "flex", gap: 20, justifyContent: "center", flexWrap: "wrap", marginTop: 18, fontSize: 12.5, color: C.textSub }}>
+          {[
+            { v: "yes", t: "Yes" },
+            { v: "partial", t: "Partial" },
+            { v: "no", t: "No" },
+          ].map((item) => (
+            <span key={item.v} style={{ display: "inline-flex", alignItems: "center", gap: 7 }}>
+              {cell(item.v)}
+              {item.t}
+            </span>
           ))}
         </div>
       </div>
