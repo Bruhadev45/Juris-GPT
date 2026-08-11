@@ -139,7 +139,11 @@ function Counter({ value, suffix, decimals = 0, active }: { value: number; suffi
   return (
     <>
       {decimals ? current.toFixed(decimals) : Math.floor(current)}
-      <span style={{ color: C.burgundy, fontWeight: 600 }}>{suffix}</span>
+      {/* Inherit the number's color so the unit stays legible on any surface.
+          A fixed burgundy here vanished against the burgundy stats gradient,
+          turning "47K+" into "47" and "90%" into "90". Opacity keeps the unit
+          visually secondary to the figure without dropping below AA. */}
+      <span style={{ color: "currentColor", opacity: 0.6, fontWeight: 600 }}>{suffix}</span>
     </>
   );
 }
