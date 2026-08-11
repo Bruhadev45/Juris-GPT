@@ -171,6 +171,19 @@ function SectionLabel({ num, children, color = C.burgundy }: { num: string; chil
   );
 }
 
+// One size for every peer section heading. These had drifted to 48px on two
+// sections and 44px on four others (with lineHeight drifting 1.05 vs 1.1),
+// which reads as sloppiness rather than hierarchy at that small a delta.
+// 48px sits cleanly under the 64px H1. The closing CTA deliberately stays
+// larger at 56px — that is a tier, not drift.
+const SECTION_H2: React.CSSProperties = {
+  fontSize: "clamp(32px,3.5vw,48px)",
+  fontWeight: 700,
+  letterSpacing: "-0.03em",
+  color: C.ink,
+  lineHeight: 1.05,
+};
+
 // Single source for the section links so the desktop row and the mobile
 // disclosure panel can never drift apart.
 const NAV_ITEMS = [
@@ -796,7 +809,7 @@ function ServicesGrid() {
         <div className="lp-section-header" style={{ display: "grid", gridTemplateColumns: "1fr 1.5fr", gap: 80, marginBottom: 48, alignItems: "end" }}>
           <div>
             <SectionLabel num="§ 01">What you can ask</SectionLabel>
-            <h2 style={{ fontSize: "clamp(32px,3.5vw,48px)", fontWeight: 700, letterSpacing: "-0.03em", color: C.ink, lineHeight: 1.05 }}>
+            <h2 style={SECTION_H2}>
               Ask{" "}
               <em style={{ fontFamily: "var(--font-spectral)", fontStyle: "italic", fontWeight: 400, color: C.burgundy }}>anything.</em>
               <br />
@@ -871,7 +884,7 @@ function HowItWorks() {
       <div style={{ maxWidth: 1240, margin: "0 auto" }}>
         <div style={{ marginBottom: 64, maxWidth: 720 }}>
           <SectionLabel num="§ 02" color={C.gold}>Workflow</SectionLabel>
-          <h2 style={{ fontSize: "clamp(32px,3.5vw,48px)", fontWeight: 700, letterSpacing: "-0.03em", color: C.ink, lineHeight: 1.05 }}>
+          <h2 style={SECTION_H2}>
             From question to citation,
             <br />
             <em style={{ fontFamily: "var(--font-spectral)", fontStyle: "italic", fontWeight: 400, color: C.burgundy }}>in four steps.</em>
@@ -916,7 +929,7 @@ function ComparisonTable() {
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <div style={{ marginBottom: 48, textAlign: "center" }}>
           <SectionLabel num="§ 03">Comparison</SectionLabel>
-          <h2 style={{ fontSize: "clamp(32px,3.5vw,44px)", fontWeight: 700, letterSpacing: "-0.03em", color: C.ink, lineHeight: 1.1 }}>
+          <h2 style={SECTION_H2}>
             Why teams switch to <em style={{ fontFamily: "var(--font-spectral)", fontStyle: "italic", fontWeight: 400, color: C.burgundy }}>JurisGPT</em>.
           </h2>
         </div>
@@ -1031,7 +1044,7 @@ function BenchmarksSection() {
         <div className="lp-section-header" style={{ display: "grid", gridTemplateColumns: "1fr 1.5fr", gap: 80, marginBottom: 48, alignItems: "end" }}>
           <div>
             <SectionLabel num="§ 04">Benchmarks</SectionLabel>
-            <h2 style={{ fontSize: "clamp(32px,3.5vw,44px)", fontWeight: 700, letterSpacing: "-0.03em", color: C.ink, lineHeight: 1.1 }}>
+            <h2 style={SECTION_H2}>
               Measured, not{" "}
               <em style={{ fontFamily: "var(--font-spectral)", fontStyle: "italic", fontWeight: 400, color: C.burgundy }}>marketed.</em>
             </h2>
@@ -1128,7 +1141,7 @@ function Testimonials() {
       <div style={{ maxWidth: 1240, margin: "0 auto" }}>
         <div style={{ marginBottom: 48, maxWidth: 640 }}>
           <SectionLabel num="§ 05" color={C.sage}>Principles</SectionLabel>
-          <h2 style={{ fontSize: "clamp(32px,3.5vw,44px)", fontWeight: 700, letterSpacing: "-0.03em", color: C.ink, lineHeight: 1.1 }}>
+          <h2 style={SECTION_H2}>
             What we&apos;ll <em style={{ fontFamily: "var(--font-spectral)", fontStyle: "italic", fontWeight: 400, color: C.burgundy }}>never</em> compromise on.
           </h2>
           <p style={{ fontSize: 15, color: C.textSub, marginTop: 16, lineHeight: 1.65 }}>
@@ -1164,7 +1177,7 @@ function FAQSection() {
       <div style={{ maxWidth: 760, margin: "0 auto" }}>
         <div style={{ marginBottom: 48, textAlign: "center" }}>
           <SectionLabel num="§ 06" color={C.gold}>FAQ</SectionLabel>
-          <h2 style={{ fontSize: "clamp(32px,3.5vw,44px)", fontWeight: 700, letterSpacing: "-0.03em", color: C.ink, lineHeight: 1.1 }}>Common questions.</h2>
+          <h2 style={SECTION_H2}>Common questions.</h2>
         </div>
         {faqs.map(([q, a], i) => {
           const isOpen = open === i;
