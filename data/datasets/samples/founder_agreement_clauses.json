@@ -2,21 +2,326 @@
   {
     "clause_type": "Vesting Schedule",
     "standard_terms": "4-year vesting with 1-year cliff",
-    "sample_text": "Each Founder's equity shall vest over a period of forty-eight (48) months, with a twelve (12) month cliff. Upon the cliff date, 25% of the Founder's equity shall vest, with the remaining 75% vesting monthly over the subsequent 36 months."
+    "sample_text": "Each Founder's equity shall vest over a period of forty-eight (48) months, with a twelve (12) month cliff. Upon the cliff date, 25% of the Founder's equity shall vest, with the remaining 75% vesting monthly over the subsequent 36 months. Equity vesting protects the company by ensuring founders earn their shareholding over time."
   },
   {
-    "clause_type": "Non-Compete",
-    "standard_terms": "12-24 months post-employment",
-    "sample_text": "During the term of this Agreement and for a period of [12/24] months following termination, the Founder shall not, directly or indirectly, engage in any business that competes with the Company's business within India."
+    "clause_type": "Cliff Period",
+    "standard_terms": "12-month cliff before any equity vests",
+    "sample_text": "No portion of the Founder's shares shall vest prior to the first anniversary of the Effective Date (the \"Cliff Period\"). If the Founder ceases to be engaged with the Company before the expiry of the cliff period, no equity shall vest and all unvested shares shall be subject to buyback at face value. A cliff period in vesting prevents short-term departures from diluting the cap table."
+  },
+  {
+    "clause_type": "Reverse Vesting",
+    "standard_terms": "Founder shares issued upfront, subject to repurchase until vested",
+    "sample_text": "The Founder's shares are issued in full on the Effective Date but remain subject to reverse vesting: the Company (or the continuing founders) shall have the right to repurchase unvested shares at the lower of face value or fair market value if the Founder exits before the vesting schedule completes. Reverse vesting for founders is the standard structure in Indian startups because company law restricts conditional issuance of shares."
+  },
+  {
+    "clause_type": "Accelerated Vesting (Single Trigger)",
+    "standard_terms": "100% acceleration on change of control",
+    "sample_text": "Upon a Change of Control of the Company (including merger, amalgamation, or sale of substantially all assets), all unvested shares of the Founder shall immediately vest. This single-trigger accelerated vesting rewards founders on acquisition."
+  },
+  {
+    "clause_type": "Accelerated Vesting (Double Trigger)",
+    "standard_terms": "Acceleration on change of control plus termination without cause",
+    "sample_text": "If, within twelve (12) months following a Change of Control, the Founder's engagement is terminated by the acquirer without Cause, then all of the Founder's unvested equity shall become fully vested. Double-trigger accelerated vesting is preferred by investors because it retains founders through the transition."
+  },
+  {
+    "clause_type": "Equity Split",
+    "standard_terms": "Split based on contribution, role, capital and commitment",
+    "sample_text": "The Founders agree that the equity of the Company shall be split as follows: [Founder A]: [x]%, [Founder B]: [y]%, [Founder C]: [z]%. Founders should split equity considering idea origination, capital contributed, full-time commitment, domain expertise, and future roles, and record the split in the founders' agreement before incorporation."
+  },
+  {
+    "clause_type": "Co-Founder Exit",
+    "standard_terms": "Unvested shares lapse; vested shares subject to buyback/ROFR",
+    "sample_text": "When a co-founder leaves the company, all unvested shares shall stand forfeited or be repurchased at face value, and the departing founder's vested shares shall first be offered to the continuing founders under the right of first refusal. The departing founder shall resign from the Board and remain bound by confidentiality, IP assignment, and non-compete obligations."
+  },
+  {
+    "clause_type": "Good Leaver",
+    "standard_terms": "Fair value for vested shares on good-leaver exit",
+    "sample_text": "A Founder who exits due to death, permanent disability, or termination without cause shall be a \"Good Leaver\" and shall be entitled to retain or sell vested shares at fair market value determined by an independent valuer. Good leaver vs bad leaver treatment determines the repurchase price of a departing founder's equity."
+  },
+  {
+    "clause_type": "Bad Leaver",
+    "standard_terms": "Face value/discounted buyback for bad-leaver exit",
+    "sample_text": "A Founder who resigns without the consent of the Board within the lock-in period, or whose engagement is terminated for Cause (fraud, gross misconduct, material breach), shall be a \"Bad Leaver\", and all of that Founder's shares (vested and unvested) may be repurchased at the lower of face value or 50% of fair market value."
+  },
+  {
+    "clause_type": "Shotgun Clause (Buy-Sell)",
+    "standard_terms": "Either party may trigger a buy-or-sell offer at a named price",
+    "sample_text": "In the event of an irreconcilable deadlock, any Founder may serve a shotgun notice offering to purchase the other Founder's shares at a specified price per share; the recipient must either sell at that price or buy the offeror's shares at the same price. A shotgun clause (also called a buy-sell or Russian roulette provision) forces a clean exit when founders cannot continue together."
+  },
+  {
+    "clause_type": "Deadlock Resolution",
+    "standard_terms": "Escalation, mediation, then buy-sell mechanism",
+    "sample_text": "Any deadlock in Board or shareholder decisions shall first be escalated to good-faith negotiation between the Founders, then to mediation; if unresolved within 60 days, the shotgun buy-sell procedure shall apply. Texas shoot-out and Dutch auction variants may be substituted by mutual agreement."
   },
   {
     "clause_type": "IP Assignment",
     "standard_terms": "All work product belongs to company",
-    "sample_text": "The Founder hereby irrevocably assigns to the Company all right, title, and interest in and to any and all Inventions, including all Intellectual Property Rights therein, that the Founder may solely or jointly conceive, develop, or reduce to practice during the term of this Agreement."
+    "sample_text": "The Founder hereby irrevocably assigns to the Company all right, title, and interest in and to any and all Inventions, including all Intellectual Property Rights therein, that the Founder may solely or jointly conceive, develop, or reduce to practice during the term of this Agreement. An IP assignment clause ensures the startup, not the individual founder, owns the code, brand, and inventions, and includes a waiver of moral rights to the extent permitted by law."
+  },
+  {
+    "clause_type": "Prior IP Carve-Out",
+    "standard_terms": "Founder's pre-existing IP listed and excluded",
+    "sample_text": "All intellectual property conceived by the Founder prior to the Effective Date and listed in Schedule A (\"Prior IP\") is excluded from assignment; if any Prior IP is incorporated into Company products, the Founder grants the Company a perpetual, irrevocable, royalty-free licence to use it."
   },
   {
     "clause_type": "Dispute Resolution",
     "standard_terms": "Arbitration in India",
-    "sample_text": "Any dispute arising out of or in connection with this Agreement shall be finally resolved by arbitration in accordance with the Arbitration and Conciliation Act, 1996. The seat of arbitration shall be [City], India. The arbitration shall be conducted in English."
+    "sample_text": "Any dispute arising out of or in connection with this Agreement shall be finally resolved by arbitration in accordance with the Arbitration and Conciliation Act, 1996. The seat of arbitration shall be [City], India, before a sole arbitrator appointed mutually. Dispute resolution in founder agreements typically proceeds through negotiation, mediation, and then binding arbitration, keeping founder disputes out of court."
+  },
+  {
+    "clause_type": "Drag-Along Rights",
+    "standard_terms": "Majority can compel minority to join a sale",
+    "sample_text": "If shareholders holding at least [75]% of the shares approve a sale of the Company, all remaining shareholders shall be required (\"dragged along\") to sell their shares on the same terms and price. Drag-along rights ensure a buyer can acquire 100% of the company without minority holdouts."
+  },
+  {
+    "clause_type": "Tag-Along Rights",
+    "standard_terms": "Minority may join a majority sale pro rata",
+    "sample_text": "If any Founder proposes to transfer shares to a third party, each other shareholder shall have the right to tag along and sell a proportionate number of shares to the same purchaser on the same terms. Tag-along rights protect minority shareholders from being left behind when the majority exits."
+  },
+  {
+    "clause_type": "Anti-Dilution (Full Ratchet)",
+    "standard_terms": "Conversion price reset to the down-round price",
+    "sample_text": "If the Company issues shares at a price lower than the price paid by the Investor (a \"Down Round\"), the Investor's conversion price shall be reduced to the price of the new issuance. A full ratchet anti-dilution clause gives investors maximum protection but is founder-unfriendly."
+  },
+  {
+    "clause_type": "Anti-Dilution (Broad-Based Weighted Average)",
+    "standard_terms": "Conversion price adjusted by weighted-average formula",
+    "sample_text": "In a Down Round, the Investor's conversion price shall be adjusted using the broad-based weighted average formula, taking into account the number of shares outstanding and the size of the new issuance. Broad-based weighted average is the market-standard anti-dilution protection in Indian term sheets."
+  },
+  {
+    "clause_type": "Right of First Refusal",
+    "standard_terms": "Company/founders may match any third-party offer",
+    "sample_text": "Before transferring any shares to a third party, the selling Founder shall first offer the shares to the Company and the other Founders at the same price and on the same terms as the bona fide third-party offer. A right of first refusal (ROFR) clause keeps the cap table closed to outsiders unless existing stakeholders decline to match."
+  },
+  {
+    "clause_type": "Right of First Offer",
+    "standard_terms": "Seller must solicit insiders' offer before marketing shares",
+    "sample_text": "A Founder desiring to sell shares shall first invite offers from the other Founders and the Company (a right of first offer) before soliciting third-party purchasers, and may not sell to a third party at a price lower than the best insider offer."
+  },
+  {
+    "clause_type": "Voting Rights",
+    "standard_terms": "One vote per equity share; reserved matters require supermajority",
+    "sample_text": "Each equity share carries one vote in accordance with Section 47 of the Companies Act, 2013. Voting rights in a shareholders agreement may be modified through differential voting rights (DVR) shares, voting trusts, or proxy arrangements, and certain reserved matters shall require the affirmative vote of shareholders holding at least [75]% of the voting rights."
+  },
+  {
+    "clause_type": "Board Composition",
+    "standard_terms": "Each major founder/investor nominates directors",
+    "sample_text": "The Board shall consist of up to five (5) directors: two nominated by the Founders, one nominated by the Investor, and up to two independent directors. The right to nominate a director shall fall away if the nominating shareholder's holding drops below [10]%."
+  },
+  {
+    "clause_type": "Reserved Matters",
+    "standard_terms": "Key decisions need investor/founder consent",
+    "sample_text": "Notwithstanding anything to the contrary, the Company shall not, without the prior written consent of the Investor(s) and Founders holding a majority: (a) amend the charter documents; (b) issue new securities; (c) incur indebtedness above ₹[amount]; (d) sell material assets or IP; (e) declare dividends; or (f) change the nature of the business. These protective provisions are commonly called reserved matters."
+  },
+  {
+    "clause_type": "Non-Compete",
+    "standard_terms": "12-24 months post-exit, subject to Section 27 limits",
+    "sample_text": "During the term of this Agreement and for a period of [12/24] months following termination, the Founder shall not, directly or indirectly, engage in any business that competes with the Company's business within India. Note that under Section 27 of the Indian Contract Act, 1872, post-termination non-compete restraints are enforceable only narrowly, so in-term restrictions and garden-leave structures are preferred."
+  },
+  {
+    "clause_type": "Non-Solicitation",
+    "standard_terms": "No poaching employees, customers or suppliers for 24 months",
+    "sample_text": "For twenty-four (24) months after ceasing to hold shares or office, the Founder shall not solicit or entice away any employee, consultant, customer, or supplier of the Company. Non-solicitation clauses are generally more enforceable in India than pure non-compete covenants."
+  },
+  {
+    "clause_type": "Confidentiality",
+    "standard_terms": "Perpetual protection of confidential information and trade secrets",
+    "sample_text": "Each Founder shall keep confidential all Confidential Information, including business plans, financials, source code, customer lists, and trade secrets, and shall use it solely for the benefit of the Company. A confidentiality clause survives termination of the agreement and is enforceable in India through injunctions and damages under contract law."
+  },
+  {
+    "clause_type": "ESOP Pool",
+    "standard_terms": "10-15% option pool carved out pre-investment",
+    "sample_text": "The Founders shall establish an Employee Stock Option Plan (ESOP) pool of [10-15]% of the fully diluted share capital, in accordance with Section 62(1)(b) of the Companies Act, 2013 and Rule 12 of the Companies (Share Capital and Debentures) Rules, 2014. ESOP options granted to employees vest over time and convert to shares on exercise, unlike founder equity which is issued upfront subject to reverse vesting."
+  },
+  {
+    "clause_type": "Sweat Equity",
+    "standard_terms": "Shares for know-how/IP at a discount per Section 54",
+    "sample_text": "The Company may issue sweat equity shares to the Founder in consideration of know-how, intellectual property, or value additions, in compliance with Section 54 of the Companies Act, 2013 and Rule 8 of the Companies (Share Capital and Debentures) Rules, 2014, subject to the cap of 15% of paid-up capital in a year and lock-in of three years. A sweat equity arrangement compensates founders for non-cash contributions."
+  },
+  {
+    "clause_type": "Founder Roles and Responsibilities",
+    "standard_terms": "Defined titles, time commitment, and decision domains",
+    "sample_text": "Each Founder shall devote their full business time to the Company. [Founder A] shall serve as Chief Executive Officer responsible for strategy and fundraising; [Founder B] as Chief Technology Officer responsible for product and engineering. Changes to roles require Board approval."
+  },
+  {
+    "clause_type": "Founder Remuneration",
+    "standard_terms": "Salary deferred/modest until funding milestones",
+    "sample_text": "Until the Company raises at least ₹[amount] in external funding, each Founder shall draw a salary not exceeding ₹[amount] per month. Founder compensation shall thereafter be reviewed annually by the Board, subject to Section 197 of the Companies Act, 2013 where applicable."
+  },
+  {
+    "clause_type": "Lock-In Period",
+    "standard_terms": "No founder share transfers for 3 years",
+    "sample_text": "The Founders shall not transfer, pledge, or encumber any shares for a period of thirty-six (36) months from the Effective Date, except with the prior written consent of the Board and the Investors. The lock-in period assures investors of founder commitment."
+  },
+  {
+    "clause_type": "Share Transfer Restrictions",
+    "standard_terms": "Transfers only per ROFR/tag-along; private company limits",
+    "sample_text": "No Founder shall transfer shares except in compliance with the right of first refusal and tag-along provisions of this Agreement. As a private limited company, the Articles restrict the right to transfer shares under Section 2(68) of the Companies Act, 2013, and any transfer in breach shall not be registered."
+  },
+  {
+    "clause_type": "Pre-Emptive Rights",
+    "standard_terms": "Existing shareholders may subscribe pro rata to new issues",
+    "sample_text": "Any new issuance of shares or securities convertible into shares shall first be offered to existing shareholders in proportion to their holding, consistent with Section 62(1)(a) of the Companies Act, 2013. Pre-emptive rights protect shareholders from dilution without the opportunity to participate."
+  },
+  {
+    "clause_type": "Liquidation Preference",
+    "standard_terms": "1x non-participating preference for investors",
+    "sample_text": "On a liquidation event (winding-up, merger, or sale of the Company), the holders of Preference Shares shall be entitled to receive, prior to equity shareholders, an amount equal to 1x the investment amount (non-participating), with the balance distributed pro rata among equity shareholders."
+  },
+  {
+    "clause_type": "Exit Strategy",
+    "standard_terms": "IPO, strategic sale, or buyback within agreed horizon",
+    "sample_text": "The Founders and Investors shall use reasonable efforts to provide an exit within [5-7] years through an initial public offering, strategic sale, secondary sale, or buyback of shares in accordance with Section 68 of the Companies Act, 2013. If no exit occurs, the Investor may exercise drag-along rights subject to a minimum valuation floor."
+  },
+  {
+    "clause_type": "Buyback of Shares",
+    "standard_terms": "Company repurchase per Section 68 limits",
+    "sample_text": "The Company may buy back shares from a departing Founder subject to the conditions of Section 68 of the Companies Act, 2013, including the 25% limit of paid-up capital and free reserves, board and shareholder approvals, and the debt-equity ratio test."
+  },
+  {
+    "clause_type": "Call Option",
+    "standard_terms": "Continuing founders may buy defaulting founder's shares",
+    "sample_text": "Upon a material breach or Bad Leaver event, the non-defaulting Founders shall have a call option to purchase all shares of the defaulting Founder at the price determined under the Bad Leaver provisions, exercisable by notice within 90 days."
+  },
+  {
+    "clause_type": "Put Option",
+    "standard_terms": "Founder may require buyout on defined events",
+    "sample_text": "On death or permanent incapacity of a Founder, the legal heirs shall have a put option requiring the Company or continuing Founders to purchase the deceased Founder's vested shares at fair market value, payable in up to four quarterly instalments."
+  },
+  {
+    "clause_type": "Representations and Warranties",
+    "standard_terms": "Authority, no conflicts, IP ownership warranted",
+    "sample_text": "Each Founder represents and warrants that: (a) they have full power to enter this Agreement; (b) execution does not breach any employment or other agreement; (c) all IP contributed is owned solely by them and is unencumbered; and (d) they are not disqualified from directorship under Section 164 of the Companies Act, 2013."
+  },
+  {
+    "clause_type": "Indemnity",
+    "standard_terms": "Breaching party indemnifies losses arising from breach",
+    "sample_text": "Each Founder (the \"Indemnifying Party\") shall indemnify, defend, and hold harmless the Company and other Founders from and against all losses, damages, claims, and expenses arising out of any breach of this Agreement, misrepresentation, fraud, or violation of applicable law. Contracts of indemnity are governed by Section 124 of the Indian Contract Act, 1872."
+  },
+  {
+    "clause_type": "Guarantee",
+    "standard_terms": "Surety liable on principal's default",
+    "sample_text": "The Guarantor irrevocably guarantees the due performance of the obligations of the Principal under this Agreement and shall pay on first demand any amount not paid by the Principal. A contract of guarantee involves surety, principal debtor, and creditor under Section 126 of the Indian Contract Act, 1872, and the surety's liability is co-extensive with the principal debtor under Section 128."
+  },
+  {
+    "clause_type": "Force Majeure",
+    "standard_terms": "Performance suspended during events beyond control",
+    "sample_text": "Neither party shall be liable for failure or delay in performance caused by events beyond its reasonable control, including acts of God, epidemic, pandemic, lockdown, war, riot, fire, flood, embargo, or change in law (a \"Force Majeure Event\"), provided notice is given within [15] days. If the Force Majeure Event continues for more than [90] days, either party may terminate. Force majeure clauses allocate risk that the doctrine of frustration under Section 56 of the Indian Contract Act, 1872 would otherwise govern."
+  },
+  {
+    "clause_type": "Governing Law",
+    "standard_terms": "Indian law governs the agreement",
+    "sample_text": "This Agreement shall be governed by and construed in accordance with the laws of India, without regard to conflict of laws principles. A governing law clause determines which country's or state's substantive law applies to the interpretation and enforcement of the contract."
+  },
+  {
+    "clause_type": "Jurisdiction",
+    "standard_terms": "Exclusive jurisdiction of named courts",
+    "sample_text": "Subject to the arbitration clause, the courts at [City], India shall have exclusive jurisdiction over all disputes arising out of this Agreement. A jurisdiction clause fixes the forum where parties may litigate, complementing the governing law clause."
+  },
+  {
+    "clause_type": "Termination",
+    "standard_terms": "Termination for breach, insolvency, or by notice",
+    "sample_text": "This Agreement may be terminated: (a) by mutual written consent; (b) by either party on [30] days' written notice if the other party commits a material breach and fails to cure it within the notice period; or (c) immediately upon insolvency or winding-up of a party. Requirements for contract termination should specify notice period, cure period, and the consequences of termination including accrued rights."
+  },
+  {
+    "clause_type": "Termination for Cause",
+    "standard_terms": "Immediate removal for fraud/misconduct",
+    "sample_text": "The Company may terminate a Founder's engagement immediately for Cause, meaning fraud, embezzlement, wilful misconduct, conviction of an offence involving moral turpitude, persistent neglect of duties, or material breach of this Agreement that is incurable, in which case Bad Leaver consequences shall apply."
+  },
+  {
+    "clause_type": "Limitation of Liability",
+    "standard_terms": "Liability capped; indirect damages excluded",
+    "sample_text": "Neither party's aggregate liability under this Agreement shall exceed ₹[amount]/the fees paid in the preceding twelve months, and neither party shall be liable for any indirect, incidental, consequential, or punitive damages, or loss of profits, revenue, or data. A limitation of liability clause caps contractual exposure but does not limit liability for fraud, gross negligence, or breach of confidentiality/IP obligations."
+  },
+  {
+    "clause_type": "Liquidated Damages",
+    "standard_terms": "Pre-agreed reasonable compensation for breach",
+    "sample_text": "In the event of breach of the exclusivity obligation, the breaching party shall pay liquidated damages of ₹[amount], which the parties agree is a genuine pre-estimate of loss and not a penalty. Under Section 74 of the Indian Contract Act, 1872, courts award reasonable compensation not exceeding the stipulated amount, whether characterised as liquidated damages or penalty."
+  },
+  {
+    "clause_type": "Non-Disclosure (NDA) Core Obligation",
+    "standard_terms": "Definition of confidential information, permitted use, exclusions",
+    "sample_text": "The Receiving Party shall hold in strict confidence all Confidential Information disclosed by the Disclosing Party, use it solely for the Purpose, and disclose it only to representatives on a need-to-know basis bound by equivalent obligations. The essential elements of an NDA are: definition of confidential information, permitted purpose, exclusions (public domain, independently developed, lawfully received), term of protection, return or destruction of materials, and remedies including injunctive relief."
+  },
+  {
+    "clause_type": "NDA Exclusions",
+    "standard_terms": "Public domain, prior knowledge, independent development",
+    "sample_text": "Confidential Information does not include information that: (a) is or becomes publicly available without breach; (b) was known to the Receiving Party prior to disclosure; (c) is independently developed without use of the Confidential Information; or (d) is required to be disclosed by law or court order, provided prompt notice is given."
+  },
+  {
+    "clause_type": "Service Level Agreement (SLA)",
+    "standard_terms": "Uptime commitment, response times, service credits",
+    "sample_text": "The Service Provider shall maintain 99.9% monthly uptime and respond to Severity-1 incidents within 30 minutes. A service level agreement defines measurable performance standards — availability, response and resolution times, and quality metrics — together with reporting and review mechanisms."
+  },
+  {
+    "clause_type": "SLA Service Credits",
+    "standard_terms": "Credits as sole remedy for SLA misses",
+    "sample_text": "If uptime falls below the committed service level, the Customer shall be entitled to service credits of [5]% of monthly fees per [0.5]% shortfall, capped at [30]% of monthly fees. Service credits are the Customer's sole and exclusive remedy for SLA failures, except where chronic failure triggers a termination right."
+  },
+  {
+    "clause_type": "Memorandum of Understanding (Binding Provisions)",
+    "standard_terms": "MOU largely non-binding except key clauses",
+    "sample_text": "This MOU records the parties' intention to negotiate in good faith and is not intended to be legally binding, except for the clauses on confidentiality, exclusivity, costs, and governing law, which are binding. The legal enforceability of an MOU under Indian law depends on whether the parties intended to create legal relations and whether essential terms are certain."
+  },
+  {
+    "clause_type": "Entire Agreement",
+    "standard_terms": "Supersedes prior discussions; no reliance on outside statements",
+    "sample_text": "This Agreement constitutes the entire agreement between the parties with respect to its subject matter and supersedes all prior agreements, understandings, and representations, whether oral or written. No party has relied on any statement not expressly set out herein."
+  },
+  {
+    "clause_type": "Severability",
+    "standard_terms": "Invalid clause severed; rest survives",
+    "sample_text": "If any provision of this Agreement is held invalid or unenforceable, it shall be severed and the remaining provisions shall continue in full force. The parties shall replace the severed provision with a valid provision that most closely reflects the original intent."
+  },
+  {
+    "clause_type": "Assignment",
+    "standard_terms": "No assignment without consent; affiliates excepted",
+    "sample_text": "Neither party may assign or transfer its rights or obligations under this Agreement without the prior written consent of the other party, except to an affiliate or a successor in a merger or sale of substantially all assets."
+  },
+  {
+    "clause_type": "Notices",
+    "standard_terms": "Written notice to registered address/email",
+    "sample_text": "All notices under this Agreement shall be in writing and delivered by hand, registered post, courier, or email to the addresses set out in Schedule B, and shall be deemed received on delivery (or, for email, on transmission without bounce-back)."
+  },
+  {
+    "clause_type": "Amendment",
+    "standard_terms": "Written amendment signed by all parties",
+    "sample_text": "No amendment or modification of this Agreement shall be valid unless made in writing and signed by all parties. Under Section 62 of the Indian Contract Act, 1872, the parties may by agreement substitute, rescind, or alter the contract (novation)."
+  },
+  {
+    "clause_type": "Waiver",
+    "standard_terms": "No implied waiver; must be written",
+    "sample_text": "No failure or delay by a party in exercising any right shall operate as a waiver, nor shall any single or partial exercise preclude further exercise. A waiver is effective only if in writing and signed by the waiving party."
+  },
+  {
+    "clause_type": "Counterparts and Electronic Execution",
+    "standard_terms": "Execution in counterparts; e-signatures valid",
+    "sample_text": "This Agreement may be executed in counterparts, each of which is an original. Electronic signatures affixed in accordance with the Information Technology Act, 2000 (including Aadhaar eSign and digital signature certificates) shall be as valid as handwritten signatures, except for instruments excluded under the First Schedule of that Act."
+  },
+  {
+    "clause_type": "Survival",
+    "standard_terms": "Confidentiality, IP, indemnity survive termination",
+    "sample_text": "The provisions relating to confidentiality, intellectual property assignment, non-solicitation, indemnity, limitation of liability, governing law, and dispute resolution shall survive termination or expiry of this Agreement."
+  },
+  {
+    "clause_type": "Stamp Duty and Registration",
+    "standard_terms": "Agreement to be stamped per state Stamp Act",
+    "sample_text": "This Agreement shall be stamped in accordance with the applicable State Stamp Act at the place of execution, and the stamp duty shall be borne by [the Company/equally]. An unstamped or insufficiently stamped agreement is inadmissible in evidence until the deficit duty and penalty are paid."
+  },
+  {
+    "clause_type": "Publicity",
+    "standard_terms": "No announcements without consent",
+    "sample_text": "Neither party shall issue any press release or public announcement regarding this Agreement or use the other party's name or logo without prior written consent, except as required by law or stock exchange regulation."
+  },
+  {
+    "clause_type": "Further Assurances",
+    "standard_terms": "Parties to execute documents to give effect",
+    "sample_text": "Each party shall execute such further documents, deeds, and instruments and do all such acts as may be reasonably required to give full effect to the provisions of this Agreement, including filings with the Registrar of Companies."
+  },
+  {
+    "clause_type": "Independent Contractor",
+    "standard_terms": "No employment/partnership/agency created",
+    "sample_text": "Nothing in this Agreement shall constitute a partnership, joint venture, employment, or agency relationship between the parties. Neither party may bind the other except as expressly authorised in writing."
   }
 ]

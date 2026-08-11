@@ -1,0 +1,112 @@
+[
+  {
+    "id": 85,
+    "question": "What is the GST rate for software services?",
+    "answer": "Software supplied as a service (SaaS, custom development, licensing the right to use, maintenance and support) attracts GST at 18%. Classification: SAC 998314 covers information technology design and development services; SAC 997331 covers licensing services for the right to use computer software. Pre-packaged or 'canned' software supplied on media is treated as goods under HSN 8523 and also attracts 18%, so the goods-versus-services distinction changes the classification but not the headline rate. Export of software services is zero-rated under Section 16 of the IGST Act, 2017, provided the supply meets all five conditions of the export-of-services definition in Section 2(6) of the IGST Act. Exporters may either supply under a Letter of Undertaking in Form RFD-11 without paying IGST, or pay IGST and claim a refund. Supplies to a Special Economic Zone unit or developer for authorised operations are likewise zero-rated. Input tax credit on inputs and input services used for zero-rated supplies remains available even though no output tax is charged.",
+    "category": "tax",
+    "related_laws": [
+      "CGST Act, 2017 - Section 9",
+      "IGST Act, 2017 - Section 2(6), Section 16",
+      "Notification No. 11/2017-Central Tax (Rate)"
+    ]
+  },
+  {
+    "id": 86,
+    "question": "What is e-invoicing under GST and does my startup need it?",
+    "answer": "E-invoicing is the requirement in Rule 48(4) of the CGST Rules, 2017 to report business-to-business invoices to a government Invoice Registration Portal before issuing them. The portal validates the invoice and returns an Invoice Reference Number (IRN) and a digitally signed QR code. Under Rule 48(5), an invoice covered by the requirement but issued without an IRN is not a valid document, which means the recipient cannot claim input tax credit on it. Applicability is driven by aggregate annual turnover in any financial year from 2017-18 onwards, and the threshold has been lowered repeatedly since introduction, so verify the current limit before concluding you are outside it. It applies to B2B supplies, exports and supplies to SEZs, but not to business-to-consumer invoices. Excluded categories include banks, insurers, non-banking financial companies, goods transport agencies, passenger transport services and cinema exhibitors. Once you cross the threshold the obligation is permanent; it does not lapse if turnover subsequently falls.",
+    "category": "tax",
+    "related_laws": [
+      "CGST Rules, 2017 - Rule 48(4), Rule 48(5)",
+      "CGST Act, 2017 - Section 31",
+      "Notification No. 13/2020-Central Tax as amended"
+    ]
+  },
+  {
+    "id": 87,
+    "question": "What is the Section 80-IAC startup tax exemption and who qualifies?",
+    "answer": "Section 80-IAC of the Income-tax Act, 1961 allows an eligible start-up a deduction of 100% of profits and gains from an eligible business for any three consecutive assessment years, chosen by the start-up out of the first ten years from incorporation. Conditions: the entity must be a company or a limited liability partnership; it must hold recognition from the Department for Promotion of Industry and Internal Trade (DPIIT) and a certificate from the Inter-Ministerial Board; it must be incorporated within the eligibility window specified in the section, which has been extended several times by successive Finance Acts and should be checked against the current text; total turnover must not exceed Rs. 100 crore in the previous year for which the deduction is claimed; and it must not be formed by splitting up or reconstructing an existing business, nor by transferring previously used plant and machinery beyond the permitted limit. Choosing the three years matters commercially: most start-ups are loss-making early on, so the deduction is usually worth more if deferred to the first profitable years within the ten-year window. The deduction reduces taxable income but does not exempt the company from Minimum Alternate Tax unless it has opted into the concessional regime under Section 115BAB.",
+    "category": "tax",
+    "related_laws": [
+      "Income-tax Act, 1961 - Section 80-IAC",
+      "Income-tax Act, 1961 - Section 115JB, Section 115BAB",
+      "DPIIT Notification G.S.R. 127(E)"
+    ]
+  },
+  {
+    "id": 88,
+    "question": "What are the digital tax provisions affecting technology startups in India?",
+    "answer": "Four regimes matter for a technology business. First, Significant Economic Presence under Explanation 2A to Section 9(1)(i) of the Income-tax Act, 1961 creates a business connection in India for a non-resident based on transaction value or user thresholds, even without physical presence. Second, Section 194-O requires an e-commerce operator to deduct tax at source on the gross amount of sales or services facilitated through its digital platform for e-commerce participants; the rate has been revised downward since introduction, so confirm the current rate. Third, the Equalisation Levy introduced by the Finance Act, 2016 applied to online advertisement payments and was later extended to e-commerce supply; both components have since been withdrawn on separate dates, so treat any historical guidance on this with caution and verify the position for the period concerned. Fourth, under GST, Online Information Database Access and Retrieval (OIDAR) services supplied by a non-resident to an unregistered Indian recipient require the supplier to register and pay GST under Section 14 of the IGST Act, 2017. For an Indian start-up selling software abroad the practical questions are usually whether the supply is an export of services under Section 2(6) of the IGST Act, and whether a permanent establishment is created in the customer's jurisdiction.",
+    "category": "tax",
+    "related_laws": [
+      "Income-tax Act, 1961 - Section 9(1)(i) Explanation 2A, Section 194-O",
+      "IGST Act, 2017 - Section 2(6), Section 14",
+      "Finance Act, 2016 - Chapter VIII (Equalisation Levy)"
+    ]
+  },
+  {
+    "id": 89,
+    "question": "How are ESOPs taxed in India and can a startup defer the tax?",
+    "answer": "Employee stock options are taxed at two points. At exercise, the difference between the fair market value of the share on the exercise date and the price actually paid by the employee is a perquisite taxable as salary under Section 17(2)(vi) of the Income-tax Act, 1961, and the employer must deduct tax at source on it. At sale, the difference between the sale consideration and the fair market value already taxed as a perquisite is a capital gain, long-term or short-term depending on the holding period, which runs from the date of allotment rather than the date of grant. The practical problem is that the first charge falls due when the employee has cash outflow but no liquidity. Eligible start-ups, meaning those holding a certificate under Section 80-IAC, may defer the deduction and payment of tax on the perquisite under Sections 192(1C) and 191(2): the tax becomes payable at the earliest of five years from the end of the relevant assessment year, the date the employee ceases employment, or the date the employee sells the shares. The deferral applies only to timing, not to the amount, and only start-ups meeting the Section 80-IAC eligibility can use it.",
+    "category": "tax",
+    "related_laws": [
+      "Income-tax Act, 1961 - Section 17(2)(vi), Section 192(1C), Section 191(2)",
+      "Income-tax Act, 1961 - Section 80-IAC",
+      "Income-tax Rules, 1962 - Rule 3(8)"
+    ]
+  },
+  {
+    "id": 90,
+    "question": "What is the GST composition scheme and should a small business opt for it?",
+    "answer": "The composition scheme in Section 10 of the CGST Act, 2017 lets a small supplier pay GST at a flat rate on turnover instead of the normal rate on each supply, with much lighter compliance. Eligibility for goods is aggregate turnover in the preceding financial year not exceeding Rs. 1.5 crore, reduced to Rs. 75 lakh for specified special category states. Service providers who cannot use the main scheme may use the separate route in Section 10(2A) if turnover does not exceed Rs. 50 lakh. Indicative rates are 1% for traders and manufacturers, 5% for restaurant services not serving alcohol, and 6% under Section 10(2A). Compliance is a quarterly statement in Form CMP-08 and an annual return in Form GSTR-4 rather than monthly returns. The trade-offs are significant: a composition dealer cannot collect GST from customers, cannot claim input tax credit, cannot make inter-state outward supplies, cannot supply through an e-commerce operator required to collect tax at source, and must state on every bill of supply that it is a composition taxable person not eligible to collect tax. Because the customer gets no input tax credit, the scheme usually suits businesses selling to end consumers rather than to other registered businesses.",
+    "category": "tax",
+    "related_laws": [
+      "CGST Act, 2017 - Section 10, Section 10(2A)",
+      "CGST Rules, 2017 - Rule 3 to Rule 7",
+      "CGST Act, 2017 - Section 2(6) (aggregate turnover)"
+    ]
+  },
+  {
+    "id": 91,
+    "question": "When can a business claim input tax credit under GST?",
+    "answer": "Section 16 of the CGST Act, 2017 sets four cumulative conditions for input tax credit: the recipient must hold a tax invoice or debit note; must have received the goods or services; the tax charged must have actually been paid to the government by the supplier; and the recipient must have furnished the return under Section 39. A further condition requires the invoice to appear in the auto-populated statement Form GSTR-2B, which makes the supplier's compliance a precondition for the recipient's credit. If the recipient does not pay the supplier within 180 days of the invoice date, the credit taken must be reversed with interest and may be reclaimed on payment. Section 16(4) imposes a time limit: credit for an invoice cannot be taken after the 30th of November following the end of the financial year to which the invoice relates, or the date of filing the annual return, whichever is earlier. Section 17(5) blocks credit outright on specified items, including motor vehicles with limited exceptions, food and beverages, health services, membership of clubs, works contract services for immovable property other than plant and machinery, and goods lost, stolen, destroyed or given as free samples.",
+    "category": "tax",
+    "related_laws": [
+      "CGST Act, 2017 - Section 16, Section 17(5), Section 39",
+      "CGST Rules, 2017 - Rule 36(4), Rule 37",
+      "CGST Act, 2017 - Section 16(4)"
+    ]
+  },
+  {
+    "id": 92,
+    "question": "How is export of services treated under GST and what is an LUT?",
+    "answer": "Export of services is a zero-rated supply under Section 16 of the IGST Act, 2017, meaning no output tax is charged while input tax credit on related inputs remains fully available. To qualify as an export of services under Section 2(6) of the IGST Act all five conditions must be met: the supplier is located in India; the recipient is located outside India; the place of supply is outside India; payment is received in convertible foreign exchange or in Indian rupees where permitted by the Reserve Bank of India; and the supplier and recipient are not merely establishments of the same person under Explanation 1 to Section 8. Failing any one condition makes the supply taxable, which is the most common reason an Indian services exporter receives a demand. There are two routes. Under the first, the exporter furnishes a Letter of Undertaking in Form RFD-11 before the start of the financial year and exports without paying IGST, then claims a refund of unutilised input tax credit. Under the second, the exporter pays IGST on the export and claims a refund of the tax paid. The LUT route is generally preferred because it avoids blocking working capital in a refund claim.",
+    "category": "tax",
+    "related_laws": [
+      "IGST Act, 2017 - Section 2(6), Section 8, Section 16",
+      "CGST Rules, 2017 - Rule 96, Rule 96A",
+      "CGST Act, 2017 - Section 54 (refunds)"
+    ]
+  },
+  {
+    "id": 93,
+    "question": "What TDS obligations does a startup have when paying vendors and employees?",
+    "answer": "A start-up must deduct tax at source on several common payments under the Income-tax Act, 1961. Section 192 covers salary, deducted monthly at the employee's average rate of tax. Section 194J covers fees for professional or technical services, royalty and non-compete payments. Section 194C covers payments to contractors and sub-contractors, with different rates for individuals or Hindu undivided families and for other entities. Section 194-I covers rent for land, buildings, plant and machinery. Section 194Q covers purchase of goods above the prescribed value where the buyer's turnover exceeds the specified limit. Section 194-O covers e-commerce operators paying e-commerce participants. Each section has its own threshold below which no deduction is required, and rates and thresholds are revised by Finance Acts, so confirm the current figures for the relevant year. Deducted tax must be deposited by the 7th of the following month, except for March where the due date is the 30th of April. Quarterly statements are filed in Form 24Q for salary and Form 26Q for other domestic payments. The commercial consequence of failure is disproportionate: Section 40(a)(ia) disallows 30% of the expenditure when tax is not deducted or not paid, so a missed deduction increases taxable profit as well as attracting interest under Section 201(1A) and a penalty.",
+    "category": "tax",
+    "related_laws": [
+      "Income-tax Act, 1961 - Sections 192, 194C, 194J, 194-I, 194Q, 194-O",
+      "Income-tax Act, 1961 - Section 40(a)(ia), Section 201(1A)",
+      "Income-tax Rules, 1962 - Rule 31A"
+    ]
+  },
+  {
+    "id": 94,
+    "question": "What is angel tax and does it still apply to startup funding rounds?",
+    "answer": "Angel tax was the charge under Section 56(2)(viib) of the Income-tax Act, 1961, which treated the excess of consideration received by a closely held company for issuing shares over the fair market value of those shares as income from other sources in the hands of the company. It was aimed at unexplained share premium but in practice caught genuine start-up rounds priced on future potential rather than present book value, because the valuation methods accepted under Rule 11UA often produced a lower fair market value than the negotiated price. DPIIT-recognised start-ups meeting specified conditions could claim exemption by filing a declaration in Form 2. The provision was subsequently abolished, so for issues made on or after the effective date of that abolition the charge no longer arises; confirm the exact applicability date against the current text of the Act before relying on this for a past round, since assessments for earlier years can still be reopened. Two related provisions remain relevant to funding rounds: Section 68 can still be invoked where the identity, creditworthiness or genuineness of the investor is not established, and Section 79 restricts the carry-forward of losses on a change in shareholding, with a relaxation for eligible start-ups where the original shareholders continue to hold their shares.",
+    "category": "tax",
+    "related_laws": [
+      "Income-tax Act, 1961 - Section 56(2)(viib), Section 68, Section 79",
+      "Income-tax Rules, 1962 - Rule 11UA",
+      "DPIIT Notification G.S.R. 127(E)"
+    ]
+  }
+]

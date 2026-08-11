@@ -1,0 +1,158 @@
+[
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "2",
+    "title": "Interpretation clause",
+    "content": "Defines the building blocks of contract law: a 'proposal' (offer) is when one person signifies willingness to do or abstain from doing anything with a view to obtaining the assent of another; when the proposal is accepted it becomes a 'promise'; the person making the proposal is the 'promisor' and the acceptor the 'promisee'. 'Consideration' is defined in Section 2(d) as an act, abstinence, or promise done at the desire of the promisor. An agreement is 'every promise and every set of promises forming the consideration for each other' (Section 2(e)), and a contract is 'an agreement enforceable by law' (Section 2(h)). An agreement not enforceable by law is void (Section 2(g))."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "10",
+    "title": "What agreements are contracts",
+    "content": "All agreements are contracts if they are made by the free consent of parties competent to contract, for a lawful consideration and with a lawful object, and are not expressly declared void. This section lays down the essential elements of a valid contract under Indian law: (1) offer and acceptance, (2) free consent, (3) competency of parties, (4) lawful consideration, (5) lawful object, and (6) the agreement must not be one expressly declared void by the Act. Writing and registration are required only where a specific law demands them."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "11",
+    "title": "Who are competent to contract",
+    "content": "Every person is competent to contract who is of the age of majority according to the law to which he is subject, who is of sound mind, and who is not disqualified from contracting by any law. Agreements entered into by minors are void ab initio as held in Mohori Bibee v. Dharmodas Ghose. Competency of parties is one of the essentials of a valid contract under Section 10."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "13",
+    "title": "Consent defined",
+    "content": "Two or more persons are said to consent when they agree upon the same thing in the same sense (consensus ad idem). Identity of mind on the subject matter of the agreement is the foundation of a binding contract."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "14",
+    "title": "Free consent defined",
+    "content": "Consent is free when it is not caused by coercion (Section 15), undue influence (Section 16), fraud (Section 17), misrepresentation (Section 18), or mistake (Sections 20-22). When consent is caused by coercion, undue influence, fraud, or misrepresentation, the contract is voidable at the option of the party whose consent was so caused. Free consent is an essential element of a valid contract."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "16",
+    "title": "Undue influence",
+    "content": "A contract is induced by undue influence where the relations subsisting between the parties are such that one party is in a position to dominate the will of the other and uses that position to obtain an unfair advantage. Relationships of trust, authority, and dependence — such as employer-employee or promoter-investor — can attract scrutiny under this section."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "17",
+    "title": "Fraud defined",
+    "content": "Fraud includes acts committed by a party to a contract with intent to deceive another party: the suggestion of a fact which is not true by one who does not believe it to be true; active concealment of a fact; a promise made without intention of performing it; and any other act fitted to deceive. A contract induced by fraud is voidable, and the defrauded party may also claim damages."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "23",
+    "title": "What considerations and objects are lawful, and what not",
+    "content": "The consideration or object of an agreement is lawful unless it is forbidden by law; would defeat the provisions of any law; is fraudulent; involves injury to the person or property of another; or the Court regards it as immoral or opposed to public policy. Every agreement of which the object or consideration is unlawful is void. This section is the basis on which unlawful and public-policy-violating contract terms are struck down."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "25",
+    "title": "Agreement without consideration, void, unless in writing and registered, or is a promise to compensate, or is a promise to pay a debt barred by limitation law",
+    "content": "An agreement made without consideration is void, unless: (1) it is expressed in writing, registered, and made on account of natural love and affection between parties standing in near relation; (2) it is a promise to compensate a person who has already voluntarily done something for the promisor; or (3) it is a written and signed promise to pay a debt barred by the law of limitation. The rule 'no consideration, no contract' has these statutory exceptions."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "27",
+    "title": "Agreement in restraint of trade, void",
+    "content": "Every agreement by which anyone is restrained from exercising a lawful profession, trade, or business of any kind is, to that extent, void. The only statutory exception permits a seller of business goodwill to agree not to carry on a similar business within specified local limits. For startups and founder agreements, Section 27 means post-termination non-compete clauses against employees and founders are generally unenforceable in India, though restraints operating during the term of employment, and reasonable confidentiality and non-solicitation obligations, are upheld. Leading cases include Niranjan Shankar Golikari v. Century Spinning and Percept D'Mark v. Zaheer Khan."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "28",
+    "title": "Agreements in restraint of legal proceedings, void",
+    "content": "Agreements that absolutely restrict a party from enforcing contractual rights through ordinary tribunals, or that limit the time within which rights may be enforced, are void to that extent. Exceptions preserve the validity of arbitration agreements — a contract may validly refer present or future disputes to arbitration. Clauses shortening the limitation period for filing claims are hit by this section."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "29",
+    "title": "Agreements void for uncertainty",
+    "content": "Agreements the meaning of which is not certain, or capable of being made certain, are void. Essential terms such as price, subject matter, and duration must be certain or objectively ascertainable; otherwise the agreement fails for vagueness. This is why letters of intent and MOUs lacking definite terms may be unenforceable."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "32",
+    "title": "Enforcement of contracts contingent on an event happening",
+    "content": "Contingent contracts to do or not do anything if an uncertain future event happens cannot be enforced by law unless and until that event has happened. If the event becomes impossible, such contracts become void. Conditions precedent in investment agreements (such as regulatory approval) operate on this principle."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "37",
+    "title": "Obligation of parties to contracts",
+    "content": "The parties to a contract must either perform or offer to perform their respective promises, unless such performance is dispensed with or excused under this Act or any other law. Performance obligations pass to legal representatives unless a contrary intention appears from the contract (for example, contracts involving personal skill)."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "39",
+    "title": "Effect of refusal of party to perform promise wholly",
+    "content": "When a party to a contract has refused to perform, or disabled himself from performing, his promise in its entirety, the promisee may put an end to the contract, unless he has signified acquiescence in its continuance. This section embodies anticipatory breach — the innocent party may terminate and sue for damages when the other party repudiates the contract."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "55",
+    "title": "Effect of failure to perform at fixed time, in contract in which time is essential",
+    "content": "When a party promises to do a thing at or before a specified time and fails, the contract becomes voidable at the option of the promisee if the intention of the parties was that time should be of the essence. If time is not of the essence, the contract does not become voidable, but the promisee is entitled to compensation for loss occasioned by the delay. Termination rights for delay in commercial contracts rest on this section."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "56",
+    "title": "Agreement to do impossible act; doctrine of frustration",
+    "content": "An agreement to do an act impossible in itself is void. A contract to do an act which, after the contract is made, becomes impossible or unlawful becomes void when the act becomes impossible or unlawful. This section codifies the doctrine of frustration of contract in India: supervening impossibility or illegality automatically discharges the contract. The Supreme Court in Satyabrata Ghose v. Mugneeram Bangur held that 'impossible' includes impracticability that upsets the very foundation of the contract. Force majeure clauses in contracts are express allocations of these risks; where a contract contains a force majeure clause, Section 32 governs, and Section 56 applies in its absence."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "62",
+    "title": "Effect of novation, rescission, and alteration of contract",
+    "content": "If the parties to a contract agree to substitute a new contract for it, or to rescind or alter it, the original contract need not be performed. Novation requires the substitution of a new contract with the consent of all parties, commonly used when a startup restructures obligations or replaces a founder agreement with a shareholders agreement."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "65",
+    "title": "Obligation of person who has received advantage under void agreement, or contract that becomes void",
+    "content": "When an agreement is discovered to be void, or when a contract becomes void, any person who has received any advantage under such agreement or contract is bound to restore it, or to make compensation for it, to the person from whom he received it. This restitution principle prevents unjust enrichment when contracts fail, including on frustration under Section 56."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "73",
+    "title": "Compensation for loss or damage caused by breach of contract",
+    "content": "When a contract has been broken, the party who suffers by such breach is entitled to receive compensation for any loss or damage caused to him thereby, which naturally arose in the usual course of things from such breach, or which the parties knew, when they made the contract, to be likely to result from the breach. Compensation is not to be given for any remote and indirect loss. This is the principal remedy for breach of contract in India, following the rule in Hadley v. Baxendale; the aggrieved party also has a duty to mitigate. Other remedies include rescission, restitution under Section 65, specific performance and injunctions under the Specific Relief Act, 1963, and quantum meruit."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "74",
+    "title": "Compensation for breach of contract where penalty stipulated for",
+    "content": "When a contract has been broken, if a sum is named in the contract as the amount to be paid in case of such breach, or if the contract contains any other stipulation by way of penalty, the party complaining of the breach is entitled to receive reasonable compensation not exceeding the amount so named. Indian law thus does not distinguish sharply between liquidated damages and penalties: the named sum is a ceiling, and the court awards only reasonable compensation, as explained in Fateh Chand v. Balkishan Dass and Kailash Nath Associates v. DDA. A genuine pre-estimate of loss (liquidated damages) is generally awarded without strict proof of loss where loss is difficult to prove."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "75",
+    "title": "Party rightfully rescinding contract, entitled to compensation",
+    "content": "A person who rightfully rescinds a contract is entitled to compensation for any damage which he has sustained through the non-fulfilment of the contract. This complements the termination right under Section 39 for repudiation."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "124",
+    "title": "Contract of indemnity defined",
+    "content": "A contract of indemnity is a contract by which one party promises to save the other from loss caused to him by the conduct of the promisor himself, or by the conduct of any other person. The person who promises is the indemnifier and the person protected is the indemnity-holder. Indemnity clauses in commercial and founder agreements allocate the risk of third-party claims, breaches, and losses."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "125",
+    "title": "Rights of indemnity-holder when sued",
+    "content": "The promisee in a contract of indemnity is entitled to recover from the promisor all damages he is compelled to pay in a suit in respect of any matter to which the indemnity applies, all costs of such suit, and all sums paid under a compromise made in good faith. This section defines the scope of recovery under an indemnity clause."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "126",
+    "title": "Contract of guarantee, surety, principal debtor and creditor",
+    "content": "A contract of guarantee is a contract to perform the promise, or discharge the liability, of a third person in case of his default. The person who gives the guarantee is the surety, the person for whom the guarantee is given is the principal debtor, and the person to whom it is given is the creditor. A guarantee may be oral or written. Unlike indemnity (a two-party arrangement covering loss), a guarantee is a tripartite arrangement triggered by the principal debtor's default."
+  },
+  {
+    "act": "Indian Contract Act, 1872",
+    "section": "128",
+    "title": "Surety's liability",
+    "content": "The liability of the surety is co-extensive with that of the principal debtor, unless it is otherwise provided by the contract. The creditor may proceed directly against the surety without first exhausting remedies against the principal debtor. Personal guarantees by founders for startup loans operate under this framework."
+  }
+]

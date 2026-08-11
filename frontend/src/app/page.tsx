@@ -926,21 +926,30 @@ function BenchBar({ label, value, display, max, color, active, delay, tag, muted
 function BenchmarksSection() {
   const [ref, inView] = useInView({ threshold: 0.2 });
 
-  // Real numbers from the public 120-query benchmark, reproduced 2026-07-06
-  // (data/eval/results in the repo). MRR: how high the first relevant
-  // source ranks (1.0 = always first).
+  // Mean reciprocal rank from the 120-query benchmark over the final 47,867
+  // document corpus (runs 20260707_151649 and 20260707_151933; see
+  // data/eval/results/figures/aggregate_metrics.csv). These are the figures
+  // reported in the paper — do not edit them independently of that file.
   const retrieval = [
-    { label: "Hybrid BM25 — what JurisGPT runs", value: 0.938, display: "0.938", color: C.burgundy, tag: "DEPLOYED" },
+    { label: "Hybrid BM25 — what JurisGPT runs", value: 0.953, display: "0.953", color: C.burgundy, tag: "DEPLOYED" },
     { label: "Dense embeddings", value: 0.925, display: "0.925", color: C.gold },
-    { label: "Lexical baseline", value: 0.886, display: "0.886", color: C.textSub, muted: true },
-    { label: "Hybrid + generic reranker", value: 0.821, display: "0.821", color: C.textSub, muted: true },
+    { label: "Lexical baseline", value: 0.888, display: "0.888", color: C.textSub, muted: true },
+    { label: "Hybrid + generic reranker", value: 0.864, display: "0.864", color: C.textSub, muted: true },
     { label: "Dense + generic reranker", value: 0.758, display: "0.758", color: C.textSub, muted: true },
   ];
 
+  // Claim-level audit of 40 answers (data/eval/results/figures/FAITHFULNESS.md,
+  // run 20260707_085205). Two distinct rates, reported separately because they
+  // measure different things:
+  //   severe  2.5%  — the answer invented a statute, section or case
+  //   strict 32.5%  — at least one claim the judge could not trace to a source
+  // The industry bars below are broad hallucination rates measured under
+  // different protocols, so this is an indicative comparison, not head-to-head.
   const hallucination = [
     { label: "Generic AI chatbots", value: 82, rangeStart: 58, display: "58–82%", color: C.ink, muted: true },
     { label: "Commercial legal AI tools", value: 33, rangeStart: 17, display: "17–33%", color: C.textSub, muted: true },
-    { label: "JurisGPT", value: 10, display: "~10%", color: C.burgundy, tag: "AUDITED" },
+    { label: "JurisGPT — unsupported claim", value: 32.5, display: "32.5%", color: C.gold, tag: "AUDITED" },
+    { label: "JurisGPT — invented authority", value: 2.5, display: "2.5%", color: C.burgundy, tag: "AUDITED" },
   ];
 
   return (
@@ -955,9 +964,10 @@ function BenchmarksSection() {
             </h2>
           </div>
           <p style={{ fontSize: 15, color: C.textSub, lineHeight: 1.65, margin: 0 }}>
-            Every number below comes from a public, peer-reviewed 120-query benchmark over 47,756 Indian legal
-            documents — with the corpus, scripts, and per-query results shipped in the repository, so anyone can
-            re-run them. We did, and they reproduce.
+            Every number below comes from a 120-query benchmark over 47,867 Indian legal documents, with queries
+            verified independently by three annotators (Fleiss&apos; κ&nbsp;=&nbsp;0.81) — and with the corpus,
+            scripts, and per-query results shipped in the repository, so anyone can re-run them. We did, and they
+            reproduce.
           </p>
         </div>
 
@@ -974,8 +984,9 @@ function BenchmarksSection() {
               <BenchBar key={row.label} {...row} max={1} active={inView} delay={i * 90} />
             ))}
             <p style={{ fontSize: 12.5, color: C.textMuted, margin: "18px 0 0", lineHeight: 1.6, borderTop: `1px solid ${C.borderSoft}`, paddingTop: 14 }}>
-              The study&apos;s core finding: bolting on a generic reranker <em>lowers</em> quality by 12–16 points
-              (p&nbsp;&lt;&nbsp;1e-4). So JurisGPT doesn&apos;t use one.
+              The study&apos;s core finding: bolting on a generic reranker <em>lowers</em> ranking quality by
+              8.7–16.3 nDCG@5 points (p&nbsp;&lt;&nbsp;1e-4) and costs 17× the retrieval latency. So JurisGPT
+              doesn&apos;t use one.
             </p>
           </div>
 
@@ -985,21 +996,23 @@ function BenchmarksSection() {
             </div>
             <div style={{ fontSize: 17, fontWeight: 700, color: C.ink, marginBottom: 4 }}>Answers with unsupported legal claims</div>
             <p style={{ fontSize: 13, color: C.textSub, margin: "0 0 24px", lineHeight: 1.55 }}>
-              Every claim in every answer checked against its cited sources (40-query audit). Lower is better.
+              Every claim in every answer checked against its cited sources (40-query audit). Lower is better. We
+              report two rates: any claim we could not trace, and the narrower case of inventing authority outright.
             </p>
             {hallucination.map((row, i) => (
               <BenchBar key={row.label} {...row} max={100} active={inView} delay={300 + i * 90} />
             ))}
             <p style={{ fontSize: 12.5, color: C.textMuted, margin: "18px 0 0", lineHeight: 1.6, borderTop: `1px solid ${C.borderSoft}`, paddingTop: 14 }}>
-              Industry ranges: Stanford studies of legal AI (2024). JurisGPT: independent claim-level audit of the
-              deployed pipeline — and not one answer invented a statute or case that doesn&apos;t exist.
+              Industry ranges: Stanford studies of legal AI (2024), measured under different protocols — treat the
+              comparison as indicative, not head-to-head. JurisGPT: claim-level audit of the deployed pipeline by an
+              LLM judge, on 40 queries. One answer in forty cited authority that does not exist.
             </p>
           </div>
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 12, marginTop: 20, padding: "16px 22px", background: C.warmGray, border: `1px solid ${C.border}`, borderRadius: 10 }}>
           <span style={{ fontFamily: "var(--font-jetbrains-mono)", fontSize: 11.5, color: C.textSub, letterSpacing: "0.04em" }}>
-            120 queries · 47,756 documents · reproduced from a fresh run · 06 Jul 2026
+            120 human-verified queries · 47,867 documents · 5 retrieval configurations · 07 Jul 2026
           </span>
           <a
             href="https://github.com/Bruhadev45/Juris-GPT"

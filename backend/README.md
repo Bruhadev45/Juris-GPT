@@ -132,8 +132,10 @@ docker build -t jurisgpt-api .
 docker run -p 8000:8000 --env-file .env jurisgpt-api
 ```
 
-### Railway/Render
+### Any container host
 
-1. Set environment variables in your hosting platform
+No hosting provider is configured in this repo. To deploy the image anywhere:
+
+1. Set environment variables in your hosting platform (see `.env.example`)
 2. Set build command: `pip install -r requirements.txt`
 3. Set start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`

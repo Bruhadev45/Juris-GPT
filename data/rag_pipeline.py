@@ -42,6 +42,7 @@ OBSIDIAN_ENABLED = os.getenv("OBSIDIAN_ENABLED", "true").lower() == "true"
 OBSIDIAN_VAULT_PATH = os.getenv("OBSIDIAN_VAULT_PATH", os.path.expanduser("~/Documents/Obsidian Vault"))
 STATUTE_SAMPLE_FILES = [
     "companies_act_sections.json",
+    "indian_contract_act_sections.json",
     "patent_act_sections.json",
     "trademark_act_sections.json",
     "income_tax_act_sections.json",
@@ -348,7 +349,8 @@ class JurisGPTRAG:
                 path=str(chroma_path),
                 settings=Settings(anonymized_telemetry=False)
             )
-            self.collection = client.get_collection("jurisgpt_legal")
+            collection_name = os.getenv("RAG_CHROMA_COLLECTION", "jurisgpt_legal")
+            self.collection = client.get_collection(collection_name)
             self.vector_store = "chroma"
             logger.info("ChromaDB loaded (%d vectors)", self.collection.count())
         except Exception as e:
@@ -661,6 +663,63 @@ class JurisGPTRAG:
         document["title_token_set"] = set(title_tokens)
         return document
 
+    def _verify_citations(self, answer: str, citations: List["Citation"]) -> str:
+        """Post-generation grounding audit: fix or strip misattributed [i] markers.
+
+        The dominant residual hallucination mode (see faithfulness evals) is a
+        true legal statement pinned to a retrieved source that does not state
+        it. A fast verifier pass checks every cited sentence against its
+        source and rewrites the answer so citations only appear where the
+        source actually supports the sentence. Disable with
+        RAG_VERIFY_CITATIONS=false. Fails open: any error returns the
+        original answer.
+        """
+        if os.getenv("RAG_VERIFY_CITATIONS", "true").lower() not in ("1", "true", "yes"):
+            return answer
+        if not answer or not citations or "[" not in answer:
+            return answer
+        try:
+            import anthropic
+
+            sources = "\n\n".join(
+                f"[{i}] {c.title}\n{c.content.strip()[:1200]}"
+                for i, c in enumerate(citations, 1)
+            )
+            prompt = f"""You are auditing a legal answer for citation accuracy. Here are the ONLY sources:
+
+{sources}
+
+Here is the answer:
+---
+{answer}
+---
+
+Rewrite the answer applying these rules, changing as little as possible:
+1. Keep a citation [i] on a sentence only if source i actually states that sentence's claim (paraphrase ok).
+2. If a claim is stated by a DIFFERENT listed source, fix the citation number.
+3. If no listed source states the claim, remove the citation marker and either delete the claim or rephrase it as "Beyond the provided sources: ...".
+4. Do not add new information. Keep formatting, headings, and tone.
+
+Return ONLY the corrected answer, no commentary."""
+            # Haiku keeps the per-message latency/cost of this always-on
+            # product pass small (per the operator's cost ceiling).
+            client = anthropic.Anthropic(max_retries=3)
+            resp = client.messages.create(
+                model="claude-haiku-4-5",
+                max_tokens=4000,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            if resp.stop_reason == "refusal":
+                return answer
+            verified = "".join(b.text for b in resp.content if b.type == "text").strip()
+            # Guard against degenerate rewrites (empty or drastically shorter).
+            if verified and len(verified) >= 0.4 * len(answer):
+                return verified
+            return answer
+        except Exception as exc:
+            logger.warning("Citation verification skipped: %s", exc)
+            return answer
+
     @staticmethod
     def _content_to_text(content: Any) -> str:
         """Normalize LangChain message content to a plain string.
@@ -852,15 +911,36 @@ class JurisGPTRAG:
             return [item.strip() for item in env_value.split(",") if item.strip()]
         return DEFAULT_CLOUD_CORPUS_FILES.copy()
 
-    def _build_spaces_client(self):
-        """Build an S3-compatible client for DigitalOcean Spaces."""
+    def _build_spaces_client(self) -> Optional[Any]:
+        """Build an S3-compatible client for the corpus bucket.
+
+        Two modes, chosen by whether an endpoint override is present:
+
+        - DigitalOcean Spaces (endpoint set): authenticates with the explicit
+          key pair, since Spaces has no ambient credential source.
+        - Native AWS S3 (no endpoint): omits both the endpoint and the keys so
+          botocore resolves credentials itself. On ECS that is the task role,
+          which means no long-lived access keys exist to leak or rotate.
+        """
         access_key = os.getenv("DO_SPACES_KEY")
         secret_key = os.getenv("DO_SPACES_SECRET")
         endpoint = os.getenv("DO_SPACES_ENDPOINT")
-        region = os.getenv("DO_SPACES_REGION")
+        region = os.getenv("DO_SPACES_REGION") or os.getenv("AWS_REGION")
 
-        if not access_key or not secret_key or not endpoint:
-            self.corpus_error = "DigitalOcean Spaces is not fully configured."
+        uses_custom_endpoint = bool(endpoint)
+
+        if uses_custom_endpoint and not (access_key and secret_key):
+            self.corpus_error = (
+                "DigitalOcean Spaces is not fully configured: DO_SPACES_ENDPOINT "
+                "is set but DO_SPACES_KEY/DO_SPACES_SECRET are missing."
+            )
+            return None
+
+        if not uses_custom_endpoint and not region:
+            self.corpus_error = (
+                "Native S3 corpus loading needs a region: set DO_SPACES_REGION "
+                "or AWS_REGION."
+            )
             return None
 
         try:
@@ -869,13 +949,19 @@ class JurisGPTRAG:
             self.corpus_error = "boto3 is not installed, so cloud corpus loading is unavailable."
             return None
 
-        return boto3.client(
-            "s3",
-            region_name=region,
-            endpoint_url=endpoint,
-            aws_access_key_id=access_key,
-            aws_secret_access_key=secret_key,
-        )
+        client_kwargs: Dict[str, Any] = {"region_name": region}
+
+        if uses_custom_endpoint:
+            client_kwargs["endpoint_url"] = endpoint
+            client_kwargs["aws_access_key_id"] = access_key
+            client_kwargs["aws_secret_access_key"] = secret_key
+        elif access_key and secret_key:
+            # Explicit keys against native S3 — supported, but the task role
+            # is preferred wherever it is available.
+            client_kwargs["aws_access_key_id"] = access_key
+            client_kwargs["aws_secret_access_key"] = secret_key
+
+        return boto3.client("s3", **client_kwargs)
 
     def _load_cloud_json(self, s3_client, bucket: str, object_key: str) -> List[Dict[str, Any]]:
         """Load a JSON corpus file from cloud storage and cache it locally."""
@@ -1489,6 +1575,7 @@ CONTEXT FROM LEGAL CORPUS:
                 # blocks; downstream (pydantic schemas, SSE, evaluator) all
                 # require a plain string.
                 answer = self._content_to_text(response.content)
+                answer = self._verify_citations(answer, citations)
 
                 follow_ups = self._generate_follow_ups(query, citations)
                 model_name = "anthropic" if self.llm_type == "anthropic" else "openai"

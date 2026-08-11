@@ -1,4 +1,4 @@
-# Backend container for Railway/Render/Fly.
+# Backend container for the JurisGPT API.
 # Targets the Python FastAPI backend at ./backend, with read access to ./data
 # (the chatbot service imports rag_pipeline.py from ../data).
 
@@ -29,7 +29,7 @@ COPY . /app
 # Make sure runtime can find the data folder relative to backend.
 WORKDIR /app/backend
 
-# Hosts using $PORT (Railway, Render, Fly) — the start command honors it.
+# Hosts that inject $PORT are honored by the start command below.
 EXPOSE 8000
 
 # Default to 8000 if PORT isn't injected; the start command interpolates it.

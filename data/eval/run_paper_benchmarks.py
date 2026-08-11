@@ -64,6 +64,8 @@ class RAGConfig:
     hybrid_search: bool
     use_reranker: bool
     vector_store_type: str = "lexical"  # "lexical" | "chroma"
+    embedding_model: Optional[str] = None  # None -> MiniLM (legacy store default)
+    chroma_collection: Optional[str] = None  # None -> default "jurisgpt_legal"
 
 
 PAPER_CONFIGS: Dict[str, RAGConfig] = {
@@ -104,6 +106,30 @@ PAPER_CONFIGS: Dict[str, RAGConfig] = {
         use_reranker=True,
         vector_store_type="chroma",
     ),
+    "dense_minilm_full": RAGConfig(
+        name="dense_minilm_full",
+        description=(
+            "Dense MiniLM retrieval over the full-corpus Chroma index "
+            "(all-MiniLM-L6-v2, 384d, cosine; built by build_dense_indexes.py)"
+        ),
+        hybrid_search=False,
+        use_reranker=False,
+        vector_store_type="chroma",
+        chroma_collection="jurisgpt_minilm_full",
+    ),
+    "dense_inlegalbert": RAGConfig(
+        name="dense_inlegalbert",
+        description=(
+            "Dense InLegalBERT retrieval over the full-corpus Chroma index "
+            "(law-ai/InLegalBERT, 768d CLS-pooled, cosine; built by "
+            "build_dense_indexes.py)"
+        ),
+        hybrid_search=False,
+        use_reranker=False,
+        vector_store_type="chroma",
+        embedding_model="law-ai/InLegalBERT",
+        chroma_collection="jurisgpt_inlegalbert_full",
+    ),
 }
 
 # Override the rerank flag for the rerank configurations after dataclass
@@ -134,12 +160,20 @@ def _build_rag_for_config(config: RAGConfig, *, force_lexical: bool):
         os.environ.pop("RAG_USE_RERANKER", None)
 
     if config.vector_store_type == "chroma":
-        # Match the existing 28k-vector Chroma store, which was built with
-        # all-MiniLM-L6-v2 (384d). Using InLegalBERT here would crash at
-        # query time (dim mismatch).
-        os.environ["EMBEDDING_MODEL"] = "sentence-transformers/all-MiniLM-L6-v2"
+        # The embedding model must match the one the target collection was
+        # built with, or query-time dimensions mismatch. The legacy
+        # "jurisgpt_legal" store is MiniLM (384d); the full-corpus stores
+        # built by build_dense_indexes.py declare their model per config.
+        os.environ["EMBEDDING_MODEL"] = (
+            config.embedding_model or "sentence-transformers/all-MiniLM-L6-v2"
+        )
+        if config.chroma_collection:
+            os.environ["RAG_CHROMA_COLLECTION"] = config.chroma_collection
+        else:
+            os.environ.pop("RAG_CHROMA_COLLECTION", None)
         store_type = "chroma"
     else:
+        os.environ.pop("RAG_CHROMA_COLLECTION", None)
         store_type = "lexical" if force_lexical else "chroma"
 
     rag = RAG_MOD.JurisGPTRAG(
@@ -328,9 +362,22 @@ def main() -> None:
         action="store_true",
         help="Allow the configuration to attach to a Chroma/FAISS vector store",
     )
+    parser.add_argument(
+        "--benchmark-file",
+        type=Path,
+        default=None,
+        help=(
+            "Alternative benchmark JSON (e.g. benchmark_queries_expanded.json); "
+            "defaults to the 120-query human-verified set"
+        ),
+    )
     args = parser.parse_args()
 
-    benchmark = EVAL_MOD.load_benchmark()
+    if args.benchmark_file:
+        with args.benchmark_file.open("r", encoding="utf-8") as f:
+            benchmark = json.load(f)
+    else:
+        benchmark = EVAL_MOD.load_benchmark()
     queries: List[Dict[str, Any]] = benchmark["queries"]
     if args.max_queries:
         queries = queries[: args.max_queries]
