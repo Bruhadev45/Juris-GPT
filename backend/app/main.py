@@ -73,7 +73,23 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS middleware (must be first)
+# Middleware order note: add_middleware() PREPENDS, so the LAST one added is
+# the OUTERMOST layer. CORS must therefore be added last — otherwise it sits
+# inside CSRF/rate-limiting and any response those short-circuit (403, 429)
+# goes out with no Access-Control-Allow-Origin, which the browser reports as
+# an opaque network failure instead of the real status.
+
+# Audit logging middleware (innermost — sees the resolved route)
+app.add_middleware(AuditLogMiddleware)
+
+# Rate limiting middleware
+app.add_middleware(RateLimitMiddleware)
+
+# CSRF protection middleware
+app.add_middleware(CSRFMiddleware)
+
+# CORS middleware (added last so it is the outermost layer and can attach
+# CORS headers to every response, including middleware-generated errors)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
@@ -81,15 +97,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# CSRF protection middleware (after CORS, before rate limiting)
-app.add_middleware(CSRFMiddleware)
-
-# Rate limiting middleware
-app.add_middleware(RateLimitMiddleware)
-
-# Audit logging middleware
-app.add_middleware(AuditLogMiddleware)
 
 
 # ============== Health & Info Endpoints ==============
