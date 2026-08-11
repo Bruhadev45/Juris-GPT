@@ -171,9 +171,19 @@ function SectionLabel({ num, children, color = C.burgundy }: { num: string; chil
   );
 }
 
+// Single source for the section links so the desktop row and the mobile
+// disclosure panel can never drift apart.
+const NAV_ITEMS = [
+  { label: "What you can ask", href: "#features" },
+  { label: "How it works", href: "#how" },
+  { label: "Benchmarks", href: "#benchmarks" },
+  { label: "FAQ", href: "#faq" },
+];
+
 function Nav({ onOpenApp }: { onOpenApp: () => void }) {
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   void onOpenApp; // kept for backwards-compat; nav now routes to auth pages
 
@@ -209,18 +219,39 @@ function Nav({ onOpenApp }: { onOpenApp: () => void }) {
         <span style={{ fontWeight: 700, fontSize: 17, letterSpacing: "-0.02em", color: C.ink }}>JurisGPT</span>
       </div>
       <div className="lp-nav-links" style={{ display: "flex", gap: 28, alignItems: "center" }}>
-        {[
-          { label: "What you can ask", href: "#features" },
-          { label: "How it works", href: "#how" },
-          { label: "Benchmarks", href: "#benchmarks" },
-          { label: "FAQ", href: "#faq" },
-        ].map((item) => (
+        {NAV_ITEMS.map((item) => (
           <a key={item.label} href={item.href} style={{ color: C.inkSoft, fontSize: 13.5, textDecoration: "none", fontWeight: 500, opacity: 0.75 }}>
             {item.label}
           </a>
         ))}
       </div>
       <div className="lp-nav-buttons" style={{ display: "flex", gap: 8, alignItems: "center", flexShrink: 0 }}>
+        {/* Below 900px the inline nav links are hidden; this toggle is the only
+            way left to reach the page sections, so it must appear at exactly
+            the breakpoint that hides them. */}
+        <button
+          className="lp-nav-toggle"
+          aria-expanded={menuOpen}
+          aria-controls="lp-mobile-nav"
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          onClick={() => setMenuOpen((v) => !v)}
+          style={{ display: "none", width: 40, height: 40, alignItems: "center", justifyContent: "center", background: "transparent", border: "none", borderRadius: 8, cursor: "pointer", color: C.ink }}
+        >
+          <svg width="18" height="14" viewBox="0 0 18 14" aria-hidden>
+            {menuOpen ? (
+              <g stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                <line x1="2" y1="2" x2="16" y2="12" />
+                <line x1="16" y1="2" x2="2" y2="12" />
+              </g>
+            ) : (
+              <g stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                <line x1="1" y1="2" x2="17" y2="2" />
+                <line x1="1" y1="7" x2="17" y2="7" />
+                <line x1="1" y1="12" x2="17" y2="12" />
+              </g>
+            )}
+          </svg>
+        </button>
         <button onClick={() => router.push("/login")} className="lp-signin-btn" style={{ padding: "7px 14px", background: "transparent", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 13.5, color: C.inkSoft, fontWeight: 500, whiteSpace: "nowrap" }}>
           Sign in
         </button>
@@ -228,6 +259,36 @@ function Nav({ onOpenApp }: { onOpenApp: () => void }) {
           <span className="lp-btn-text">Sign up</span>
         </button>
       </div>
+
+      {menuOpen && (
+        <div
+          id="lp-mobile-nav"
+          className="lp-mobile-nav"
+          style={{
+            position: "absolute",
+            top: 64,
+            left: 0,
+            right: 0,
+            background: "rgba(250,246,239,0.97)",
+            backdropFilter: "blur(12px)",
+            borderBottom: `1px solid ${C.border}`,
+            padding: "8px 18px 16px",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          {NAV_ITEMS.map((item) => (
+            <a
+              key={item.label}
+              href={item.href}
+              onClick={() => setMenuOpen(false)}
+              style={{ color: C.inkSoft, fontSize: 15, textDecoration: "none", fontWeight: 500, padding: "13px 4px", borderBottom: `1px solid ${C.borderSoft}` }}
+            >
+              {item.label}
+            </a>
+          ))}
+        </div>
+      )}
     </nav>
   );
 }
@@ -1225,15 +1286,20 @@ export default function Home() {
         @media (max-width: 900px) {
           .lp-nav { padding: 0 18px !important; }
           .lp-nav-links { display: none !important; }
+          /* Revealed at exactly the width that hides the inline links. */
+          .lp-nav-toggle { display: inline-flex !important; }
           .lp-hero-grid, .lp-section-header { grid-template-columns: 1fr !important; gap: 36px !important; }
           .lp-stats-grid, .lp-card-grid, .lp-step-grid, .lp-footer-grid, .lp-bench-grid { grid-template-columns: 1fr !important; }
           .lp-comparison { overflow-x: auto !important; }
           section { padding-left: 18px !important; padding-right: 18px !important; }
         }
         @media (max-width: 640px) {
-          .lp-signin-btn { display: none !important; }
-          .lp-btn-text { display: none !important; }
-          .lp-dark-button { padding: 10px !important; border-radius: 10px !important; }
+          /* Both auth CTAs stay labelled on phones. Hiding .lp-btn-text left
+             the Sign up button with no content at all — a burgundy square with
+             no text, no icon and no accessible name. Tightening the type and
+             padding fits "Sign in" + "Sign up" in 390px with room to spare. */
+          .lp-signin-btn { padding: 7px 10px !important; font-size: 13px !important; }
+          .lp-dark-button { padding: 8px 14px !important; font-size: 13px !important; }
         }
       `}</style>
       <Nav onOpenApp={openApp} />
