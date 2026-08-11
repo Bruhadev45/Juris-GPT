@@ -99,3 +99,4 @@ backend/models/.cache/
 
 # Claude Code machine-local settings (leaked a live API key once — keep out of git)
 .claude/settings.local.json
+.gstack/
