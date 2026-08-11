@@ -5,9 +5,9 @@ Implements double-submit cookie pattern for CSRF protection
 
 import secrets
 from typing import Optional
-from fastapi import Request, HTTPException, APIRouter
+from fastapi import Request, APIRouter
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import Response
+from starlette.responses import JSONResponse, Response
 
 CSRF_COOKIE_NAME = "csrf_token"
 CSRF_HEADER_NAME = "X-CSRF-Token"
@@ -85,9 +85,14 @@ class CSRFMiddleware(BaseHTTPMiddleware):
             header_token = request.headers.get(CSRF_HEADER_NAME)
 
             if not validate_csrf_token(cookie_token, header_token):
-                raise HTTPException(
+                # Return a response rather than raising: FastAPI's HTTPException
+                # handlers only run inside the routing layer, so an exception
+                # raised here escapes as a bare 500 with no CORS headers — the
+                # browser then reports ERR_FAILED and the client cannot read
+                # the status. Returning lets the outer CORSMiddleware wrap it.
+                return JSONResponse(
                     status_code=403,
-                    detail="CSRF token validation failed"
+                    content={"detail": "CSRF token validation failed"},
                 )
 
         # Process request
